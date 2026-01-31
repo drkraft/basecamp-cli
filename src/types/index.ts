@@ -236,6 +236,23 @@ export interface BasecampCampfireLine {
    content: string;
 }
 
+export interface BasecampComment {
+   id: number;
+   status: string;
+   visible_to_clients: boolean;
+   created_at: string;
+   updated_at: string;
+   title: string;
+   inherits_status: boolean;
+   type: string;
+   url: string;
+   app_url: string;
+   parent: BasecampParent;
+   bucket: BasecampBucket;
+   creator: BasecampPerson;
+   content: string;
+}
+
 export interface BasecampRecording {
    id: number;
    status: string;
