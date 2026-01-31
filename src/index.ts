@@ -8,10 +8,7 @@ import { createMessagesCommands } from './commands/messages.js';
 import { createCampfiresCommands } from './commands/campfires.js';
 import { createPeopleCommands } from './commands/people.js';
 import { createCommentsCommands } from './commands/comments.js';
-import { createVaultsCommands } from './commands/vaults.js';
-import { createDocumentsCommands } from './commands/documents.js';
-import { createUploadsCommands } from './commands/uploads.js';
-import { createWebhooksCommands } from './commands/webhooks.js';
+import { createSchedulesCommands } from './commands/schedules.js';
 
 const program = new Command();
 
@@ -34,9 +31,6 @@ program.addCommand(createMessagesCommands());
 program.addCommand(createCampfiresCommands());
 program.addCommand(createPeopleCommands());
 program.addCommand(createCommentsCommands());
-program.addCommand(createVaultsCommands());
-program.addCommand(createDocumentsCommands());
-program.addCommand(createUploadsCommands());
-program.addCommand(createWebhooksCommands());
+program.addCommand(createSchedulesCommands());
 
 program.parse();
