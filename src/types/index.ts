@@ -486,3 +486,31 @@ export interface PaginatedResponse<T> {
   nextPage?: string;
   totalCount?: number;
 }
+
+export interface BasecampSearchResult {
+  id: number;
+  status: string;
+  visible_to_clients: boolean;
+  created_at: string;
+  updated_at: string;
+  title: string;
+  inherits_status: boolean;
+  type: string;
+  url: string;
+  app_url: string;
+  bookmark_url: string;
+  subscription_url: string;
+  comments_count: number;
+  comments_url: string;
+  parent: BasecampParent;
+  bucket: BasecampBucket;
+  creator: BasecampPerson;
+  content?: string;
+  description?: string;
+  plain_text_content?: string;
+  starts_on?: string | null;
+  due_on?: string | null;
+  assignees?: BasecampPerson[];
+  completion_subscribers?: BasecampPerson[];
+  completion_url?: string;
+}
