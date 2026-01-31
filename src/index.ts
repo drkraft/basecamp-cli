@@ -11,6 +11,7 @@ import { createCommentsCommands } from './commands/comments.js';
 import { createVaultsCommands } from './commands/vaults.js';
 import { createDocumentsCommands } from './commands/documents.js';
 import { createUploadsCommands } from './commands/uploads.js';
+import { createWebhooksCommands } from './commands/webhooks.js';
 
 const program = new Command();
 
@@ -36,5 +37,6 @@ program.addCommand(createCommentsCommands());
 program.addCommand(createVaultsCommands());
 program.addCommand(createDocumentsCommands());
 program.addCommand(createUploadsCommands());
+program.addCommand(createWebhooksCommands());
 
 program.parse();
