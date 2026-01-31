@@ -50,6 +50,40 @@ async function fetchAllPages<T>(
   return allResults;
 }
 
+// Retry configuration for handling rate limits and server errors
+function getRetryConfig() {
+  return {
+    limit: 3,
+    methods: ['GET', 'HEAD', 'PUT', 'DELETE', 'OPTIONS', 'TRACE', 'POST'],
+    statusCodes: [429, 500, 502, 503, 504],
+    errorCodes: [],
+    calculateDelay: ({ attemptCount }: { attemptCount: number }) => {
+      // Exponential backoff: 1s, 2s, 4s
+      return Math.pow(2, attemptCount - 1) * 1000;
+    }
+  };
+}
+
+// Helper to extract retry delay from Retry-After header
+function getRetryAfterDelay(response: any): number | undefined {
+  const retryAfter = response.headers['retry-after'];
+  if (!retryAfter) return undefined;
+
+  // Retry-After can be in seconds or HTTP-date format
+  const seconds = parseInt(retryAfter, 10);
+  if (!isNaN(seconds)) {
+    return seconds * 1000;
+  }
+
+  // Try parsing as HTTP-date
+  const retryDate = new Date(retryAfter);
+  if (!isNaN(retryDate.getTime())) {
+    return Math.max(0, retryDate.getTime() - Date.now());
+  }
+
+  return undefined;
+}
+
 async function createClient(): Promise<Got> {
   const accessToken = await getValidAccessToken();
   const accountId = getCurrentAccountId();
@@ -66,17 +100,34 @@ async function createClient(): Promise<Got> {
       'Content-Type': 'application/json'
     },
     responseType: 'json',
+    retry: getRetryConfig(),
     hooks: {
+      beforeRetry: [
+        ({ response, retryCount }) => {
+          if (response && response.statusCode === 429) {
+            const retryAfter = getRetryAfterDelay(response);
+            if (retryAfter !== undefined) {
+              console.error(chalk.yellow(`Rate limited. Retrying after ${Math.ceil(retryAfter / 1000)}s (attempt ${retryCount})`));
+            } else {
+              console.error(chalk.yellow(`Rate limited. Retrying with exponential backoff (attempt ${retryCount})`));
+            }
+          } else if (response && [500, 502, 503, 504].includes(response.statusCode)) {
+            console.error(chalk.yellow(`Server error (${response.statusCode}). Retrying with exponential backoff (attempt ${retryCount})`));
+          }
+        }
+      ],
       beforeError: [
         (error) => {
           if (error instanceof HTTPError) {
             const { response } = error;
             if (response.statusCode === 429) {
-              console.error(chalk.yellow('Rate limited. Please wait and try again.'));
+              console.error(chalk.red('Rate limited. Max retries exceeded. Please wait and try again.'));
             } else if (response.statusCode === 401) {
               console.error(chalk.red('Authentication failed. Please run: basecamp auth login'));
             } else if (response.statusCode === 404) {
               console.error(chalk.red('Resource not found.'));
+            } else if ([500, 502, 503, 504].includes(response.statusCode)) {
+              console.error(chalk.red(`Server error (${response.statusCode}). Max retries exceeded.`));
             }
           }
           return error;
