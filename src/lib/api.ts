@@ -661,3 +661,52 @@ export async function search(
   
   return fetchAllPages<BasecampSearchResult>(client, `search.json?${params.toString()}`);
 }
+
+// Recordings
+export async function listRecordings(
+  type: string,
+  options?: {
+    bucket?: string | number[];
+    status?: 'active' | 'archived' | 'trashed';
+    sort?: 'created_at' | 'updated_at';
+    direction?: 'asc' | 'desc';
+  }
+): Promise<BasecampRecording[]> {
+  const client = await createClient();
+  const params = new URLSearchParams();
+  params.append('type', type);
+  
+  if (options?.bucket) {
+    const bucketValue = Array.isArray(options.bucket) 
+      ? options.bucket.join(',') 
+      : options.bucket;
+    params.append('bucket', bucketValue.toString());
+  }
+  if (options?.status) params.append('status', options.status);
+  if (options?.sort) params.append('sort', options.sort);
+  if (options?.direction) params.append('direction', options.direction);
+  
+  const url = `projects/recordings.json?${params.toString()}`;
+  return fetchAllPages<BasecampRecording>(client, url);
+}
+
+export async function archiveRecording(projectId: number, recordingId: number): Promise<void> {
+  const client = await createClient();
+  await client.put(`buckets/${projectId}/recordings/${recordingId}/status/archived.json`);
+}
+
+export async function unarchiveRecording(projectId: number, recordingId: number): Promise<void> {
+  const client = await createClient();
+  await client.put(`buckets/${projectId}/recordings/${recordingId}/status/active.json`);
+}
+
+export async function trashRecording(projectId: number, recordingId: number): Promise<void> {
+  const client = await createClient();
+  await client.put(`buckets/${projectId}/recordings/${recordingId}/status/trashed.json`);
+}
+
+// Events
+export async function listEvents(projectId: number, recordingId: number): Promise<BasecampEvent[]> {
+  const client = await createClient();
+  return fetchAllPages<BasecampEvent>(client, `buckets/${projectId}/recordings/${recordingId}/events.json`);
+}
