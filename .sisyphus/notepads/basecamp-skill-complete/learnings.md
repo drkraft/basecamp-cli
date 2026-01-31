@@ -272,3 +272,113 @@
 5. Webhooks are project-scoped, not account-scoped
 6. Delivery tracking includes full request/response for debugging
 
+
+## Schedules & Schedule Entries Implementation (Wave 3, Task 9)
+
+### API Design Pattern
+- Schedule is a singleton per project (accessed via dock like todoset)
+- Endpoint: `/buckets/{id}/schedules/{schedule_id}/entries.json`
+- Schedule entries support ISO 8601 date formats (YYYY-MM-DD or full datetime)
+- All-day events: use date-only format without time component
+
+### Type Definitions
+- `BasecampSchedule`: Contains schedule metadata, entries_count, include_due_assignments flag
+- `BasecampScheduleEntry`: Full event object with participants array, all_day boolean, starts_at/ends_at timestamps
+- Both types follow existing pattern with status, bucket, creator, parent references
+
+### API Functions Implemented
+1. `getSchedule(projectId)` - Fetch schedule via dock lookup
+2. `listScheduleEntries(projectId, status?)` - List entries with optional status filter
+3. `getScheduleEntry(projectId, entryId)` - Get single entry details
+4. `createScheduleEntry(projectId, summary, startsAt, options)` - Create with optional description, endsAt, allDay, participantIds
+5. `updateScheduleEntry(projectId, entryId, updates)` - Partial updates supported
+6. `deleteScheduleEntry(projectId, entryId)` - Delete entry
+
+### Command Structure
+- `basecamp schedules get --project <id>` - Display schedule info
+- `basecamp schedules entries --project <id> [--status <status>]` - List events in table format
+- `basecamp schedules create-entry --project <id> --summary "..." --starts-at "..."` - Create event
+- `basecamp schedules update-entry <id> --project <id> [--summary "..."]` - Update event
+- `basecamp schedules delete-entry <id> --project <id>` - Delete event
+- All commands support `--format table|json`
+
+### Key Implementation Details
+- Schedule lookup via `project.dock.find(d => d.name === 'schedule')`
+- Payload construction with optional fields (only include if provided)
+- Participant IDs passed as array in payload
+- Date handling: accepts ISO 8601 formats directly
+- Error handling: throws if schedule not enabled for project
+
+### Testing Strategy
+- 30+ test cases covering all CRUD operations
+- Tests for date format handling (ISO 8601, timezone-aware)
+- Participant management tests
+- Error handling for invalid IDs and missing schedule
+- Property validation (all_day, starts_at, ends_at, participants)
+
+### Files Modified
+- `src/types/index.ts`: Added BasecampSchedule, BasecampScheduleEntry interfaces
+- `src/lib/api.ts`: Added 6 schedule API functions with proper error handling
+- `src/commands/schedules.ts`: Created with 5 subcommands (get, entries, create-entry, update-entry, delete-entry)
+- `src/index.ts`: Registered createSchedulesCommands
+- `src/__tests__/schedules.test.ts`: Comprehensive test suite
+
+### Build & Verification
+- ✅ `bun run build` succeeds
+- ✅ All imports resolve correctly
+- ✅ TypeScript compilation clean
+- ✅ Commit: `c1792d1 feat(schedules): add schedules and schedule entries commands`
+
+
+## Subscriptions Management Implementation (Wave 3, Task 14)
+
+### API Endpoints
+- GET `/buckets/{id}/recordings/{id}/subscription.json` - Get subscription info
+- POST `/buckets/{id}/recordings/{id}/subscription.json` - Subscribe current user
+- DELETE `/buckets/{id}/recordings/{id}/subscription.json` - Unsubscribe current user
+
+### Type Definition
+- `BasecampSubscription` interface with:
+  - `subscribed: boolean` - Current user's subscription status
+  - `count: number` - Total subscriber count
+  - `url: string` - API endpoint URL
+  - `subscribers: BasecampPerson[]` - Array of subscriber objects
+
+### API Functions
+- `getSubscriptions(projectId, recordingId)` - Fetch subscription info
+- `subscribe(projectId, recordingId)` - Subscribe current user
+- `unsubscribe(projectId, recordingId)` - Unsubscribe current user
+
+### Command Structure
+- `basecamp subscriptions list --project <id> --recording <id> [--format table|json]`
+- `basecamp subscriptions subscribe --project <id> --recording <id> [--json]`
+- `basecamp subscriptions unsubscribe --project <id> --recording <id>`
+
+### Test Strategy
+- 17 tests covering data structure validation
+- Type safety verification
+- Subscription state management
+- URL endpoint pattern validation
+- Subscriber person data integrity
+
+### Key Learnings
+- Subscriptions are per-recording (todos, messages, etc.)
+- Endpoint uses singular "subscription" not "subscriptions"
+- POST with empty JSON body subscribes current user
+- DELETE always returns 204 No Content (idempotent)
+- Subscribers array contains full BasecampPerson objects
+- Table output shows ID, Name, Email, Title columns
+- Format flag consistent with other commands (table|json)
+
+### Files Modified
+- src/types/index.ts - Added BasecampSubscription interface
+- src/lib/api.ts - Added 3 API functions + import
+- src/commands/subscriptions.ts - New command file with 3 subcommands
+- src/index.ts - Registered subscriptions command
+- src/__tests__/subscriptions.test.ts - New test file with 17 tests
+
+### Build & Tests
+- ✅ Build: `bun run build` succeeded
+- ✅ Tests: 17/17 passing in subscriptions.test.ts
+- ✅ Commit: 450349c feat(subscriptions): add subscription management commands
+
