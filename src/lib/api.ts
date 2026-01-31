@@ -3,15 +3,16 @@ import chalk from 'chalk';
 import { getValidAccessToken } from './auth.js';
 import { getCurrentAccountId } from './config.js';
 import type {
-  BasecampProject,
-  BasecampTodoList,
-  BasecampTodo,
-  BasecampMessage,
-  BasecampCampfire,
-  BasecampCampfireLine,
-  BasecampPerson,
-  BasecampDock
-} from '../types/index.js';
+   BasecampProject,
+   BasecampTodoList,
+   BasecampTodo,
+   BasecampMessage,
+   BasecampCampfire,
+   BasecampCampfireLine,
+   BasecampPerson,
+   BasecampDock,
+   BasecampTodolistGroup
+ } from '../types/index.js';
 
 const USER_AGENT = '@drkraft/basecamp-cli (contact@drkraft.com)';
 
@@ -257,6 +258,22 @@ export async function completeTodo(projectId: number, todoId: number): Promise<v
 export async function uncompleteTodo(projectId: number, todoId: number): Promise<void> {
   const client = await createClient();
   await client.delete(`buckets/${projectId}/todos/${todoId}/completion.json`);
+}
+
+// Todolist Groups
+export async function listTodolistGroups(projectId: number, todolistId: number): Promise<BasecampTodolistGroup[]> {
+  const client = await createClient();
+  return fetchAllPages<BasecampTodolistGroup>(client, `buckets/${projectId}/todolists/${todolistId}/groups.json`);
+}
+
+export async function createTodolistGroup(projectId: number, todolistId: number, name: string, color?: string): Promise<BasecampTodolistGroup> {
+  const client = await createClient();
+  const json: { name: string; color?: string } = { name };
+  if (color) json.color = color;
+  const response = await client.post(`buckets/${projectId}/todolists/${todolistId}/groups.json`, {
+    json
+  }).json<BasecampTodolistGroup>();
+  return response;
 }
 
 // Messages

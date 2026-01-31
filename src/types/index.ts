@@ -79,36 +79,64 @@ export interface BasecampTodoList {
 }
 
 export interface BasecampTodo {
-  id: number;
-  status: string;
-  visible_to_clients: boolean;
-  created_at: string;
-  updated_at: string;
-  title: string;
-  inherits_status: boolean;
-  type: string;
-  url: string;
-  app_url: string;
-  bookmark_url: string;
-  subscription_url: string;
-  comments_count: number;
-  comments_url: string;
-  parent: BasecampParent;
-  bucket: BasecampBucket;
-  creator: BasecampPerson;
-  description: string;
-  completed: boolean;
-  content: string;
-  starts_on: string | null;
-  due_on: string | null;
-  assignees: BasecampPerson[];
-  completion_subscribers: BasecampPerson[];
-  completion_url: string;
-  completion?: {
-    created_at: string;
-    creator: BasecampPerson;
-  };
-}
+   id: number;
+   status: string;
+   visible_to_clients: boolean;
+   created_at: string;
+   updated_at: string;
+   title: string;
+   inherits_status: boolean;
+   type: string;
+   url: string;
+   app_url: string;
+   bookmark_url: string;
+   subscription_url: string;
+   comments_count: number;
+   comments_url: string;
+   parent: BasecampParent;
+   bucket: BasecampBucket;
+   creator: BasecampPerson;
+   description: string;
+   completed: boolean;
+   content: string;
+   starts_on: string | null;
+   due_on: string | null;
+   assignees: BasecampPerson[];
+   completion_subscribers: BasecampPerson[];
+   completion_url: string;
+   completion?: {
+     created_at: string;
+     creator: BasecampPerson;
+   };
+ }
+
+ export interface BasecampTodolistGroup {
+   id: number;
+   status: string;
+   visible_to_clients: boolean;
+   created_at: string;
+   updated_at: string;
+   title: string;
+   inherits_status: boolean;
+   type: string;
+   url: string;
+   app_url: string;
+   bookmark_url: string;
+   subscription_url: string;
+   comments_count: number;
+   comments_url: string;
+   position: number;
+   parent: BasecampParent;
+   bucket: BasecampBucket;
+   creator: BasecampPerson;
+   description: string;
+   completed: boolean;
+   completed_ratio: string;
+   name: string;
+   todos_url: string;
+   group_position_url: string;
+   app_todos_url: string;
+ }
 
 export interface BasecampParent {
   id: number;
@@ -192,6 +220,66 @@ export interface BasecampCampfire {
 }
 
 export interface BasecampCampfireLine {
+   id: number;
+   status: string;
+   visible_to_clients: boolean;
+   created_at: string;
+   updated_at: string;
+   title: string;
+   inherits_status: boolean;
+   type: string;
+   url: string;
+   app_url: string;
+   parent: BasecampParent;
+   bucket: BasecampBucket;
+   creator: BasecampPerson;
+   content: string;
+}
+
+export interface BasecampRecording {
+   id: number;
+   status: string;
+   visible_to_clients: boolean;
+   created_at: string;
+   updated_at: string;
+   title: string;
+   inherits_status: boolean;
+   type: string;
+   url: string;
+   app_url: string;
+   bookmark_url: string;
+   subscription_url: string;
+   comments_count: number;
+   comments_url: string;
+   parent: BasecampParent;
+   bucket: BasecampBucket;
+   creator: BasecampPerson;
+   content?: string;
+   subject?: string;
+   description?: string;
+   completed?: boolean;
+   due_on?: string | null;
+   starts_on?: string | null;
+   assignees?: BasecampPerson[];
+}
+
+export interface BasecampEvent {
+   id: number;
+   recording_id: number;
+   action: string;
+   details: Record<string, any>;
+   created_at: string;
+   creator: BasecampPerson;
+}
+
+export interface BasecampSubscription {
+  subscribed: boolean;
+  count: number;
+  url: string;
+  subscribers: BasecampPerson[];
+}
+
+export interface BasecampCardTable {
   id: number;
   status: string;
   visible_to_clients: boolean;
@@ -202,10 +290,140 @@ export interface BasecampCampfireLine {
   type: string;
   url: string;
   app_url: string;
+  bookmark_url: string;
+  subscription_url: string;
+  bucket: BasecampBucket;
+  creator: BasecampPerson;
+  subscribers: BasecampPerson[];
+  lists: BasecampColumn[];
+}
+
+export interface BasecampColumn {
+  id: number;
+  status: string;
+  visible_to_clients: boolean;
+  created_at: string;
+  updated_at: string;
+  title: string;
+  inherits_status: boolean;
+  type: string;
+  url: string;
+  app_url: string;
+  bookmark_url: string;
+  position?: number;
+  parent: BasecampParent;
+  bucket: BasecampBucket;
+  creator: BasecampPerson;
+  description: string | null;
+  subscribers: BasecampPerson[];
+  color: string | null;
+  cards_count: number;
+  comment_count: number;
+  cards_url: string;
+}
+
+export interface BasecampCard {
+  id: number;
+  status: string;
+  visible_to_clients: boolean;
+  created_at: string;
+  updated_at: string;
+  title: string;
+  inherits_status: boolean;
+  type: string;
+  url: string;
+  app_url: string;
+  bookmark_url: string;
+  subscription_url: string;
+  comments_count: number;
+  comments_url: string;
+  position: number;
+  parent: BasecampParent;
+  bucket: BasecampBucket;
+  creator: BasecampPerson;
+  description: string;
+  completed: boolean;
+  content: string;
+  due_on: string | null;
+  assignees: BasecampPerson[];
+  completion_subscribers: BasecampPerson[];
+  completion_url: string;
+  comment_count: number;
+}
+
+export interface BasecampVault {
+  id: number;
+  status: string;
+  visible_to_clients: boolean;
+  created_at: string;
+  updated_at: string;
+  title: string;
+  inherits_status: boolean;
+  type: string;
+  url: string;
+  app_url: string;
+  bookmark_url: string;
+  position: number;
+  parent?: BasecampParent;
+  bucket: BasecampBucket;
+  creator: BasecampPerson;
+  documents_count: number;
+  documents_url: string;
+  uploads_count: number;
+  uploads_url: string;
+  vaults_count: number;
+  vaults_url: string;
+}
+
+export interface BasecampDocument {
+  id: number;
+  status: string;
+  visible_to_clients: boolean;
+  created_at: string;
+  updated_at: string;
+  title: string;
+  inherits_status: boolean;
+  type: string;
+  url: string;
+  app_url: string;
+  bookmark_url: string;
+  subscription_url: string;
+  comments_count: number;
+  comments_url: string;
+  position: number;
   parent: BasecampParent;
   bucket: BasecampBucket;
   creator: BasecampPerson;
   content: string;
+}
+
+export interface BasecampUpload {
+  id: number;
+  status: string;
+  visible_to_clients: boolean;
+  created_at: string;
+  updated_at: string;
+  title: string;
+  inherits_status: boolean;
+  type: string;
+  url: string;
+  app_url: string;
+  bookmark_url: string;
+  subscription_url: string;
+  comments_count: number;
+  comments_url: string;
+  position: number;
+  parent: BasecampParent;
+  bucket: BasecampBucket;
+  creator: BasecampPerson;
+  description: string;
+  content_type: string;
+  byte_size: number;
+  filename: string;
+  download_url: string;
+  app_download_url: string;
+  width?: number;
+  height?: number;
 }
 
 export interface BasecampConfig {

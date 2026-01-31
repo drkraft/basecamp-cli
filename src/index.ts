@@ -7,6 +7,7 @@ import { createTodoListsCommands, createTodosCommands } from './commands/todos.j
 import { createMessagesCommands } from './commands/messages.js';
 import { createCampfiresCommands } from './commands/campfires.js';
 import { createPeopleCommands } from './commands/people.js';
+import { createSchedulesCommands } from './commands/schedules.js';
 
 const program = new Command();
 
@@ -28,5 +29,6 @@ program.addCommand(createTodosCommands());
 program.addCommand(createMessagesCommands());
 program.addCommand(createCampfiresCommands());
 program.addCommand(createPeopleCommands());
+program.addCommand(createSchedulesCommands());
 
 program.parse();
