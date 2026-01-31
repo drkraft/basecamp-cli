@@ -710,3 +710,141 @@ export async function listEvents(projectId: number, recordingId: number): Promis
   const client = await createClient();
   return fetchAllPages<BasecampEvent>(client, `buckets/${projectId}/recordings/${recordingId}/events.json`);
 }
+
+export async function getCardTable(projectId: number): Promise<BasecampCardTable> {
+  const client = await createClient();
+  const project = await getProject(projectId);
+  const kanbanDock = project.dock.find((d: BasecampDock) => d.name === 'kanban_board');
+
+  if (!kanbanDock) {
+    throw new Error('Card table (Kanban board) not enabled for this project');
+  }
+
+  const cardTableId = kanbanDock.id;
+  const response = await client.get(`buckets/${projectId}/card_tables/${cardTableId}.json`).json<BasecampCardTable>();
+  return response;
+}
+
+export async function getColumn(projectId: number, columnId: number): Promise<BasecampColumn> {
+  const client = await createClient();
+  const response = await client.get(`buckets/${projectId}/card_tables/columns/${columnId}.json`).json<BasecampColumn>();
+  return response;
+}
+
+export async function createColumn(
+  projectId: number,
+  title: string,
+  description?: string
+): Promise<BasecampColumn> {
+  const client = await createClient();
+  const cardTable = await getCardTable(projectId);
+  const response = await client.post(`buckets/${projectId}/card_tables/${cardTable.id}/columns.json`, {
+    json: { title, description }
+  }).json<BasecampColumn>();
+  return response;
+}
+
+export async function updateColumn(
+  projectId: number,
+  columnId: number,
+  updates: {
+    title?: string;
+    description?: string;
+  }
+): Promise<BasecampColumn> {
+  const client = await createClient();
+  const response = await client.put(`buckets/${projectId}/card_tables/columns/${columnId}.json`, {
+    json: updates
+  }).json<BasecampColumn>();
+  return response;
+}
+
+export async function deleteColumn(projectId: number, columnId: number): Promise<void> {
+  const client = await createClient();
+  await client.delete(`buckets/${projectId}/card_tables/columns/${columnId}.json`);
+}
+
+export async function listCards(projectId: number, columnId: number): Promise<BasecampCard[]> {
+  const client = await createClient();
+  return fetchAllPages<BasecampCard>(client, `buckets/${projectId}/card_tables/lists/${columnId}/cards.json`);
+}
+
+export async function getCard(projectId: number, cardId: number): Promise<BasecampCard> {
+  const client = await createClient();
+  const response = await client.get(`buckets/${projectId}/card_tables/cards/${cardId}.json`).json<BasecampCard>();
+  return response;
+}
+
+export async function createCard(
+  projectId: number,
+  columnId: number,
+  title: string,
+  options?: {
+    content?: string;
+    due_on?: string;
+    assignee_ids?: number[];
+    notify?: boolean;
+  }
+): Promise<BasecampCard> {
+  const client = await createClient();
+  const payload: any = { title };
+  
+  if (options?.content) payload.content = options.content;
+  if (options?.due_on) payload.due_on = options.due_on;
+  if (options?.assignee_ids) payload.assignee_ids = options.assignee_ids;
+  if (options?.notify !== undefined) payload.notify = options.notify;
+
+  const response = await client.post(`buckets/${projectId}/card_tables/lists/${columnId}/cards.json`, {
+    json: payload
+  }).json<BasecampCard>();
+  return response;
+}
+
+export async function updateCard(
+  projectId: number,
+  cardId: number,
+  updates: {
+    title?: string;
+    content?: string;
+    due_on?: string | null;
+    assignee_ids?: number[];
+  }
+): Promise<BasecampCard> {
+  const client = await createClient();
+  const response = await client.put(`buckets/${projectId}/card_tables/cards/${cardId}.json`, {
+    json: updates
+  }).json<BasecampCard>();
+  return response;
+}
+
+export async function moveCard(projectId: number, cardId: number, columnId: number): Promise<void> {
+  const client = await createClient();
+  await client.post(`buckets/${projectId}/card_tables/cards/${cardId}/moves.json`, {
+    json: { column_id: columnId }
+  });
+}
+
+export async function deleteCard(projectId: number, cardId: number): Promise<void> {
+  const client = await createClient();
+  await client.delete(`buckets/${projectId}/card_tables/cards/${cardId}.json`);
+}
+
+// Subscriptions
+export async function getSubscriptions(projectId: number, recordingId: number): Promise<BasecampSubscription> {
+  const client = await createClient();
+  const response = await client.get(`buckets/${projectId}/recordings/${recordingId}/subscription.json`).json<BasecampSubscription>();
+  return response;
+}
+
+export async function subscribe(projectId: number, recordingId: number): Promise<BasecampSubscription> {
+  const client = await createClient();
+  const response = await client.post(`buckets/${projectId}/recordings/${recordingId}/subscription.json`, {
+    json: {}
+  }).json<BasecampSubscription>();
+  return response;
+}
+
+export async function unsubscribe(projectId: number, recordingId: number): Promise<void> {
+  const client = await createClient();
+  await client.delete(`buckets/${projectId}/recordings/${recordingId}/subscription.json`);
+}
