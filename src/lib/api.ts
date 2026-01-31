@@ -13,7 +13,7 @@ import type {
   BasecampDock
 } from '../types/index.js';
 
-const USER_AGENT = 'Basecamp CLI (emredoganer@github.com)';
+const USER_AGENT = '@drkraft/basecamp-cli (contact@drkraft.com)';
 
 /**
  * Parse RFC5988 Link header to extract the "next" page URL

@@ -1,6 +1,6 @@
 {
-  "name": "@emredoganer/basecamp-cli",
-  "version": "1.0.0",
+  "name": "@drkraft/basecamp-cli",
+  "version": "2.0.0",
   "description": "CLI tool for managing Basecamp 4 projects, to-dos, messages, and campfires",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -29,11 +29,11 @@
     "todos",
     "37signals"
   ],
-  "author": "emredoganer",
+  "author": "drkraft",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/emredoganer/basecamp-cli.git"
+    "url": "git+https://github.com/drkraft/basecamp-cli.git"
   },
   "dependencies": {
     "chalk": "^5.3.0",
