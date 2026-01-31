@@ -9,6 +9,7 @@ import { createCampfiresCommands } from './commands/campfires.js';
 import { createPeopleCommands } from './commands/people.js';
 import { createCommentsCommands } from './commands/comments.js';
 import { createSchedulesCommands } from './commands/schedules.js';
+import { createSearchCommand } from './commands/search.js';
 
 const program = new Command();
 
@@ -32,5 +33,6 @@ program.addCommand(createCampfiresCommands());
 program.addCommand(createPeopleCommands());
 program.addCommand(createCommentsCommands());
 program.addCommand(createSchedulesCommands());
+program.addCommand(createSearchCommand());
 
 program.parse();
