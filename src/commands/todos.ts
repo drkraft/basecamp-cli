@@ -22,7 +22,7 @@ export function createTodoListsCommands(): Command {
     .command('list')
     .description('List to-do lists in a project')
     .requiredOption('-p, --project <id>', 'Project ID')
-    .option('--json', 'Output as JSON')
+    .option('-f, --format <format>', 'Output format (table|json)', 'table')
     .action(async (options) => {
       if (!isAuthenticated()) {
         console.log(chalk.yellow('Not authenticated. Run "basecamp auth login" to login.'));
@@ -37,7 +37,7 @@ export function createTodoListsCommands(): Command {
         }
         const lists = await listTodoLists(projectId);
 
-        if (options.json) {
+        if (options.format === 'json') {
           console.log(JSON.stringify(lists, null, 2));
           return;
         }
@@ -118,7 +118,7 @@ export function createTodosCommands(): Command {
     .requiredOption('-p, --project <id>', 'Project ID')
     .requiredOption('-l, --list <id>', 'To-do list ID')
     .option('--completed', 'Show completed to-dos')
-    .option('--json', 'Output as JSON')
+    .option('-f, --format <format>', 'Output format (table|json)', 'table')
     .action(async (options) => {
       if (!isAuthenticated()) {
         console.log(chalk.yellow('Not authenticated. Run "basecamp auth login" to login.'));
@@ -138,7 +138,7 @@ export function createTodosCommands(): Command {
         }
         const todoList = await listTodos(projectId, listId, options.completed);
 
-        if (options.json) {
+        if (options.format === 'json') {
           console.log(JSON.stringify(todoList, null, 2));
           return;
         }
@@ -176,7 +176,7 @@ export function createTodosCommands(): Command {
     .command('get <id>')
     .description('Get to-do details')
     .requiredOption('-p, --project <id>', 'Project ID')
-    .option('--json', 'Output as JSON')
+    .option('-f, --format <format>', 'Output format (table|json)', 'table')
     .action(async (id: string, options) => {
       if (!isAuthenticated()) {
         console.log(chalk.yellow('Not authenticated. Run "basecamp auth login" to login.'));
@@ -196,7 +196,7 @@ export function createTodosCommands(): Command {
         }
         const todo = await getTodo(projectId, todoId);
 
-        if (options.json) {
+        if (options.format === 'json') {
           console.log(JSON.stringify(todo, null, 2));
           return;
         }

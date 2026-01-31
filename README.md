@@ -166,16 +166,29 @@ basecamp people list --project <id>
 basecamp people get <id>
 
 # Get your profile
-basecamp me
+basecamp people me
 ```
 
 ## Output Formats
 
-All list and get commands support `--json` flag for JSON output:
+All list and get commands support `--format` flag for controlling output format:
 
 ```bash
-basecamp projects list --json
-basecamp todos get <id> --project <project-id> --json
+# Table format (default)
+basecamp projects list
+basecamp projects list --format table
+
+# JSON format
+basecamp projects list --format json
+basecamp todos get <id> --project <project-id> --format json
+```
+
+## Global Options
+
+```bash
+# Enable verbose output for debugging
+basecamp --verbose projects list
+basecamp -v people me
 ```
 
 ## Environment Variables

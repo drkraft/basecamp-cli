@@ -12,7 +12,7 @@ export function createMessagesCommands(): Command {
     .command('list')
     .description('List messages in a project')
     .requiredOption('-p, --project <id>', 'Project ID')
-    .option('--json', 'Output as JSON')
+    .option('-f, --format <format>', 'Output format (table|json)', 'table')
     .action(async (options) => {
       if (!isAuthenticated()) {
         console.log(chalk.yellow('Not authenticated. Run "basecamp auth login" to login.'));
@@ -27,7 +27,7 @@ export function createMessagesCommands(): Command {
         }
         const messageList = await listMessages(projectId);
 
-        if (options.json) {
+        if (options.format === 'json') {
           console.log(JSON.stringify(messageList, null, 2));
           return;
         }
@@ -65,7 +65,7 @@ export function createMessagesCommands(): Command {
     .command('get <id>')
     .description('Get message details')
     .requiredOption('-p, --project <id>', 'Project ID')
-    .option('--json', 'Output as JSON')
+    .option('-f, --format <format>', 'Output format (table|json)', 'table')
     .action(async (id: string, options) => {
       if (!isAuthenticated()) {
         console.log(chalk.yellow('Not authenticated. Run "basecamp auth login" to login.'));
@@ -85,7 +85,7 @@ export function createMessagesCommands(): Command {
         }
         const message = await getMessage(projectId, messageId);
 
-        if (options.json) {
+        if (options.format === 'json') {
           console.log(JSON.stringify(message, null, 2));
           return;
         }
