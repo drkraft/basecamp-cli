@@ -3,7 +3,7 @@
 import { Command } from 'commander';
 import { createAuthCommands, createAccountsCommand, createAccountCommand } from './commands/auth.js';
 import { createProjectsCommands } from './commands/projects.js';
-import { createTodoListsCommands, createTodosCommands } from './commands/todos.js';
+import { createTodoListsCommands, createTodosCommands, createTodoGroupsCommands } from './commands/todos.js';
 import { createMessagesCommands } from './commands/messages.js';
 import { createCampfiresCommands } from './commands/campfires.js';
 import { createPeopleCommands } from './commands/people.js';
@@ -28,6 +28,7 @@ program.addCommand(createAccountCommand());
 program.addCommand(createProjectsCommands());
 program.addCommand(createTodoListsCommands());
 program.addCommand(createTodosCommands());
+program.addCommand(createTodoGroupsCommands());
 program.addCommand(createMessagesCommands());
 program.addCommand(createCampfiresCommands());
 program.addCommand(createPeopleCommands());
