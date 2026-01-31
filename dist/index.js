@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 // src/index.ts
-import { Command as Command8 } from "commander";
+import { Command as Command9 } from "commander";
 
 // src/commands/auth.ts
 import { Command } from "commander";
@@ -689,6 +689,33 @@ async function getMe() {
   const client = await createClient();
   const response = await client.get("my/profile.json").json();
   return response;
+}
+async function listComments(projectId, recordingId) {
+  const client = await createClient();
+  return fetchAllPages(client, `buckets/${projectId}/recordings/${recordingId}/comments.json`);
+}
+async function getComment(projectId, commentId) {
+  const client = await createClient();
+  const response = await client.get(`buckets/${projectId}/comments/${commentId}.json`).json();
+  return response;
+}
+async function createComment(projectId, recordingId, content) {
+  const client = await createClient();
+  const response = await client.post(`buckets/${projectId}/recordings/${recordingId}/comments.json`, {
+    json: { content }
+  }).json();
+  return response;
+}
+async function updateComment(projectId, commentId, content) {
+  const client = await createClient();
+  const response = await client.put(`buckets/${projectId}/comments/${commentId}.json`, {
+    json: { content }
+  }).json();
+  return response;
+}
+async function deleteComment(projectId, commentId) {
+  const client = await createClient();
+  await client.delete(`buckets/${projectId}/comments/${commentId}.json`);
 }
 async function getSchedule(projectId) {
   const client = await createClient();
@@ -1481,13 +1508,13 @@ Total: ${peopleList.length} people`));
   return people;
 }
 
-// src/commands/schedules.ts
+// src/commands/comments.ts
 import { Command as Command7 } from "commander";
 import chalk9 from "chalk";
 import Table7 from "cli-table3";
-function createSchedulesCommands() {
-  const schedules = new Command7("schedules").description("Manage schedules and schedule entries");
-  schedules.command("get").description("Get schedule info for a project").requiredOption("-p, --project <id>", "Project ID").option("-f, --format <format>", "Output format (table|json)", "table").action(async (options) => {
+function createCommentsCommands() {
+  const comments = new Command7("comments").description("Manage comments on recordings (todos, messages, etc.)");
+  comments.command("list").description("List comments on a recording").requiredOption("-p, --project <id>", "Project ID").requiredOption("-r, --recording <id>", "Recording ID (todo, message, etc.)").option("-f, --format <format>", "Output format (table|json)", "table").action(async (options) => {
     if (!isAuthenticated()) {
       console.log(chalk9.yellow('Not authenticated. Run "basecamp auth login" to login.'));
       return;
@@ -1498,24 +1525,42 @@ function createSchedulesCommands() {
         console.error(chalk9.red("Invalid project ID: must be a number"));
         process.exit(1);
       }
-      const schedule = await getSchedule(projectId);
+      const recordingId = parseInt(options.recording, 10);
+      if (isNaN(recordingId)) {
+        console.error(chalk9.red("Invalid recording ID: must be a number"));
+        process.exit(1);
+      }
+      const commentsList = await listComments(projectId, recordingId);
       if (options.format === "json") {
-        console.log(JSON.stringify(schedule, null, 2));
+        console.log(JSON.stringify(commentsList, null, 2));
         return;
       }
-      console.log(chalk9.bold(schedule.title));
-      console.log(chalk9.dim(`ID: ${schedule.id}`));
-      console.log(chalk9.dim(`Status: ${schedule.status}`));
-      console.log(chalk9.dim(`Entries: ${schedule.entries_count}`));
-      console.log(chalk9.dim(`Include due assignments: ${schedule.include_due_assignments}`));
-      console.log(chalk9.dim(`Created: ${new Date(schedule.created_at).toLocaleDateString()}`));
-      console.log(chalk9.dim(`URL: ${schedule.app_url}`));
+      if (commentsList.length === 0) {
+        console.log(chalk9.yellow("No comments found."));
+        return;
+      }
+      const table = new Table7({
+        head: ["ID", "Creator", "Content", "Created"],
+        colWidths: [12, 20, 40, 20],
+        wordWrap: true
+      });
+      commentsList.forEach((comment) => {
+        table.push([
+          comment.id,
+          comment.creator?.name || "-",
+          comment.content.substring(0, 37) + (comment.content.length > 37 ? "..." : ""),
+          new Date(comment.created_at).toLocaleDateString()
+        ]);
+      });
+      console.log(table.toString());
+      console.log(chalk9.dim(`
+Total: ${commentsList.length} comments`));
     } catch (error) {
-      console.error(chalk9.red("Failed to get schedule:"), error instanceof Error ? error.message : error);
+      console.error(chalk9.red("Failed to list comments:"), error instanceof Error ? error.message : error);
       process.exit(1);
     }
   });
-  schedules.command("entries").description("List schedule entries in a project").requiredOption("-p, --project <id>", "Project ID").option("--status <status>", "Filter by status (active|archived|trashed)").option("-f, --format <format>", "Output format (table|json)", "table").action(async (options) => {
+  comments.command("get <id>").description("Get comment details").requiredOption("-p, --project <id>", "Project ID").option("-f, --format <format>", "Output format (table|json)", "table").action(async (id, options) => {
     if (!isAuthenticated()) {
       console.log(chalk9.yellow('Not authenticated. Run "basecamp auth login" to login.'));
       return;
@@ -1524,6 +1569,158 @@ function createSchedulesCommands() {
       const projectId = parseInt(options.project, 10);
       if (isNaN(projectId)) {
         console.error(chalk9.red("Invalid project ID: must be a number"));
+        process.exit(1);
+      }
+      const commentId = parseInt(id, 10);
+      if (isNaN(commentId)) {
+        console.error(chalk9.red("Invalid comment ID: must be a number"));
+        process.exit(1);
+      }
+      const comment = await getComment(projectId, commentId);
+      if (options.format === "json") {
+        console.log(JSON.stringify(comment, null, 2));
+        return;
+      }
+      console.log(chalk9.bold("Comment"));
+      console.log(chalk9.dim(`ID: ${comment.id}`));
+      console.log(chalk9.dim(`Creator: ${comment.creator?.name || "-"}`));
+      console.log(chalk9.dim(`Created: ${new Date(comment.created_at).toLocaleString()}`));
+      console.log(chalk9.dim(`Updated: ${new Date(comment.updated_at).toLocaleString()}`));
+      console.log(chalk9.dim(`Content:
+${comment.content}`));
+      console.log(chalk9.dim(`URL: ${comment.app_url}`));
+    } catch (error) {
+      console.error(chalk9.red("Failed to get comment:"), error instanceof Error ? error.message : error);
+      process.exit(1);
+    }
+  });
+  comments.command("create").description("Create a comment on a recording").requiredOption("-p, --project <id>", "Project ID").requiredOption("-r, --recording <id>", "Recording ID (todo, message, etc.)").requiredOption("-c, --content <content>", "Comment content").option("--json", "Output as JSON").action(async (options) => {
+    if (!isAuthenticated()) {
+      console.log(chalk9.yellow('Not authenticated. Run "basecamp auth login" to login.'));
+      return;
+    }
+    try {
+      const projectId = parseInt(options.project, 10);
+      if (isNaN(projectId)) {
+        console.error(chalk9.red("Invalid project ID: must be a number"));
+        process.exit(1);
+      }
+      const recordingId = parseInt(options.recording, 10);
+      if (isNaN(recordingId)) {
+        console.error(chalk9.red("Invalid recording ID: must be a number"));
+        process.exit(1);
+      }
+      const comment = await createComment(projectId, recordingId, options.content);
+      if (options.json) {
+        console.log(JSON.stringify(comment, null, 2));
+        return;
+      }
+      console.log(chalk9.green("\u2713 Comment created"));
+      console.log(chalk9.dim(`ID: ${comment.id}`));
+      console.log(chalk9.dim(`Content: ${comment.content.substring(0, 50)}${comment.content.length > 50 ? "..." : ""}`));
+    } catch (error) {
+      console.error(chalk9.red("Failed to create comment:"), error instanceof Error ? error.message : error);
+      process.exit(1);
+    }
+  });
+  comments.command("update <id>").description("Update a comment").requiredOption("-p, --project <id>", "Project ID").requiredOption("-c, --content <content>", "New comment content").option("--json", "Output as JSON").action(async (id, options) => {
+    if (!isAuthenticated()) {
+      console.log(chalk9.yellow('Not authenticated. Run "basecamp auth login" to login.'));
+      return;
+    }
+    try {
+      const projectId = parseInt(options.project, 10);
+      if (isNaN(projectId)) {
+        console.error(chalk9.red("Invalid project ID: must be a number"));
+        process.exit(1);
+      }
+      const commentId = parseInt(id, 10);
+      if (isNaN(commentId)) {
+        console.error(chalk9.red("Invalid comment ID: must be a number"));
+        process.exit(1);
+      }
+      const comment = await updateComment(projectId, commentId, options.content);
+      if (options.json) {
+        console.log(JSON.stringify(comment, null, 2));
+        return;
+      }
+      console.log(chalk9.green("\u2713 Comment updated"));
+      console.log(chalk9.dim(`ID: ${comment.id}`));
+      console.log(chalk9.dim(`Content: ${comment.content.substring(0, 50)}${comment.content.length > 50 ? "..." : ""}`));
+    } catch (error) {
+      console.error(chalk9.red("Failed to update comment:"), error instanceof Error ? error.message : error);
+      process.exit(1);
+    }
+  });
+  comments.command("delete <id>").description("Delete a comment").requiredOption("-p, --project <id>", "Project ID").action(async (id, options) => {
+    if (!isAuthenticated()) {
+      console.log(chalk9.yellow('Not authenticated. Run "basecamp auth login" to login.'));
+      return;
+    }
+    try {
+      const projectId = parseInt(options.project, 10);
+      if (isNaN(projectId)) {
+        console.error(chalk9.red("Invalid project ID: must be a number"));
+        process.exit(1);
+      }
+      const commentId = parseInt(id, 10);
+      if (isNaN(commentId)) {
+        console.error(chalk9.red("Invalid comment ID: must be a number"));
+        process.exit(1);
+      }
+      await deleteComment(projectId, commentId);
+      console.log(chalk9.green(`\u2713 Comment ${commentId} deleted`));
+    } catch (error) {
+      console.error(chalk9.red("Failed to delete comment:"), error instanceof Error ? error.message : error);
+      process.exit(1);
+    }
+  });
+  return comments;
+}
+
+// src/commands/schedules.ts
+import { Command as Command8 } from "commander";
+import chalk10 from "chalk";
+import Table8 from "cli-table3";
+function createSchedulesCommands() {
+  const schedules = new Command8("schedules").description("Manage schedules and schedule entries");
+  schedules.command("get").description("Get schedule info for a project").requiredOption("-p, --project <id>", "Project ID").option("-f, --format <format>", "Output format (table|json)", "table").action(async (options) => {
+    if (!isAuthenticated()) {
+      console.log(chalk10.yellow('Not authenticated. Run "basecamp auth login" to login.'));
+      return;
+    }
+    try {
+      const projectId = parseInt(options.project, 10);
+      if (isNaN(projectId)) {
+        console.error(chalk10.red("Invalid project ID: must be a number"));
+        process.exit(1);
+      }
+      const schedule = await getSchedule(projectId);
+      if (options.format === "json") {
+        console.log(JSON.stringify(schedule, null, 2));
+        return;
+      }
+      console.log(chalk10.bold(schedule.title));
+      console.log(chalk10.dim(`ID: ${schedule.id}`));
+      console.log(chalk10.dim(`Status: ${schedule.status}`));
+      console.log(chalk10.dim(`Entries: ${schedule.entries_count}`));
+      console.log(chalk10.dim(`Include due assignments: ${schedule.include_due_assignments}`));
+      console.log(chalk10.dim(`Created: ${new Date(schedule.created_at).toLocaleDateString()}`));
+      console.log(chalk10.dim(`URL: ${schedule.app_url}`));
+    } catch (error) {
+      console.error(chalk10.red("Failed to get schedule:"), error instanceof Error ? error.message : error);
+      process.exit(1);
+    }
+  });
+  schedules.command("entries").description("List schedule entries in a project").requiredOption("-p, --project <id>", "Project ID").option("--status <status>", "Filter by status (active|archived|trashed)").option("-f, --format <format>", "Output format (table|json)", "table").action(async (options) => {
+    if (!isAuthenticated()) {
+      console.log(chalk10.yellow('Not authenticated. Run "basecamp auth login" to login.'));
+      return;
+    }
+    try {
+      const projectId = parseInt(options.project, 10);
+      if (isNaN(projectId)) {
+        console.error(chalk10.red("Invalid project ID: must be a number"));
         process.exit(1);
       }
       const entries = await listScheduleEntries(projectId, options.status);
@@ -1532,10 +1729,10 @@ function createSchedulesCommands() {
         return;
       }
       if (entries.length === 0) {
-        console.log(chalk9.yellow("No schedule entries found."));
+        console.log(chalk10.yellow("No schedule entries found."));
         return;
       }
-      const table = new Table7({
+      const table = new Table8({
         head: ["ID", "Summary", "Start", "End", "All Day", "Participants"],
         colWidths: [12, 25, 20, 20, 10, 20],
         wordWrap: true
@@ -1554,22 +1751,22 @@ function createSchedulesCommands() {
         ]);
       });
       console.log(table.toString());
-      console.log(chalk9.dim(`
+      console.log(chalk10.dim(`
 Total: ${entries.length} entries`));
     } catch (error) {
-      console.error(chalk9.red("Failed to list schedule entries:"), error instanceof Error ? error.message : error);
+      console.error(chalk10.red("Failed to list schedule entries:"), error instanceof Error ? error.message : error);
       process.exit(1);
     }
   });
   schedules.command("create-entry").description("Create a schedule entry").requiredOption("-p, --project <id>", "Project ID").requiredOption("-s, --summary <summary>", "Event summary").requiredOption("--starts-at <datetime>", "Start date/time (ISO 8601)").option("--ends-at <datetime>", "End date/time (ISO 8601)").option("-d, --description <description>", "Event description").option("--all-day", "Mark as all-day event").option("--participants <ids>", "Comma-separated participant IDs").option("--json", "Output as JSON").action(async (options) => {
     if (!isAuthenticated()) {
-      console.log(chalk9.yellow('Not authenticated. Run "basecamp auth login" to login.'));
+      console.log(chalk10.yellow('Not authenticated. Run "basecamp auth login" to login.'));
       return;
     }
     try {
       const projectId = parseInt(options.project, 10);
       if (isNaN(projectId)) {
-        console.error(chalk9.red("Invalid project ID: must be a number"));
+        console.error(chalk10.red("Invalid project ID: must be a number"));
         process.exit(1);
       }
       const entryOptions = {};
@@ -1584,29 +1781,29 @@ Total: ${entries.length} entries`));
         console.log(JSON.stringify(entry, null, 2));
         return;
       }
-      console.log(chalk9.green("\u2713 Schedule entry created"));
-      console.log(chalk9.dim(`ID: ${entry.id}`));
-      console.log(chalk9.dim(`Summary: ${entry.summary}`));
-      console.log(chalk9.dim(`Start: ${new Date(entry.starts_at).toLocaleString()}`));
+      console.log(chalk10.green("\u2713 Schedule entry created"));
+      console.log(chalk10.dim(`ID: ${entry.id}`));
+      console.log(chalk10.dim(`Summary: ${entry.summary}`));
+      console.log(chalk10.dim(`Start: ${new Date(entry.starts_at).toLocaleString()}`));
     } catch (error) {
-      console.error(chalk9.red("Failed to create schedule entry:"), error instanceof Error ? error.message : error);
+      console.error(chalk10.red("Failed to create schedule entry:"), error instanceof Error ? error.message : error);
       process.exit(1);
     }
   });
   schedules.command("update-entry <id>").description("Update a schedule entry").requiredOption("-p, --project <id>", "Project ID").option("-s, --summary <summary>", "New summary").option("-d, --description <description>", "New description").option("--starts-at <datetime>", "New start date/time (ISO 8601)").option("--ends-at <datetime>", "New end date/time (ISO 8601)").option("--all-day", "Mark as all-day event").option("--participants <ids>", "Comma-separated participant IDs").option("--json", "Output as JSON").action(async (id, options) => {
     if (!isAuthenticated()) {
-      console.log(chalk9.yellow('Not authenticated. Run "basecamp auth login" to login.'));
+      console.log(chalk10.yellow('Not authenticated. Run "basecamp auth login" to login.'));
       return;
     }
     try {
       const projectId = parseInt(options.project, 10);
       if (isNaN(projectId)) {
-        console.error(chalk9.red("Invalid project ID: must be a number"));
+        console.error(chalk10.red("Invalid project ID: must be a number"));
         process.exit(1);
       }
       const entryId = parseInt(id, 10);
       if (isNaN(entryId)) {
-        console.error(chalk9.red("Invalid entry ID: must be a number"));
+        console.error(chalk10.red("Invalid entry ID: must be a number"));
         process.exit(1);
       }
       const updates = {};
@@ -1623,34 +1820,34 @@ Total: ${entries.length} entries`));
         console.log(JSON.stringify(entry, null, 2));
         return;
       }
-      console.log(chalk9.green("\u2713 Schedule entry updated"));
-      console.log(chalk9.dim(`ID: ${entry.id}`));
-      console.log(chalk9.dim(`Summary: ${entry.summary}`));
+      console.log(chalk10.green("\u2713 Schedule entry updated"));
+      console.log(chalk10.dim(`ID: ${entry.id}`));
+      console.log(chalk10.dim(`Summary: ${entry.summary}`));
     } catch (error) {
-      console.error(chalk9.red("Failed to update schedule entry:"), error instanceof Error ? error.message : error);
+      console.error(chalk10.red("Failed to update schedule entry:"), error instanceof Error ? error.message : error);
       process.exit(1);
     }
   });
   schedules.command("delete-entry <id>").description("Delete a schedule entry").requiredOption("-p, --project <id>", "Project ID").action(async (id, options) => {
     if (!isAuthenticated()) {
-      console.log(chalk9.yellow('Not authenticated. Run "basecamp auth login" to login.'));
+      console.log(chalk10.yellow('Not authenticated. Run "basecamp auth login" to login.'));
       return;
     }
     try {
       const projectId = parseInt(options.project, 10);
       if (isNaN(projectId)) {
-        console.error(chalk9.red("Invalid project ID: must be a number"));
+        console.error(chalk10.red("Invalid project ID: must be a number"));
         process.exit(1);
       }
       const entryId = parseInt(id, 10);
       if (isNaN(entryId)) {
-        console.error(chalk9.red("Invalid entry ID: must be a number"));
+        console.error(chalk10.red("Invalid entry ID: must be a number"));
         process.exit(1);
       }
       await deleteScheduleEntry(projectId, entryId);
-      console.log(chalk9.green(`\u2713 Schedule entry ${entryId} deleted`));
+      console.log(chalk10.green(`\u2713 Schedule entry ${entryId} deleted`));
     } catch (error) {
-      console.error(chalk9.red("Failed to delete schedule entry:"), error instanceof Error ? error.message : error);
+      console.error(chalk10.red("Failed to delete schedule entry:"), error instanceof Error ? error.message : error);
       process.exit(1);
     }
   });
@@ -1658,7 +1855,7 @@ Total: ${entries.length} entries`));
 }
 
 // src/index.ts
-var program = new Command8();
+var program = new Command9();
 program.name("basecamp").description("CLI for managing Basecamp 4 projects, to-dos, messages, and campfires").version("1.0.0").option("-v, --verbose", "Enable verbose output for debugging");
 program.addCommand(createAuthCommands());
 program.addCommand(createAccountsCommand());
@@ -1669,5 +1866,6 @@ program.addCommand(createTodosCommands());
 program.addCommand(createMessagesCommands());
 program.addCommand(createCampfiresCommands());
 program.addCommand(createPeopleCommands());
+program.addCommand(createCommentsCommands());
 program.addCommand(createSchedulesCommands());
 program.parse();

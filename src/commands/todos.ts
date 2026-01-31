@@ -395,5 +395,112 @@ export function createTodosCommands(): Command {
       }
     });
 
-  return todos;
-}
+   return todos;
+ }
+
+ export function createTodoGroupsCommands(): Command {
+   const todogroups = new Command('todogroups')
+     .description('Manage to-do list groups');
+
+   todogroups
+     .command('list')
+     .description('List to-do groups in a to-do list')
+     .requiredOption('-p, --project <id>', 'Project ID')
+     .requiredOption('-l, --list <id>', 'To-do list ID')
+     .option('-f, --format <format>', 'Output format (table|json)', 'table')
+     .action(async (options) => {
+       if (!isAuthenticated()) {
+         console.log(chalk.yellow('Not authenticated. Run "basecamp auth login" to login.'));
+         return;
+       }
+
+       try {
+         const projectId = parseInt(options.project, 10);
+         if (isNaN(projectId)) {
+           console.error(chalk.red('Invalid project ID: must be a number'));
+           process.exit(1);
+         }
+         const listId = parseInt(options.list, 10);
+         if (isNaN(listId)) {
+           console.error(chalk.red('Invalid list ID: must be a number'));
+           process.exit(1);
+         }
+         const groups = await listTodolistGroups(projectId, listId);
+
+         if (options.format === 'json') {
+           console.log(JSON.stringify(groups, null, 2));
+           return;
+         }
+
+         if (groups.length === 0) {
+           console.log(chalk.yellow('No to-do groups found.'));
+           return;
+         }
+
+         const table = new Table({
+           head: ['ID', 'Name', 'Progress', 'Position'],
+           colWidths: [12, 25, 15, 12],
+           wordWrap: true
+         });
+
+         groups.forEach(group => {
+           table.push([
+             group.id,
+             group.name,
+             group.completed_ratio || '0/0',
+             group.position
+           ]);
+         });
+
+         console.log(table.toString());
+         console.log(chalk.dim(`\nTotal: ${groups.length} groups`));
+       } catch (error) {
+         console.error(chalk.red('Failed to list to-do groups:'), error instanceof Error ? error.message : error);
+         process.exit(1);
+       }
+     });
+
+   todogroups
+     .command('create')
+     .description('Create a to-do group')
+     .requiredOption('-p, --project <id>', 'Project ID')
+     .requiredOption('-l, --list <id>', 'To-do list ID')
+     .requiredOption('-n, --name <name>', 'Group name')
+     .option('--color <color>', 'Group color (white|red|orange|yellow|green|blue|aqua|purple|gray|pink|brown)')
+     .option('--json', 'Output as JSON')
+     .action(async (options) => {
+       if (!isAuthenticated()) {
+         console.log(chalk.yellow('Not authenticated. Run "basecamp auth login" to login.'));
+         return;
+       }
+
+       try {
+         const projectId = parseInt(options.project, 10);
+         if (isNaN(projectId)) {
+           console.error(chalk.red('Invalid project ID: must be a number'));
+           process.exit(1);
+         }
+         const listId = parseInt(options.list, 10);
+         if (isNaN(listId)) {
+           console.error(chalk.red('Invalid list ID: must be a number'));
+           process.exit(1);
+         }
+         const group = await createTodolistGroup(projectId, listId, options.name, options.color);
+
+         if (options.json) {
+           console.log(JSON.stringify(group, null, 2));
+           return;
+         }
+
+         console.log(chalk.green('✓ To-do group created'));
+         console.log(chalk.dim(`ID: ${group.id}`));
+         console.log(chalk.dim(`Name: ${group.name}`));
+         console.log(chalk.dim(`Position: ${group.position}`));
+       } catch (error) {
+         console.error(chalk.red('Failed to create to-do group:'), error instanceof Error ? error.message : error);
+         process.exit(1);
+       }
+     });
+
+   return todogroups;
+ }
