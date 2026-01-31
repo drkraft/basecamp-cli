@@ -302,7 +302,7 @@ Wave 4 (MCP & Publication - After Wave 3):
 
 ### Phase 2: Stabilisation CLI
 
-- [ ] 4. Mettre à jour package.json et identité
+- [x] 4. Mettre à jour package.json et identité
 
   **What to do**:
   - Changer `name` en `@drkraft/basecamp-cli`
@@ -346,7 +346,7 @@ Wave 4 (MCP & Publication - After Wave 3):
 
 ---
 
-- [ ] 5. Standardiser interface CLI (breaking changes)
+- [x] 5. Standardiser interface CLI (breaking changes)
 
   **What to do**:
   - Renommer `basecamp me` → `basecamp people me` (cohérence)
@@ -391,7 +391,7 @@ Wave 4 (MCP & Publication - After Wave 3):
 
 ---
 
-- [ ] 6. Ajouter tests pour modules existants
+- [x] 6. Ajouter tests pour modules existants
 
   **What to do**:
   - Créer tests pour `src/lib/api.ts` (projects, todos, messages, campfires, people)

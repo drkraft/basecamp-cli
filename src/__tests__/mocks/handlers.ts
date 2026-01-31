@@ -255,13 +255,211 @@ export const handlers = [
     });
   }),
 
-  http.get(`${BASECAMP_API_BASE}/99999999/my/profile.json`, () => {
-    return HttpResponse.json({
-      id: 1,
-      name: 'Current User',
-      email_address: 'me@example.com',
-      created_at: '2024-01-01T00:00:00Z',
-      updated_at: '2024-01-01T00:00:00Z',
-    });
-  }),
-];
+   http.get(`${BASECAMP_API_BASE}/99999999/my/profile.json`, () => {
+     return HttpResponse.json({
+       id: 1,
+       name: 'Current User',
+       email_address: 'me@example.com',
+       created_at: '2024-01-01T00:00:00Z',
+       updated_at: '2024-01-01T00:00:00Z',
+     });
+   }),
+
+   http.get(`${BASECAMP_API_BASE}/99999999/buckets/:projectId/recordings/:recordingId/comments.json`, () => {
+     return HttpResponse.json([
+       {
+         id: 1,
+         status: 'active',
+         visible_to_clients: true,
+         created_at: '2024-01-15T10:30:00Z',
+         updated_at: '2024-01-15T10:30:00Z',
+         title: 'Comment',
+         inherits_status: false,
+         type: 'Comment',
+         url: 'https://3.basecampapi.com/99999999/comments/1.json',
+         app_url: 'https://basecamp.com/99999999/projects/999/comments/1',
+         parent: {
+           id: 888,
+           title: 'Recording',
+           type: 'Todo',
+           url: 'https://3.basecampapi.com/99999999/todos/888.json',
+           app_url: 'https://basecamp.com/99999999/projects/999/todos/888'
+         },
+         bucket: {
+           id: 999,
+           name: 'Test Project',
+           type: 'Project'
+         },
+         creator: {
+           id: 1,
+           attachable_sgid: 'sgid-123',
+           name: 'John Doe',
+           email_address: 'john@example.com',
+           personable_type: 'User',
+           title: 'Developer',
+           bio: null,
+           location: null,
+           created_at: '2024-01-01T00:00:00Z',
+           updated_at: '2024-01-01T00:00:00Z',
+           admin: false,
+           owner: false,
+           client: false,
+           employee: true,
+           time_zone: 'UTC',
+           avatar_url: 'https://example.com/avatar.jpg',
+           can_manage_projects: false,
+           can_manage_people: false
+         },
+         content: 'This is a test comment'
+       }
+     ]);
+   }),
+
+   http.get(`${BASECAMP_API_BASE}/99999999/buckets/:projectId/comments/:id.json`, () => {
+     return HttpResponse.json({
+       id: 1,
+       status: 'active',
+       visible_to_clients: true,
+       created_at: '2024-01-15T10:30:00Z',
+       updated_at: '2024-01-15T10:30:00Z',
+       title: 'Comment',
+       inherits_status: false,
+       type: 'Comment',
+       url: 'https://3.basecampapi.com/99999999/comments/1.json',
+       app_url: 'https://basecamp.com/99999999/projects/999/comments/1',
+       parent: {
+         id: 888,
+         title: 'Recording',
+         type: 'Todo',
+         url: 'https://3.basecampapi.com/99999999/todos/888.json',
+         app_url: 'https://basecamp.com/99999999/projects/999/todos/888'
+       },
+       bucket: {
+         id: 999,
+         name: 'Test Project',
+         type: 'Project'
+       },
+       creator: {
+         id: 1,
+         attachable_sgid: 'sgid-123',
+         name: 'John Doe',
+         email_address: 'john@example.com',
+         personable_type: 'User',
+         title: 'Developer',
+         bio: null,
+         location: null,
+         created_at: '2024-01-01T00:00:00Z',
+         updated_at: '2024-01-01T00:00:00Z',
+         admin: false,
+         owner: false,
+         client: false,
+         employee: true,
+         time_zone: 'UTC',
+         avatar_url: 'https://example.com/avatar.jpg',
+         can_manage_projects: false,
+         can_manage_people: false
+       },
+       content: 'This is a test comment'
+     });
+   }),
+
+   http.post(`${BASECAMP_API_BASE}/99999999/buckets/:projectId/recordings/:recordingId/comments.json`, () => {
+     return HttpResponse.json({
+       id: 2,
+       status: 'active',
+       visible_to_clients: true,
+       created_at: '2024-01-15T10:30:00Z',
+       updated_at: '2024-01-15T10:30:00Z',
+       title: 'Comment',
+       inherits_status: false,
+       type: 'Comment',
+       url: 'https://3.basecampapi.com/99999999/comments/2.json',
+       app_url: 'https://basecamp.com/99999999/projects/999/comments/2',
+       parent: {
+         id: 888,
+         title: 'Recording',
+         type: 'Todo',
+         url: 'https://3.basecampapi.com/99999999/todos/888.json',
+         app_url: 'https://basecamp.com/99999999/projects/999/todos/888'
+       },
+       bucket: {
+         id: 999,
+         name: 'Test Project',
+         type: 'Project'
+       },
+       creator: {
+         id: 1,
+         attachable_sgid: 'sgid-123',
+         name: 'John Doe',
+         email_address: 'john@example.com',
+         personable_type: 'User',
+         title: 'Developer',
+         bio: null,
+         location: null,
+         created_at: '2024-01-01T00:00:00Z',
+         updated_at: '2024-01-01T00:00:00Z',
+         admin: false,
+         owner: false,
+         client: false,
+         employee: true,
+         time_zone: 'UTC',
+         avatar_url: 'https://example.com/avatar.jpg',
+         can_manage_projects: false,
+         can_manage_people: false
+       },
+       content: 'New test comment'
+     });
+   }),
+
+   http.put(`${BASECAMP_API_BASE}/99999999/buckets/:projectId/comments/:id.json`, () => {
+     return HttpResponse.json({
+       id: 1,
+       status: 'active',
+       visible_to_clients: true,
+       created_at: '2024-01-15T10:30:00Z',
+       updated_at: '2024-01-15T11:00:00Z',
+       title: 'Comment',
+       inherits_status: false,
+       type: 'Comment',
+       url: 'https://3.basecampapi.com/99999999/comments/1.json',
+       app_url: 'https://basecamp.com/99999999/projects/999/comments/1',
+       parent: {
+         id: 888,
+         title: 'Recording',
+         type: 'Todo',
+         url: 'https://3.basecampapi.com/99999999/todos/888.json',
+         app_url: 'https://basecamp.com/99999999/projects/999/todos/888'
+       },
+       bucket: {
+         id: 999,
+         name: 'Test Project',
+         type: 'Project'
+       },
+       creator: {
+         id: 1,
+         attachable_sgid: 'sgid-123',
+         name: 'John Doe',
+         email_address: 'john@example.com',
+         personable_type: 'User',
+         title: 'Developer',
+         bio: null,
+         location: null,
+         created_at: '2024-01-01T00:00:00Z',
+         updated_at: '2024-01-01T00:00:00Z',
+         admin: false,
+         owner: false,
+         client: false,
+         employee: true,
+         time_zone: 'UTC',
+         avatar_url: 'https://example.com/avatar.jpg',
+         can_manage_projects: false,
+         can_manage_people: false
+       },
+       content: 'Updated comment content'
+     });
+   }),
+
+   http.delete(`${BASECAMP_API_BASE}/99999999/buckets/:projectId/comments/:id.json`, () => {
+     return HttpResponse.json({});
+   }),
+ ];
