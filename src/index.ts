@@ -6,14 +6,15 @@ import { createProjectsCommands } from './commands/projects.js';
 import { createTodoListsCommands, createTodosCommands } from './commands/todos.js';
 import { createMessagesCommands } from './commands/messages.js';
 import { createCampfiresCommands } from './commands/campfires.js';
-import { createPeopleCommands, createMeCommand } from './commands/people.js';
+import { createPeopleCommands } from './commands/people.js';
 
 const program = new Command();
 
 program
   .name('basecamp')
   .description('CLI for managing Basecamp 4 projects, to-dos, messages, and campfires')
-  .version('1.0.0');
+  .version('1.0.0')
+  .option('-v, --verbose', 'Enable verbose output for debugging');
 
 // Auth commands
 program.addCommand(createAuthCommands());
@@ -27,6 +28,5 @@ program.addCommand(createTodosCommands());
 program.addCommand(createMessagesCommands());
 program.addCommand(createCampfiresCommands());
 program.addCommand(createPeopleCommands());
-program.addCommand(createMeCommand());
 
 program.parse();

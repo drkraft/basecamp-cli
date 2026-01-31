@@ -12,7 +12,7 @@ export function createCampfiresCommands(): Command {
     .command('list')
     .description('List campfires in a project')
     .requiredOption('-p, --project <id>', 'Project ID')
-    .option('--json', 'Output as JSON')
+    .option('-f, --format <format>', 'Output format (table|json)', 'table')
     .action(async (options) => {
       if (!isAuthenticated()) {
         console.log(chalk.yellow('Not authenticated. Run "basecamp auth login" to login.'));
@@ -27,7 +27,7 @@ export function createCampfiresCommands(): Command {
         }
         const campfireList = await listCampfires(projectId);
 
-        if (options.json) {
+        if (options.format === 'json') {
           console.log(JSON.stringify(campfireList, null, 2));
           return;
         }
@@ -64,7 +64,7 @@ export function createCampfiresCommands(): Command {
     .requiredOption('-p, --project <id>', 'Project ID')
     .requiredOption('-c, --campfire <id>', 'Campfire ID')
     .option('-n, --limit <number>', 'Number of lines to show', '20')
-    .option('--json', 'Output as JSON')
+    .option('-f, --format <format>', 'Output format (table|json)', 'table')
     .action(async (options) => {
       if (!isAuthenticated()) {
         console.log(chalk.yellow('Not authenticated. Run "basecamp auth login" to login.'));
@@ -89,7 +89,7 @@ export function createCampfiresCommands(): Command {
         }
         const lines = await getCampfireLines(projectId, campfireId);
 
-        if (options.json) {
+        if (options.format === 'json') {
           console.log(JSON.stringify(lines, null, 2));
           return;
         }

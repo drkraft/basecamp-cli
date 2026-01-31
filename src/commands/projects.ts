@@ -11,7 +11,7 @@ export function createProjectsCommands(): Command {
   projects
     .command('list')
     .description('List all projects')
-    .option('--json', 'Output as JSON')
+    .option('-f, --format <format>', 'Output format (table|json)', 'table')
     .action(async (options) => {
       if (!isAuthenticated()) {
         console.log(chalk.yellow('Not authenticated. Run "basecamp auth login" to login.'));
@@ -21,7 +21,7 @@ export function createProjectsCommands(): Command {
       try {
         const projectList = await listProjects();
 
-        if (options.json) {
+        if (options.format === 'json') {
           console.log(JSON.stringify(projectList, null, 2));
           return;
         }
@@ -57,7 +57,7 @@ export function createProjectsCommands(): Command {
   projects
     .command('get <id>')
     .description('Get project details')
-    .option('--json', 'Output as JSON')
+    .option('-f, --format <format>', 'Output format (table|json)', 'table')
     .action(async (id: string, options) => {
       if (!isAuthenticated()) {
         console.log(chalk.yellow('Not authenticated. Run "basecamp auth login" to login.'));
@@ -72,7 +72,7 @@ export function createProjectsCommands(): Command {
         }
         const project = await getProject(projectId);
 
-        if (options.json) {
+        if (options.format === 'json') {
           console.log(JSON.stringify(project, null, 2));
           return;
         }

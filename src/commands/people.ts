@@ -12,7 +12,7 @@ export function createPeopleCommands(): Command {
     .command('list')
     .description('List people')
     .option('-p, --project <id>', 'Project ID (optional, lists all if omitted)')
-    .option('--json', 'Output as JSON')
+    .option('-f, --format <format>', 'Output format (table|json)', 'table')
     .action(async (options) => {
       if (!isAuthenticated()) {
         console.log(chalk.yellow('Not authenticated. Run "basecamp auth login" to login.'));
@@ -30,7 +30,7 @@ export function createPeopleCommands(): Command {
         }
         const peopleList = await listPeople(projectId);
 
-        if (options.json) {
+        if (options.format === 'json') {
           console.log(JSON.stringify(peopleList, null, 2));
           return;
         }
@@ -73,7 +73,7 @@ export function createPeopleCommands(): Command {
   people
     .command('get <id>')
     .description('Get person details')
-    .option('--json', 'Output as JSON')
+    .option('-f, --format <format>', 'Output format (table|json)', 'table')
     .action(async (id: string, options) => {
       if (!isAuthenticated()) {
         console.log(chalk.yellow('Not authenticated. Run "basecamp auth login" to login.'));
@@ -88,7 +88,7 @@ export function createPeopleCommands(): Command {
         }
         const person = await getPerson(personId);
 
-        if (options.json) {
+        if (options.format === 'json') {
           console.log(JSON.stringify(person, null, 2));
           return;
         }
@@ -114,13 +114,10 @@ export function createPeopleCommands(): Command {
       }
     });
 
-  return people;
-}
-
-export function createMeCommand(): Command {
-  const me = new Command('me')
+  people
+    .command('me')
     .description('Get your profile')
-    .option('--json', 'Output as JSON')
+    .option('-f, --format <format>', 'Output format (table|json)', 'table')
     .action(async (options) => {
       if (!isAuthenticated()) {
         console.log(chalk.yellow('Not authenticated. Run "basecamp auth login" to login.'));
@@ -130,7 +127,7 @@ export function createMeCommand(): Command {
       try {
         const person = await getMe();
 
-        if (options.json) {
+        if (options.format === 'json') {
           console.log(JSON.stringify(person, null, 2));
           return;
         }
@@ -149,5 +146,5 @@ export function createMeCommand(): Command {
       }
     });
 
-  return me;
+  return people;
 }
