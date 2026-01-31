@@ -32,7 +32,5 @@ program.addCommand(createMessagesCommands());
 program.addCommand(createCampfiresCommands());
 program.addCommand(createPeopleCommands());
 program.addCommand(createSchedulesCommands());
-program.addCommand(createRecordingsCommands());
-program.addCommand(createEventsCommands());
 
 program.parse();
