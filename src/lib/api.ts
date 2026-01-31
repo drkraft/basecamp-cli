@@ -358,7 +358,306 @@ export async function getPerson(personId: number): Promise<BasecampPerson> {
 }
 
 export async function getMe(): Promise<BasecampPerson> {
+   const client = await createClient();
+   const response = await client.get('my/profile.json').json<BasecampPerson>();
+   return response;
+ }
+
+// Comments
+export async function listComments(projectId: number, recordingId: number): Promise<BasecampComment[]> {
+   const client = await createClient();
+   return fetchAllPages<BasecampComment>(client, `buckets/${projectId}/recordings/${recordingId}/comments.json`);
+ }
+
+export async function getComment(projectId: number, commentId: number): Promise<BasecampComment> {
+   const client = await createClient();
+   const response = await client.get(`buckets/${projectId}/comments/${commentId}.json`).json<BasecampComment>();
+   return response;
+ }
+
+export async function createComment(
+   projectId: number,
+   recordingId: number,
+   content: string
+ ): Promise<BasecampComment> {
+   const client = await createClient();
+   const response = await client.post(`buckets/${projectId}/recordings/${recordingId}/comments.json`, {
+     json: { content }
+   }).json<BasecampComment>();
+   return response;
+ }
+
+export async function updateComment(
+   projectId: number,
+   commentId: number,
+   content: string
+ ): Promise<BasecampComment> {
+   const client = await createClient();
+   const response = await client.put(`buckets/${projectId}/comments/${commentId}.json`, {
+     json: { content }
+   }).json<BasecampComment>();
+   return response;
+ }
+
+export async function deleteComment(projectId: number, commentId: number): Promise<void> {
+   const client = await createClient();
+   await client.delete(`buckets/${projectId}/comments/${commentId}.json`);
+ }
+
+// Vaults
+export async function getVault(projectId: number, vaultId: number): Promise<BasecampVault> {
   const client = await createClient();
-  const response = await client.get('my/profile.json').json<BasecampPerson>();
+  const response = await client.get(`buckets/${projectId}/vaults/${vaultId}.json`).json<BasecampVault>();
   return response;
+}
+
+export async function listVaults(projectId: number, parentVaultId?: number): Promise<BasecampVault[]> {
+  const client = await createClient();
+  
+  // If no parent vault ID provided, get the primary vault from the project dock
+  if (!parentVaultId) {
+    const project = await getProject(projectId);
+    const vaultDock = project.dock.find((d: BasecampDock) => d.name === 'vault');
+    
+    if (!vaultDock) {
+      throw new Error('Vault not enabled for this project');
+    }
+    
+    // Return the primary vault as an array
+    const vault = await getVault(projectId, vaultDock.id);
+    return [vault];
+  }
+  
+  // List child vaults
+  return fetchAllPages<BasecampVault>(client, `buckets/${projectId}/vaults/${parentVaultId}/vaults.json`);
+}
+
+export async function createVault(projectId: number, parentVaultId: number, title: string): Promise<BasecampVault> {
+  const client = await createClient();
+  const response = await client.post(`buckets/${projectId}/vaults/${parentVaultId}/vaults.json`, {
+    json: { title }
+  }).json<BasecampVault>();
+  return response;
+}
+
+export async function updateVault(projectId: number, vaultId: number, title: string): Promise<BasecampVault> {
+  const client = await createClient();
+  const response = await client.put(`buckets/${projectId}/vaults/${vaultId}.json`, {
+    json: { title }
+  }).json<BasecampVault>();
+  return response;
+}
+
+// Documents
+export async function listDocuments(projectId: number, vaultId: number): Promise<BasecampDocument[]> {
+  const client = await createClient();
+  return fetchAllPages<BasecampDocument>(client, `buckets/${projectId}/vaults/${vaultId}/documents.json`);
+}
+
+export async function getDocument(projectId: number, documentId: number): Promise<BasecampDocument> {
+  const client = await createClient();
+  const response = await client.get(`buckets/${projectId}/documents/${documentId}.json`).json<BasecampDocument>();
+  return response;
+}
+
+export async function createDocument(
+  projectId: number,
+  vaultId: number,
+  title: string,
+  content: string,
+  status?: string
+): Promise<BasecampDocument> {
+  const client = await createClient();
+  const payload: { title: string; content: string; status?: string } = { title, content };
+  if (status) payload.status = status;
+  
+  const response = await client.post(`buckets/${projectId}/vaults/${vaultId}/documents.json`, {
+    json: payload
+  }).json<BasecampDocument>();
+  return response;
+}
+
+export async function updateDocument(
+  projectId: number,
+  documentId: number,
+  updates: {
+    title?: string;
+    content?: string;
+  }
+): Promise<BasecampDocument> {
+  const client = await createClient();
+  const response = await client.put(`buckets/${projectId}/documents/${documentId}.json`, {
+    json: updates
+  }).json<BasecampDocument>();
+  return response;
+}
+
+// Uploads
+export async function listUploads(projectId: number, vaultId: number): Promise<BasecampUpload[]> {
+  const client = await createClient();
+  return fetchAllPages<BasecampUpload>(client, `buckets/${projectId}/vaults/${vaultId}/uploads.json`);
+}
+
+export async function getUpload(projectId: number, uploadId: number): Promise<BasecampUpload> {
+  const client = await createClient();
+  const response = await client.get(`buckets/${projectId}/uploads/${uploadId}.json`).json<BasecampUpload>();
+  return response;
+}
+
+export async function createUpload(
+  projectId: number,
+  vaultId: number,
+  attachable_sgid: string,
+  options?: {
+    description?: string;
+    base_name?: string;
+  }
+): Promise<BasecampUpload> {
+  const client = await createClient();
+  const payload: { attachable_sgid: string; description?: string; base_name?: string } = { attachable_sgid };
+  if (options?.description) payload.description = options.description;
+  if (options?.base_name) payload.base_name = options.base_name;
+  
+  const response = await client.post(`buckets/${projectId}/vaults/${vaultId}/uploads.json`, {
+    json: payload
+  }).json<BasecampUpload>();
+  return response;
+}
+
+export async function updateUpload(
+  projectId: number,
+  uploadId: number,
+  updates: {
+    description?: string;
+    base_name?: string;
+  }
+): Promise<BasecampUpload> {
+  const client = await createClient();
+  const response = await client.put(`buckets/${projectId}/uploads/${uploadId}.json`, {
+    json: updates
+  }).json<BasecampUpload>();
+  return response;
+}
+
+// Schedules
+export async function getSchedule(projectId: number): Promise<BasecampSchedule> {
+  const client = await createClient();
+  const project = await getProject(projectId);
+  const scheduleDock = project.dock.find((d: BasecampDock) => d.name === 'schedule');
+
+  if (!scheduleDock) {
+    throw new Error('Schedule not enabled for this project');
+  }
+
+  const scheduleId = scheduleDock.id;
+  const response = await client.get(`buckets/${projectId}/schedules/${scheduleId}.json`).json<BasecampSchedule>();
+  return response;
+}
+
+export async function listScheduleEntries(projectId: number, status?: string): Promise<BasecampScheduleEntry[]> {
+  const client = await createClient();
+  const project = await getProject(projectId);
+  const scheduleDock = project.dock.find((d: BasecampDock) => d.name === 'schedule');
+
+  if (!scheduleDock) {
+    throw new Error('Schedule not enabled for this project');
+  }
+
+  const scheduleId = scheduleDock.id;
+  const params = status ? `?status=${status}` : '';
+  return fetchAllPages<BasecampScheduleEntry>(client, `buckets/${projectId}/schedules/${scheduleId}/entries.json${params}`);
+}
+
+export async function getScheduleEntry(projectId: number, entryId: number): Promise<BasecampScheduleEntry> {
+  const client = await createClient();
+  const response = await client.get(`buckets/${projectId}/schedule_entries/${entryId}.json`).json<BasecampScheduleEntry>();
+  return response;
+}
+
+export async function createScheduleEntry(
+  projectId: number,
+  summary: string,
+  startsAt: string,
+  options?: {
+    description?: string;
+    endsAt?: string;
+    allDay?: boolean;
+    participantIds?: number[];
+  }
+): Promise<BasecampScheduleEntry> {
+  const client = await createClient();
+  const project = await getProject(projectId);
+  const scheduleDock = project.dock.find((d: BasecampDock) => d.name === 'schedule');
+
+  if (!scheduleDock) {
+    throw new Error('Schedule not enabled for this project');
+  }
+
+  const scheduleId = scheduleDock.id;
+  const payload: any = {
+    summary,
+    starts_at: startsAt
+  };
+
+  if (options?.description) payload.description = options.description;
+  if (options?.endsAt) payload.ends_at = options.endsAt;
+  if (options?.allDay !== undefined) payload.all_day = options.allDay;
+  if (options?.participantIds) payload.participant_ids = options.participantIds;
+
+  const response = await client.post(`buckets/${projectId}/schedules/${scheduleId}/entries.json`, {
+    json: payload
+  }).json<BasecampScheduleEntry>();
+  return response;
+}
+
+export async function updateScheduleEntry(
+  projectId: number,
+  entryId: number,
+  updates: {
+    summary?: string;
+    description?: string;
+    starts_at?: string;
+    ends_at?: string;
+    all_day?: boolean;
+    participant_ids?: number[];
+  }
+): Promise<BasecampScheduleEntry> {
+  const client = await createClient();
+  const response = await client.put(`buckets/${projectId}/schedule_entries/${entryId}.json`, {
+    json: updates
+  }).json<BasecampScheduleEntry>();
+  return response;
+}
+
+export async function deleteScheduleEntry(projectId: number, entryId: number): Promise<void> {
+  const client = await createClient();
+  await client.delete(`buckets/${projectId}/schedule_entries/${entryId}.json`);
+}
+
+// Search
+export async function search(
+  query: string,
+  options?: {
+    type?: string;
+    bucket_id?: number;
+    creator_id?: number;
+    file_type?: string;
+    exclude_chat?: boolean;
+    page?: number;
+    per_page?: number;
+  }
+): Promise<BasecampSearchResult[]> {
+  const client = await createClient();
+  const params = new URLSearchParams();
+  params.append('q', query);
+  
+  if (options?.type) params.append('type', options.type);
+  if (options?.bucket_id) params.append('bucket_id', options.bucket_id.toString());
+  if (options?.creator_id) params.append('creator_id', options.creator_id.toString());
+  if (options?.file_type) params.append('file_type', options.file_type);
+  if (options?.exclude_chat) params.append('exclude_chat', '1');
+  if (options?.page) params.append('page', options.page.toString());
+  if (options?.per_page) params.append('per_page', options.per_page.toString());
+  
+  return fetchAllPages<BasecampSearchResult>(client, `search.json?${params.toString()}`);
 }

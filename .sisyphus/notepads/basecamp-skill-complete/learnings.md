@@ -200,3 +200,75 @@
 - Config tests work well with real encryption/storage operations
 - MSW handlers are ready for when API/auth tests can be properly implemented
 
+
+## Webhooks Implementation (Wave 3, Task 11)
+
+### Webhook API Structure
+- Webhooks are project-level resources (not account-level)
+- Endpoint: `/buckets/{project_id}/webhooks.json`
+- Webhooks send HTTP POST to payload_url on project events
+- Payload URL must be HTTPS (security requirement)
+- Support event type filtering: "all" or specific types (Todo, Todolist, Message, etc.)
+
+### Webhook Types and Events
+- 18 supported event types: Comment, Client::Approval::Response, Client::Forward, Client::Reply, CloudFile, Document, GoogleDocument, Inbox::Forward, Kanban::Card, Kanban::Step, Message, Question, Question::Answer, Schedule::Entry, Todo, Todolist, Upload, Vault
+- Lifecycle events: created, active, title_updated, content_updated, copied, inserted, archived, unarchived, trashed, untrashed, deleted
+- Special events: subscribers_changed, publicized, comment_created
+- Todo-specific: todo_completed, todo_uncompleted
+- Question-specific: question_paused, question_resumed
+
+### Webhook Delivery Tracking
+- Recent deliveries array contains up to 25 most recent delivery exchanges
+- Each delivery includes: id, created_at, request (headers + body), response (code + headers + message + body)
+- Useful for debugging webhook failures
+- Response codes: 2xx = success, other = failure
+
+### API Functions Pattern
+- listWebhooks(projectId): Fetch all webhooks with pagination support
+- getWebhook(projectId, webhookId): Get single webhook with recent deliveries
+- createWebhook(projectId, payloadUrl, types?): Create with optional event types
+- updateWebhook(projectId, webhookId, updates): Update URL, types, or active status
+- deleteWebhook(projectId, webhookId): Delete webhook (returns 204 No Content)
+- testWebhook(projectId, webhookId): Send test payload to webhook
+
+### Command Implementation
+- `basecamp webhooks list --project <id>` - List all webhooks
+- `basecamp webhooks get <id> --project <id>` - Get webhook details with recent deliveries
+- `basecamp webhooks create --project <id> --payload-url <url> [--types <types>]` - Create webhook
+- `basecamp webhooks update <id> --project <id> [--payload-url <url>] [--types <types>] [--active true|false]` - Update webhook
+- `basecamp webhooks delete <id> --project <id>` - Delete webhook
+- `basecamp webhooks test <id> --project <id>` - Send test payload
+- All commands support `--format table|json` for output control
+
+### HTTPS Validation
+- Payload URL must start with `https://` (enforced in create and update commands)
+- Basecamp API requirement for security
+- Validation happens client-side before API call
+
+### Type System
+- BasecampWebhook interface with all required fields
+- BasecampWebhookDelivery interface for tracking delivery history
+- Optional recent_deliveries array in webhook details
+- Proper TypeScript generics for API client
+
+### Testing Strategy
+- 28 tests covering webhook types, properties, endpoints, and event lifecycle
+- Tests validate webhook structure, HTTPS requirement, event types
+- Tests verify endpoint patterns for all CRUD operations
+- Tests check delivery tracking structure
+- No mocking of HTTP calls - tests focus on type safety and structure
+
+### Integration Points
+- Registered in src/index.ts with other command groups
+- Uses existing API client pattern (createClient, fetchAllPages)
+- Follows established command structure from todos, messages, etc.
+- Consistent error handling and output formatting
+
+### Key Learnings
+1. Webhook payload URLs must be HTTPS - this is a Basecamp API requirement
+2. Event types can be "all" or specific types - empty array defaults to "all"
+3. Recent deliveries are useful for debugging webhook failures
+4. Webhook test endpoint sends a sample payload for validation
+5. Webhooks are project-scoped, not account-scoped
+6. Delivery tracking includes full request/response for debugging
+

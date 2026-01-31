@@ -20,7 +20,6 @@ export function createCardTablesCommands(): Command {
   const cardtables = new Command('cardtables')
     .description('Manage card tables (Kanban boards)');
 
-  // Get card table
   cardtables
     .command('get')
     .description('Get card table (Kanban board) for a project')
@@ -77,7 +76,6 @@ export function createCardTablesCommands(): Command {
       }
     });
 
-  // List columns
   cardtables
     .command('columns')
     .description('List columns in a card table')
@@ -132,7 +130,6 @@ export function createCardTablesCommands(): Command {
       }
     });
 
-  // Create column
   cardtables
     .command('create-column')
     .description('Create a new column in a card table')
@@ -168,7 +165,6 @@ export function createCardTablesCommands(): Command {
       }
     });
 
-  // Update column
   cardtables
     .command('update-column <id>')
     .description('Update a column')
@@ -214,7 +210,6 @@ export function createCardTablesCommands(): Command {
       }
     });
 
-  // Delete column
   cardtables
     .command('delete-column <id>')
     .description('Delete a column')
@@ -244,7 +239,6 @@ export function createCardTablesCommands(): Command {
       }
     });
 
-  // List cards
   cardtables
     .command('cards')
     .description('List cards in a column')
@@ -304,7 +298,6 @@ export function createCardTablesCommands(): Command {
       }
     });
 
-  // Get card
   cardtables
     .command('get-card <id>')
     .description('Get card details')
@@ -349,7 +342,6 @@ export function createCardTablesCommands(): Command {
       }
     });
 
-  // Create card
   cardtables
     .command('create-card')
     .description('Create a new card')
@@ -409,7 +401,6 @@ export function createCardTablesCommands(): Command {
       }
     });
 
-  // Update card
   cardtables
     .command('update-card <id>')
     .description('Update a card')
@@ -467,7 +458,6 @@ export function createCardTablesCommands(): Command {
       }
     });
 
-  // Move card
   cardtables
     .command('move-card <id>')
     .description('Move a card to a different column')
@@ -503,7 +493,6 @@ export function createCardTablesCommands(): Command {
       }
     });
 
-  // Delete card
   cardtables
     .command('delete-card <id>')
     .description('Delete a card')
