@@ -426,6 +426,52 @@ export interface BasecampUpload {
   height?: number;
 }
 
+export interface BasecampSchedule {
+  id: number;
+  status: string;
+  visible_to_clients: boolean;
+  created_at: string;
+  updated_at: string;
+  title: string;
+  inherits_status: boolean;
+  type: string;
+  url: string;
+  app_url: string;
+  bookmark_url: string;
+  position: number;
+  bucket: BasecampBucket;
+  creator: BasecampPerson;
+  include_due_assignments: boolean;
+  entries_count: number;
+  entries_url: string;
+}
+
+export interface BasecampScheduleEntry {
+  id: number;
+  status: string;
+  visible_to_clients: boolean;
+  created_at: string;
+  updated_at: string;
+  title: string;
+  inherits_status: boolean;
+  type: string;
+  url: string;
+  app_url: string;
+  bookmark_url: string;
+  subscription_url: string;
+  comments_count: number;
+  comments_url: string;
+  parent: BasecampParent;
+  bucket: BasecampBucket;
+  creator: BasecampPerson;
+  description: string;
+  summary: string;
+  all_day: boolean;
+  starts_at: string;
+  ends_at: string;
+  participants: BasecampPerson[];
+}
+
 export interface BasecampConfig {
   tokens?: BasecampTokens;
   currentAccountId?: number;
