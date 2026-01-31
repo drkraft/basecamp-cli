@@ -15,6 +15,41 @@ import type {
 
 const USER_AGENT = 'Basecamp CLI (emredoganer@github.com)';
 
+/**
+ * Parse RFC5988 Link header to extract the "next" page URL
+ * Example: Link: <https://3.basecampapi.com/999999999/projects.json?page=2>; rel="next"
+ */
+function parseNextLink(linkHeader: string | undefined): string | null {
+  if (!linkHeader) return null;
+  
+  const match = linkHeader.match(/<([^>]+)>;\s*rel="next"/);
+  return match ? match[1] : null;
+}
+
+/**
+ * Fetch all pages of a paginated API endpoint and aggregate results
+ * Handles RFC5988 Link header pagination automatically
+ */
+async function fetchAllPages<T>(
+  client: Got,
+  url: string,
+  options?: Options
+): Promise<T[]> {
+  const allResults: T[] = [];
+  let nextUrl: string | null = url;
+
+  while (nextUrl) {
+    const response = await client.get(nextUrl, options);
+    const items = response.body as T[];
+    allResults.push(...items);
+
+    const linkHeader = response.headers.link as string | undefined;
+    nextUrl = parseNextLink(linkHeader);
+  }
+
+  return allResults;
+}
+
 async function createClient(): Promise<Got> {
   const accessToken = await getValidAccessToken();
   const accountId = getCurrentAccountId();
@@ -54,8 +89,7 @@ async function createClient(): Promise<Got> {
 // Projects
 export async function listProjects(): Promise<BasecampProject[]> {
   const client = await createClient();
-  const response = await client.get('projects.json').json<BasecampProject[]>();
-  return response;
+  return fetchAllPages<BasecampProject>(client, 'projects.json');
 }
 
 export async function getProject(projectId: number): Promise<BasecampProject> {
@@ -90,8 +124,7 @@ export async function listTodoLists(projectId: number): Promise<BasecampTodoList
   }
 
   const todosetId = todosetDock.id;
-  const response = await client.get(`buckets/${projectId}/todosets/${todosetId}/todolists.json`).json<BasecampTodoList[]>();
-  return response;
+  return fetchAllPages<BasecampTodoList>(client, `buckets/${projectId}/todosets/${todosetId}/todolists.json`);
 }
 
 export async function getTodoList(projectId: number, todolistId: number): Promise<BasecampTodoList> {
@@ -120,8 +153,7 @@ export async function createTodoList(projectId: number, name: string, descriptio
 export async function listTodos(projectId: number, todolistId: number, completed?: boolean): Promise<BasecampTodo[]> {
   const client = await createClient();
   const params = completed !== undefined ? `?completed=${completed}` : '';
-  const response = await client.get(`buckets/${projectId}/todolists/${todolistId}/todos.json${params}`).json<BasecampTodo[]>();
-  return response;
+  return fetchAllPages<BasecampTodo>(client, `buckets/${projectId}/todolists/${todolistId}/todos.json${params}`);
 }
 
 export async function getTodo(projectId: number, todoId: number): Promise<BasecampTodo> {
@@ -187,8 +219,7 @@ export async function listMessages(projectId: number): Promise<BasecampMessage[]
   }
 
   const messageboardId = messageboardDock.id;
-  const response = await client.get(`buckets/${projectId}/message_boards/${messageboardId}/messages.json`).json<BasecampMessage[]>();
-  return response;
+  return fetchAllPages<BasecampMessage>(client, `buckets/${projectId}/message_boards/${messageboardId}/messages.json`);
 }
 
 export async function getMessage(projectId: number, messageId: number): Promise<BasecampMessage> {
@@ -234,8 +265,7 @@ export async function listCampfires(projectId: number): Promise<BasecampCampfire
 
 export async function getCampfireLines(projectId: number, campfireId: number): Promise<BasecampCampfireLine[]> {
   const client = await createClient();
-  const response = await client.get(`buckets/${projectId}/chats/${campfireId}/lines.json`).json<BasecampCampfireLine[]>();
-  return response;
+  return fetchAllPages<BasecampCampfireLine>(client, `buckets/${projectId}/chats/${campfireId}/lines.json`);
 }
 
 export async function sendCampfireLine(projectId: number, campfireId: number, content: string): Promise<BasecampCampfireLine> {
@@ -250,8 +280,7 @@ export async function sendCampfireLine(projectId: number, campfireId: number, co
 export async function listPeople(projectId?: number): Promise<BasecampPerson[]> {
   const client = await createClient();
   const url = projectId ? `projects/${projectId}/people.json` : 'people.json';
-  const response = await client.get(url).json<BasecampPerson[]>();
-  return response;
+  return fetchAllPages<BasecampPerson>(client, url);
 }
 
 export async function getPerson(personId: number): Promise<BasecampPerson> {
