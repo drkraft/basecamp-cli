@@ -46,7 +46,6 @@ export function createEventsCommands(): Command {
 
         const table = new Table({
           head: ['ID', 'Action', 'Creator', 'Created At'],
-          colWidths: [12, 20, 25, 20],
           wordWrap: true
         });
 

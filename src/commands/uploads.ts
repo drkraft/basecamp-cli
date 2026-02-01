@@ -50,7 +50,6 @@ export function createUploadsCommands(): Command {
 
         const table = new Table({
           head: ['ID', 'Filename', 'Type', 'Size', 'Comments', 'Created'],
-          colWidths: [12, 30, 15, 12, 10, 20],
           wordWrap: true
         });
 
@@ -58,7 +57,7 @@ export function createUploadsCommands(): Command {
           const sizeKB = (upload.byte_size / 1024).toFixed(2);
           table.push([
             upload.id,
-            upload.filename.substring(0, 27) + (upload.filename.length > 27 ? '...' : ''),
+            upload.filename,
             upload.content_type,
             `${sizeKB} KB`,
             upload.comments_count,

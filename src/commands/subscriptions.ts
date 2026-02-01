@@ -50,7 +50,6 @@ export function createSubscriptionsCommands(): Command {
 
         const table = new Table({
           head: ['ID', 'Name', 'Email', 'Title'],
-          colWidths: [12, 25, 30, 25],
           wordWrap: true
         });
 

@@ -52,7 +52,6 @@ export function createRecordingsCommands(): Command {
 
         const table = new Table({
           head: ['ID', 'Type', 'Title', 'Project', 'Created', 'Status'],
-          colWidths: [12, 15, 30, 15, 12, 10],
           wordWrap: true
         });
 
@@ -60,7 +59,7 @@ export function createRecordingsCommands(): Command {
           table.push([
             rec.id,
             rec.type,
-            rec.title?.substring(0, 28) + (rec.title?.length > 28 ? '...' : '') || '-',
+            rec.title || '-',
             rec.bucket?.name || '-',
             rec.created_at?.substring(0, 10) || '-',
             rec.status || '-'

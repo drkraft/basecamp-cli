@@ -57,7 +57,6 @@ export function createSearchCommand(): Command {
 
         const table = new Table({
           head: ['ID', 'Type', 'Title', 'Project', 'Creator'],
-          colWidths: [12, 15, 35, 20, 20],
           wordWrap: true
         });
 
@@ -65,9 +64,9 @@ export function createSearchCommand(): Command {
           table.push([
             result.id,
             result.type,
-            result.title.substring(0, 32) + (result.title.length > 32 ? '...' : ''),
-            result.bucket.name.substring(0, 18) + (result.bucket.name.length > 18 ? '...' : ''),
-            result.creator.name.substring(0, 18) + (result.creator.name.length > 18 ? '...' : '')
+            result.title,
+            result.bucket.name,
+            result.creator.name
           ]);
         });
 

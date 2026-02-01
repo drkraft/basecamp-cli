@@ -50,14 +50,13 @@ export function createDocumentsCommands(): Command {
 
         const table = new Table({
           head: ['ID', 'Title', 'Comments', 'Position', 'Created'],
-          colWidths: [12, 35, 10, 10, 20],
           wordWrap: true
         });
 
         documentsList.forEach(doc => {
           table.push([
             doc.id,
-            doc.title.substring(0, 32) + (doc.title.length > 32 ? '...' : ''),
+            doc.title,
             doc.comments_count,
             doc.position,
             new Date(doc.created_at).toLocaleDateString()

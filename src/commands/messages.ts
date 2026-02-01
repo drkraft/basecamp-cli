@@ -39,14 +39,13 @@ export function createMessagesCommands(): Command {
 
         const table = new Table({
           head: ['ID', 'Subject', 'Author', 'Date', 'Comments'],
-          colWidths: [12, 35, 20, 12, 10],
           wordWrap: true
         });
 
         messageList.forEach(msg => {
           table.push([
             msg.id,
-            msg.subject.substring(0, 32) + (msg.subject.length > 32 ? '...' : ''),
+            msg.subject,
             msg.creator?.name || '-',
             new Date(msg.created_at).toLocaleDateString(),
             msg.comments_count

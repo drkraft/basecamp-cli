@@ -42,7 +42,6 @@ export function createPeopleCommands(): Command {
 
         const table = new Table({
           head: ['ID', 'Name', 'Email', 'Title', 'Role'],
-          colWidths: [12, 25, 30, 20, 12],
           wordWrap: true
         });
 

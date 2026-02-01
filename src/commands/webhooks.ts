@@ -46,7 +46,6 @@ export function createWebhooksCommands(): Command {
 
         const table = new Table({
           head: ['ID', 'Status', 'Payload URL', 'Types'],
-          colWidths: [15, 10, 40, 30],
           wordWrap: true
         });
 
@@ -54,8 +53,8 @@ export function createWebhooksCommands(): Command {
           table.push([
             webhook.id,
             webhook.active ? chalk.green('✓ Active') : chalk.dim('○ Inactive'),
-            webhook.payload_url.substring(0, 37) + (webhook.payload_url.length > 37 ? '...' : ''),
-            webhook.types.join(', ').substring(0, 27) + (webhook.types.join(', ').length > 27 ? '...' : '')
+            webhook.payload_url,
+            webhook.types.join(', ')
           ]);
         });
 

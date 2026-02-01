@@ -33,7 +33,6 @@ export function createProjectsCommands(): Command {
 
         const table = new Table({
           head: ['ID', 'Name', 'Status', 'Description'],
-          colWidths: [12, 30, 12, 40],
           wordWrap: true
         });
 
@@ -42,7 +41,7 @@ export function createProjectsCommands(): Command {
             project.id,
             project.name,
             project.status,
-            project.description?.substring(0, 37) + (project.description?.length > 37 ? '...' : '') || '-'
+            project.description || '-'
           ]);
         });
 
