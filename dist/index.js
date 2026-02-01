@@ -80,7 +80,7 @@ import {
   updateUpload,
   updateVault,
   updateWebhook
-} from "./chunk-SNQLEFIO.js";
+} from "./chunk-YYG5FL2E.js";
 
 // src/index.ts
 import { Command as Command18 } from "commander";

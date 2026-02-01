@@ -43,24 +43,25 @@ describe('Vaults API Functions', () => {
   });
 
   describe('Function return types', () => {
-    it('getVault should return a Promise', () => {
-      const result = api.getVault(1, 1);
-      expect(result instanceof Promise).toBe(true);
+    it('getVault should return a Promise', async () => {
+      const result = await api.getVault(1, 1);
+      expect(result.id).toBe(1);
     });
 
-    it('listVaults should return a Promise', () => {
-      const result = api.listVaults(1);
-      expect(result instanceof Promise).toBe(true);
+    it('listVaults should return a Promise', async () => {
+      const result = await api.listVaults(1);
+      expect(Array.isArray(result)).toBe(true);
+      expect(result[0]?.id).toBe(1);
     });
 
-    it('createVault should return a Promise', () => {
-      const result = api.createVault(1, 1, 'Test Vault');
-      expect(result instanceof Promise).toBe(true);
+    it('createVault should return a Promise', async () => {
+      const result = await api.createVault(1, 1, 'Test Vault');
+      expect(result.title).toBe('Test Vault');
     });
 
-    it('updateVault should return a Promise', () => {
-      const result = api.updateVault(1, 1, 'Updated Vault');
-      expect(result instanceof Promise).toBe(true);
+    it('updateVault should return a Promise', async () => {
+      const result = await api.updateVault(1, 1, 'Updated Vault');
+      expect(result.title).toBe('Updated Vault');
     });
   });
 });

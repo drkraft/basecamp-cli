@@ -43,24 +43,25 @@ describe('Documents API Functions', () => {
   });
 
   describe('Function return types', () => {
-    it('listDocuments should return a Promise', () => {
-      const result = api.listDocuments(1, 1);
-      expect(result instanceof Promise).toBe(true);
+    it('listDocuments should return a Promise', async () => {
+      const result = await api.listDocuments(1, 1);
+      expect(Array.isArray(result)).toBe(true);
+      expect(result[0]?.id).toBe(5001);
     });
 
-    it('getDocument should return a Promise', () => {
-      const result = api.getDocument(1, 1);
-      expect(result instanceof Promise).toBe(true);
+    it('getDocument should return a Promise', async () => {
+      const result = await api.getDocument(1, 1);
+      expect(result.id).toBe(5001);
     });
 
-    it('createDocument should return a Promise', () => {
-      const result = api.createDocument(1, 1, 'Test Doc', '<p>Content</p>');
-      expect(result instanceof Promise).toBe(true);
+    it('createDocument should return a Promise', async () => {
+      const result = await api.createDocument(1, 1, 'Test Doc', '<p>Content</p>');
+      expect(result.title).toBe('Test Doc');
     });
 
-    it('updateDocument should return a Promise', () => {
-      const result = api.updateDocument(1, 1, { title: 'Updated' });
-      expect(result instanceof Promise).toBe(true);
+    it('updateDocument should return a Promise', async () => {
+      const result = await api.updateDocument(1, 1, { title: 'Updated' });
+      expect(result.title).toBe('Updated');
     });
   });
 });

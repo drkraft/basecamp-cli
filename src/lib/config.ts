@@ -1,6 +1,7 @@
-import Conf from 'conf';
+import Conf, { type Options } from 'conf';
 import crypto from 'crypto';
 import os from 'os';
+import path from 'path';
 import type { BasecampConfig, BasecampTokens } from '../types/index.js';
 
 // =============================================================================
@@ -67,7 +68,10 @@ function isEncrypted(text: string): boolean {
 // Configuration store
 // =============================================================================
 
-const config = new Conf<BasecampConfig>({
+const configDirectory = process.env.BASECAMP_CONFIG_DIR
+  || (process.env.NODE_ENV === 'test' ? path.join(process.cwd(), '.tmp', 'basecamp-cli-test') : undefined);
+
+const configOptions: Options<BasecampConfig> = {
   projectName: 'basecamp-cli',
   schema: {
     tokens: {
@@ -84,7 +88,13 @@ const config = new Conf<BasecampConfig>({
     // Note: clientSecret is intentionally NOT stored in config for security.
     // It must be provided via BASECAMP_CLIENT_SECRET environment variable.
   }
-});
+};
+
+if (configDirectory) {
+  configOptions.cwd = configDirectory;
+}
+
+const config = new Conf<BasecampConfig>(configOptions);
 
 // =============================================================================
 // Token management with encryption

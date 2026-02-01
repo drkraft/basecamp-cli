@@ -52,29 +52,29 @@ describe('Comments API Functions', () => {
   });
 
   describe('Function return types', () => {
-    it('listComments should return a Promise', () => {
-      const result = api.listComments(1, 1);
-      expect(result instanceof Promise).toBe(true);
+    it('listComments should return a Promise', async () => {
+      const result = await api.listComments(1, 1);
+      expect(Array.isArray(result)).toBe(true);
+      expect(result[0]?.id).toBe(1);
     });
 
-    it('getComment should return a Promise', () => {
-      const result = api.getComment(1, 1);
-      expect(result instanceof Promise).toBe(true);
+    it('getComment should return a Promise', async () => {
+      const result = await api.getComment(1, 1);
+      expect(result.id).toBe(1);
     });
 
-    it('createComment should return a Promise', () => {
-      const result = api.createComment(1, 1, 'test');
-      expect(result instanceof Promise).toBe(true);
+    it('createComment should return a Promise', async () => {
+      const result = await api.createComment(1, 1, 'test');
+      expect(result.id).toBe(2);
     });
 
-    it('updateComment should return a Promise', () => {
-      const result = api.updateComment(1, 1, 'test');
-      expect(result instanceof Promise).toBe(true);
+    it('updateComment should return a Promise', async () => {
+      const result = await api.updateComment(1, 1, 'test');
+      expect(result.id).toBe(1);
     });
 
-    it('deleteComment should return a Promise', () => {
-      const result = api.deleteComment(1, 1);
-      expect(result instanceof Promise).toBe(true);
+    it('deleteComment should return a Promise', async () => {
+      await expect(api.deleteComment(1, 1)).resolves.toBeUndefined();
     });
   });
 });
