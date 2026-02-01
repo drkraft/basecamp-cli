@@ -58,6 +58,7 @@ import {
   listWebhooks,
   logout,
   moveCard,
+  moveTodo,
   restoreRecording,
   search,
   sendCampfireLine,
@@ -78,7 +79,7 @@ import {
   updateUpload,
   updateVault,
   updateWebhook
-} from "./chunk-J3M6TH3D.js";
+} from "./chunk-R7GNOAVE.js";
 
 // src/index.ts
 import { Command as Command18 } from "commander";
@@ -667,6 +668,39 @@ Total: ${todoList.length} to-dos`));
       console.log(chalk3.green(`\u2713 To-do ${todoId} moved to trash`));
     } catch (error) {
       console.error(chalk3.red("Failed to delete to-do:"), error instanceof Error ? error.message : error);
+      process.exit(1);
+    }
+  });
+  todos.command("move <id>").description("Move a to-do to a different list").requiredOption("-p, --project <id>", "Project ID").requiredOption("-l, --list <id>", "Target to-do list ID").option("--position <pos>", "Position in target list (default: 1)", "1").action(async (id, options) => {
+    if (!isAuthenticated()) {
+      console.log(chalk3.yellow('Not authenticated. Run "basecamp auth login" to login.'));
+      return;
+    }
+    try {
+      const projectId = parseInt(options.project, 10);
+      if (isNaN(projectId)) {
+        console.error(chalk3.red("Invalid project ID: must be a number"));
+        process.exit(1);
+      }
+      const todoId = parseInt(id, 10);
+      if (isNaN(todoId)) {
+        console.error(chalk3.red("Invalid todo ID: must be a number"));
+        process.exit(1);
+      }
+      const targetListId = parseInt(options.list, 10);
+      if (isNaN(targetListId)) {
+        console.error(chalk3.red("Invalid target list ID: must be a number"));
+        process.exit(1);
+      }
+      const position = parseInt(options.position, 10);
+      if (isNaN(position) || position < 1) {
+        console.error(chalk3.red("Invalid position: must be a number >= 1"));
+        process.exit(1);
+      }
+      await moveTodo(projectId, todoId, targetListId, position);
+      console.log(chalk3.green(`\u2713 To-do ${todoId} moved to list ${targetListId}`));
+    } catch (error) {
+      console.error(chalk3.red("Failed to move to-do:"), error instanceof Error ? error.message : error);
       process.exit(1);
     }
   });
