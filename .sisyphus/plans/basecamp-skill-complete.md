@@ -924,7 +924,7 @@ Wave 4 (MCP & Publication - After Wave 3):
 
 ### Phase 5: Validation & Documentation
 
-- [~] 18. Validation manuelle complète (USER ACTION - run scripts/validate.ts)
+- [~] 18. Validation manuelle complète (BLOCKED - requires BASECAMP_CLIENT_SECRET, run: bun scripts/validate.ts)
 
   **What to do**:
   - Créer `scripts/validate.ts` script de validation
@@ -1013,7 +1013,7 @@ Wave 4 (MCP & Publication - After Wave 3):
 
 ---
 
-- [ ] 20. Publication (npm, GitHub, ClawHub)
+- [~] 20. Publication (READY - run: ./scripts/release.sh)
 
   **What to do**:
   - Vérifier package.json prêt pour publication
