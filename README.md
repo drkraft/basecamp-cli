@@ -8,7 +8,7 @@ A comprehensive command-line interface and MCP server for Basecamp 4. Manage pro
 ## Features
 
 - **Full CLI** - 18 command groups covering the complete Basecamp 4 API
-- **MCP Server** - 41 tools for AI assistant integration (Claude, etc.)
+- **MCP Server** - 43 tools for AI assistant integration (Claude, etc.)
 - **Multiple Output Formats** - Table or JSON output for all commands
 - **Pagination & Retry** - Automatic handling of large datasets and rate limits
 - **OAuth 2.0** - Secure authentication via browser
@@ -92,6 +92,7 @@ basecamp projects archive <id>                            # Archive project
 # To-do lists
 basecamp todolists list --project <id>
 basecamp todolists create --project <id> --name "Tasks"
+basecamp todolists delete <id> --project <project-id>
 
 # To-dos
 basecamp todos list --project <id> --list <list-id>
@@ -103,6 +104,7 @@ basecamp todos create --project <id> --list <list-id> --content "Task" \
 basecamp todos update <id> --project <project-id> --content "Updated"
 basecamp todos complete <id> --project <project-id>
 basecamp todos uncomplete <id> --project <project-id>
+basecamp todos delete <id> --project <project-id>
 
 # To-do groups
 basecamp todogroups list --project <id>
@@ -254,13 +256,13 @@ basecamp-mcp
 bun run mcp
 ```
 
-### Available Tools (41)
+### Available Tools (43)
 
 | Category | Tools |
 |----------|-------|
 | Projects | `basecamp_list_projects`, `basecamp_get_project`, `basecamp_create_project` |
-| Todo Lists | `basecamp_list_todolists`, `basecamp_get_todolist` |
-| Todos | `basecamp_list_todos`, `basecamp_get_todo`, `basecamp_create_todo`, `basecamp_update_todo`, `basecamp_complete_todo`, `basecamp_uncomplete_todo` |
+| Todo Lists | `basecamp_list_todolists`, `basecamp_get_todolist`, `basecamp_delete_todolist` |
+| Todos | `basecamp_list_todos`, `basecamp_get_todo`, `basecamp_create_todo`, `basecamp_update_todo`, `basecamp_complete_todo`, `basecamp_uncomplete_todo`, `basecamp_delete_todo` |
 | Messages | `basecamp_list_messages`, `basecamp_get_message`, `basecamp_create_message` |
 | People | `basecamp_list_people`, `basecamp_get_person`, `basecamp_get_me` |
 | Comments | `basecamp_list_comments`, `basecamp_get_comment`, `basecamp_create_comment` |

@@ -11,7 +11,7 @@ Full-featured CLI and MCP server for Basecamp 4 API.
 ## Features
 
 - **18 command groups** covering all Basecamp 4 domains
-- **41 MCP tools** for AI assistant integration
+- **43 MCP tools** for AI assistant integration
 - Automatic pagination and retry with backoff
 - OAuth 2.0 authentication
 
@@ -49,14 +49,14 @@ Add to your MCP config:
 | Category | Tools |
 |----------|-------|
 | Projects | list_projects, get_project, create_project |
-| Todos | list_todolists, list_todos, create_todo, complete_todo, update_todo |
+| Todos | list_todolists, list_todos, create_todo, complete_todo, update_todo, delete_todo, delete_todolist |
 | Messages | list_messages, get_message, create_message |
 | Comments | list_comments, create_comment |
 | Documents | list_documents, create_document |
 | Schedules | list_schedule_entries, create_schedule_entry |
 | Card Tables | get_card_table, list_cards, create_card |
 | Search | search |
-| + more | 41 tools total |
+| + more | 43 tools total |
 
 ## CLI Commands
 
@@ -64,6 +64,8 @@ Add to your MCP config:
 basecamp projects list
 basecamp todos list --project <id> --list <list-id>
 basecamp todos create --project <id> --list <list-id> --content "Task"
+basecamp todos delete <id> --project <id>
+basecamp todolists delete <id> --project <id>
 basecamp cardtables cards --project <id> --column <col-id>
 basecamp search "keyword"
 ```
