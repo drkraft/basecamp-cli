@@ -10,6 +10,7 @@ import { createPeopleCommands } from './commands/people.js';
 import { createCommentsCommands } from './commands/comments.js';
 import { createSchedulesCommands } from './commands/schedules.js';
 import { createSearchCommand } from './commands/search.js';
+import { createCardTablesCommands } from './commands/cardtables.js';
 
 const program = new Command();
 
@@ -35,5 +36,6 @@ program.addCommand(createPeopleCommands());
 program.addCommand(createCommentsCommands());
 program.addCommand(createSchedulesCommands());
 program.addCommand(createSearchCommand());
+program.addCommand(createCardTablesCommands());
 
 program.parse();
