@@ -262,8 +262,8 @@ bun run mcp
 | Category | Tools |
 |----------|-------|
 | Projects | `basecamp_list_projects`, `basecamp_get_project`, `basecamp_create_project` |
-| Todo Lists | `basecamp_list_todolists`, `basecamp_get_todolist`, `basecamp_delete_todolist` |
-| Todos | `basecamp_list_todos`, `basecamp_get_todo`, `basecamp_create_todo`, `basecamp_update_todo`, `basecamp_complete_todo`, `basecamp_uncomplete_todo`, `basecamp_delete_todo`, `basecamp_move_todo` |
+| Todo Lists | `basecamp_list_todolists`, `basecamp_get_todolist` |
+| Todos | `basecamp_list_todos`, `basecamp_get_todo`, `basecamp_create_todo`, `basecamp_update_todo`, `basecamp_complete_todo`, `basecamp_uncomplete_todo`, `basecamp_delete_todo`, `basecamp_delete_todolist`, `basecamp_move_todo` |
 | Messages | `basecamp_list_messages`, `basecamp_get_message`, `basecamp_create_message` |
 | People | `basecamp_list_people`, `basecamp_get_person`, `basecamp_get_me` |
 | Comments | `basecamp_list_comments`, `basecamp_get_comment`, `basecamp_create_comment` |

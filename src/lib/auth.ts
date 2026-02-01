@@ -55,8 +55,9 @@ export async function startOAuthFlow(): Promise<BasecampTokens> {
 
   if (!clientId || !clientSecret) {
     throw new Error(
-      'Missing OAuth credentials. Please set BASECAMP_CLIENT_ID and BASECAMP_CLIENT_SECRET environment variables,\n' +
-      'or run: basecamp auth configure --client-id <id> --client-secret <secret>'
+      'Missing OAuth credentials. Please configure:\n' +
+      '  1. Run: basecamp auth configure --client-id <id>\n' +
+      '  2. Set: export BASECAMP_CLIENT_SECRET="<secret>"'
     );
   }
 
