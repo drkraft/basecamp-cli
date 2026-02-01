@@ -22,9 +22,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Search**: Global search with type/project/creator filters
 - **Subscriptions**: List subscribers, subscribe/unsubscribe from recordings
 - **Todo Groups**: List and create todolist groups
+- **Delete commands**: `todos delete` and `todolists delete` (move to trash)
 
 #### MCP Server
-- New MCP (Model Context Protocol) server with 41 tools
+- New MCP (Model Context Protocol) server with 43 tools
 - Full integration with AI assistants (Claude, OpenCode, etc.)
 - All tools documented with JSON Schema
 
