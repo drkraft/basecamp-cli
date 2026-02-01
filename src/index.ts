@@ -11,21 +11,26 @@ import { createCommentsCommands } from './commands/comments.js';
 import { createSchedulesCommands } from './commands/schedules.js';
 import { createSearchCommand } from './commands/search.js';
 import { createCardTablesCommands } from './commands/cardtables.js';
+import { createVaultsCommands } from './commands/vaults.js';
+import { createDocumentsCommands } from './commands/documents.js';
+import { createUploadsCommands } from './commands/uploads.js';
+import { createWebhooksCommands } from './commands/webhooks.js';
+import { createRecordingsCommands } from './commands/recordings.js';
+import { createEventsCommands } from './commands/events.js';
+import { createSubscriptionsCommands } from './commands/subscriptions.js';
 
 const program = new Command();
 
 program
   .name('basecamp')
-  .description('CLI for managing Basecamp 4 projects, to-dos, messages, and campfires')
-  .version('1.0.0')
+  .description('CLI for managing Basecamp 4 projects, to-dos, messages, and more')
+  .version('2.0.0')
   .option('-v, --verbose', 'Enable verbose output for debugging');
 
-// Auth commands
 program.addCommand(createAuthCommands());
 program.addCommand(createAccountsCommand());
 program.addCommand(createAccountCommand());
 
-// Resource commands
 program.addCommand(createProjectsCommands());
 program.addCommand(createTodoListsCommands());
 program.addCommand(createTodosCommands());
@@ -37,5 +42,12 @@ program.addCommand(createCommentsCommands());
 program.addCommand(createSchedulesCommands());
 program.addCommand(createSearchCommand());
 program.addCommand(createCardTablesCommands());
+program.addCommand(createVaultsCommands());
+program.addCommand(createDocumentsCommands());
+program.addCommand(createUploadsCommands());
+program.addCommand(createWebhooksCommands());
+program.addCommand(createRecordingsCommands());
+program.addCommand(createEventsCommands());
+program.addCommand(createSubscriptionsCommands());
 
 program.parse();
