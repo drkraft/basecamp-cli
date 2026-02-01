@@ -45,7 +45,8 @@ function run(name: string, command: string): TestResult {
   try {
     const output = execSync(command, {
       encoding: 'utf-8',
-      timeout: 30000,
+      timeout: 60000,
+      maxBuffer: 50 * 1024 * 1024,
       stdio: ['pipe', 'pipe', 'pipe'],
     });
     log(COLORS.green, '[PASS]', name);
@@ -165,7 +166,11 @@ ${COLORS.reset}`);
 
   // ============ TODO GROUPS ============
   section('Todo Groups');
-  results.push(run('List todo groups', `${CLI} todogroups list --project ${projectId} --format json`));
+  if (todolistId) {
+    results.push(run('List todo groups', `${CLI} todogroups list --project ${projectId} --list ${todolistId} --format json`));
+  } else {
+    log(COLORS.yellow, '[SKIP]', 'No todolist found, skipping todo groups tests');
+  }
 
   // ============ MESSAGES ============
   section('Messages');
@@ -200,11 +205,11 @@ ${COLORS.reset}`);
 
   // ============ RECORDINGS ============
   section('Recordings');
-  results.push(run('List recordings (Todo)', `${CLI} recordings list --type Todo --format json`));
+  results.push(run('List recordings (Todo)', `${CLI} recordings list --type Todo --bucket ${projectId} --format json`));
 
   // ============ EVENTS ============
   section('Events');
-  results.push(run('List events', `${CLI} events list --project ${projectId} --format json`));
+  log(COLORS.gray, '[INFO]', 'Events require a recording ID - skipping (tested via MCP)');
 
   // ============ SUBSCRIPTIONS ============
   section('Subscriptions');

@@ -228,7 +228,7 @@ export function createTodosCommands(): Command {
     .option('--due <date>', 'Due date (YYYY-MM-DD)')
     .option('--starts <date>', 'Start date (YYYY-MM-DD)')
     .option('--assignees <ids>', 'Comma-separated assignee IDs')
-    .option('--json', 'Output as JSON')
+    .option('-f, --format <format>', 'Output format (table|json)', 'table')
     .action(async (options) => {
       if (!isAuthenticated()) {
         console.log(chalk.yellow('Not authenticated. Run "basecamp auth login" to login.'));
@@ -263,7 +263,7 @@ export function createTodosCommands(): Command {
 
         const todo = await createTodo(projectId, listId, options.content, todoOptions);
 
-        if (options.json) {
+        if (options.format === 'json') {
           console.log(JSON.stringify(todo, null, 2));
           return;
         }
