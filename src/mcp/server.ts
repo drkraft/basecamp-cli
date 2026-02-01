@@ -4,7 +4,7 @@ import {
   CallToolRequestSchema,
   ListToolsRequestSchema,
 } from '@modelcontextprotocol/sdk/types.js';
-import { getTools } from './tools/index.js';
+import { getTools, executeTool } from './tools/index.js';
 
 /**
  * Create and configure the MCP server
@@ -41,23 +41,29 @@ function setupToolHandlers(server: Server): void {
   // Handle tools/call request
   server.setRequestHandler(CallToolRequestSchema, async (request) => {
     const { name, arguments: args } = request.params;
-    const tools = await getTools();
     
-    const tool = tools.find((t) => t.name === name);
-    if (!tool) {
-      throw new Error(`Unknown tool: ${name}`);
+    try {
+      const result = await executeTool(name, args || {});
+      return {
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify(result, null, 2),
+          },
+        ],
+      };
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      return {
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify({ error: errorMessage }, null, 2),
+          },
+        ],
+        isError: true,
+      };
     }
-
-    // Tool execution will be implemented in the next phase
-    // For now, return a placeholder response
-    return {
-      content: [
-        {
-          type: 'text',
-          text: `Tool ${name} called with arguments: ${JSON.stringify(args)}`,
-        },
-      ],
-    };
   });
 }
 
