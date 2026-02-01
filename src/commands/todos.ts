@@ -53,7 +53,6 @@ export function createTodoListsCommands(): Command {
 
         const table = new Table({
           head: ['ID', 'Name', 'Progress', 'Description'],
-          colWidths: [12, 25, 15, 35],
           wordWrap: true
         });
 
@@ -62,7 +61,7 @@ export function createTodoListsCommands(): Command {
             list.id,
             list.name,
             list.completed_ratio || '0/0',
-            list.description?.substring(0, 32) + (list.description?.length > 32 ? '...' : '') || '-'
+            list.description || '-'
           ]);
         });
 
@@ -183,7 +182,6 @@ export function createTodosCommands(): Command {
 
         const table = new Table({
           head: ['ID', 'Status', 'Content', 'Due', 'Assignees'],
-          colWidths: [12, 10, 35, 12, 20],
           wordWrap: true
         });
 
@@ -191,7 +189,7 @@ export function createTodosCommands(): Command {
           table.push([
             todo.id,
             todo.completed ? chalk.green('✓') : chalk.dim('○'),
-            todo.content.substring(0, 32) + (todo.content.length > 32 ? '...' : ''),
+            todo.content,
             todo.due_on || '-',
             todo.assignees?.map(a => a.name).join(', ') || '-'
           ]);
@@ -538,11 +536,10 @@ export function createTodosCommands(): Command {
            return;
          }
 
-         const table = new Table({
-           head: ['ID', 'Name', 'Progress', 'Position'],
-           colWidths: [12, 25, 15, 12],
-           wordWrap: true
-         });
+          const table = new Table({
+            head: ['ID', 'Name', 'Progress', 'Position'],
+            wordWrap: true
+          });
 
          groups.forEach(group => {
            table.push([

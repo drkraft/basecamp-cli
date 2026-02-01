@@ -86,7 +86,6 @@ export function createSchedulesCommands(): Command {
 
         const table = new Table({
           head: ['ID', 'Summary', 'Start', 'End', 'All Day', 'Participants'],
-          colWidths: [12, 25, 20, 20, 10, 20],
           wordWrap: true
         });
 
@@ -97,11 +96,11 @@ export function createSchedulesCommands(): Command {
 
           table.push([
             entry.id,
-            entry.summary.substring(0, 22) + (entry.summary.length > 22 ? '...' : ''),
+            entry.summary,
             startDate,
             endDate,
             entry.all_day ? 'Yes' : 'No',
-            participants.substring(0, 18) + (participants.length > 18 ? '...' : '')
+            participants
           ]);
         });
 

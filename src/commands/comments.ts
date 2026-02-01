@@ -52,7 +52,6 @@ export function createCommentsCommands(): Command {
 
         const table = new Table({
           head: ['ID', 'Creator', 'Content', 'Created'],
-          colWidths: [12, 20, 40, 20],
           wordWrap: true
         });
 
@@ -60,7 +59,7 @@ export function createCommentsCommands(): Command {
           table.push([
             comment.id,
             comment.creator?.name || '-',
-            comment.content.substring(0, 37) + (comment.content.length > 37 ? '...' : ''),
+            comment.content,
             new Date(comment.created_at).toLocaleDateString()
           ]);
         });

@@ -170,7 +170,7 @@ function createAccountsCommand() {
       }
       const table = new Table({
         head: ["ID", "Name", "Current"],
-        colWidths: [15, 40, 10]
+        wordWrap: true
       });
       bc3Accounts.forEach((account) => {
         table.push([
@@ -257,7 +257,6 @@ function createProjectsCommands() {
       }
       const table = new Table2({
         head: ["ID", "Name", "Status", "Description"],
-        colWidths: [12, 30, 12, 40],
         wordWrap: true
       });
       projectList.forEach((project) => {
@@ -265,7 +264,7 @@ function createProjectsCommands() {
           project.id,
           project.name,
           project.status,
-          project.description?.substring(0, 37) + (project.description?.length > 37 ? "..." : "") || "-"
+          project.description || "-"
         ]);
       });
       console.log(table.toString());
@@ -377,7 +376,6 @@ function createTodoListsCommands() {
       }
       const table = new Table3({
         head: ["ID", "Name", "Progress", "Description"],
-        colWidths: [12, 25, 15, 35],
         wordWrap: true
       });
       lists.forEach((list) => {
@@ -385,7 +383,7 @@ function createTodoListsCommands() {
           list.id,
           list.name,
           list.completed_ratio || "0/0",
-          list.description?.substring(0, 32) + (list.description?.length > 32 ? "..." : "") || "-"
+          list.description || "-"
         ]);
       });
       console.log(table.toString());
@@ -474,14 +472,13 @@ function createTodosCommands() {
       }
       const table = new Table3({
         head: ["ID", "Status", "Content", "Due", "Assignees"],
-        colWidths: [12, 10, 35, 12, 20],
         wordWrap: true
       });
       todoList.forEach((todo) => {
         table.push([
           todo.id,
           todo.completed ? chalk3.green("\u2713") : chalk3.dim("\u25CB"),
-          todo.content.substring(0, 32) + (todo.content.length > 32 ? "..." : ""),
+          todo.content,
           todo.due_on || "-",
           todo.assignees?.map((a) => a.name).join(", ") || "-"
         ]);
@@ -735,7 +732,6 @@ function createTodoGroupsCommands() {
       }
       const table = new Table3({
         head: ["ID", "Name", "Progress", "Position"],
-        colWidths: [12, 25, 15, 12],
         wordWrap: true
       });
       groups.forEach((group) => {
@@ -815,13 +811,12 @@ function createMessagesCommands() {
       }
       const table = new Table4({
         head: ["ID", "Subject", "Author", "Date", "Comments"],
-        colWidths: [12, 35, 20, 12, 10],
         wordWrap: true
       });
       messageList.forEach((msg) => {
         table.push([
           msg.id,
-          msg.subject.substring(0, 32) + (msg.subject.length > 32 ? "..." : ""),
+          msg.subject,
           msg.creator?.name || "-",
           new Date(msg.created_at).toLocaleDateString(),
           msg.comments_count
@@ -925,7 +920,6 @@ function createCampfiresCommands() {
       }
       const table = new Table5({
         head: ["ID", "Title", "Topic"],
-        colWidths: [12, 30, 40],
         wordWrap: true
       });
       campfireList.forEach((campfire) => {
@@ -1045,7 +1039,6 @@ function createPeopleCommands() {
       }
       const table = new Table6({
         head: ["ID", "Name", "Email", "Title", "Role"],
-        colWidths: [12, 25, 30, 20, 12],
         wordWrap: true
       });
       peopleList.forEach((person) => {
@@ -1165,14 +1158,13 @@ function createCommentsCommands() {
       }
       const table = new Table7({
         head: ["ID", "Creator", "Content", "Created"],
-        colWidths: [12, 20, 40, 20],
         wordWrap: true
       });
       commentsList.forEach((comment) => {
         table.push([
           comment.id,
           comment.creator?.name || "-",
-          comment.content.substring(0, 37) + (comment.content.length > 37 ? "..." : ""),
+          comment.content,
           new Date(comment.created_at).toLocaleDateString()
         ]);
       });
@@ -1358,7 +1350,6 @@ function createSchedulesCommands() {
       }
       const table = new Table8({
         head: ["ID", "Summary", "Start", "End", "All Day", "Participants"],
-        colWidths: [12, 25, 20, 20, 10, 20],
         wordWrap: true
       });
       entries.forEach((entry) => {
@@ -1367,11 +1358,11 @@ function createSchedulesCommands() {
         const participants = entry.participants?.map((p) => p.name).join(", ") || "-";
         table.push([
           entry.id,
-          entry.summary.substring(0, 22) + (entry.summary.length > 22 ? "..." : ""),
+          entry.summary,
           startDate,
           endDate,
           entry.all_day ? "Yes" : "No",
-          participants.substring(0, 18) + (participants.length > 18 ? "..." : "")
+          participants
         ]);
       });
       console.log(table.toString());
@@ -1518,16 +1509,15 @@ function createSearchCommand() {
       }
       const table = new Table9({
         head: ["ID", "Type", "Title", "Project", "Creator"],
-        colWidths: [12, 15, 35, 20, 20],
         wordWrap: true
       });
       results.forEach((result) => {
         table.push([
           result.id,
           result.type,
-          result.title.substring(0, 32) + (result.title.length > 32 ? "..." : ""),
-          result.bucket.name.substring(0, 18) + (result.bucket.name.length > 18 ? "..." : ""),
-          result.creator.name.substring(0, 18) + (result.creator.name.length > 18 ? "..." : "")
+          result.title,
+          result.bucket.name,
+          result.creator.name
         ]);
       });
       console.log(table.toString());
@@ -1572,7 +1562,6 @@ function createCardTablesCommands() {
         console.log(chalk10.bold("\nColumns:"));
         const table = new Table10({
           head: ["ID", "Title", "Type", "Cards", "Color"],
-          colWidths: [12, 25, 20, 10, 12],
           wordWrap: true
         });
         cardTable.lists.forEach((column) => {
@@ -1613,7 +1602,6 @@ function createCardTablesCommands() {
       }
       const table = new Table10({
         head: ["ID", "Title", "Type", "Cards", "Color", "Position"],
-        colWidths: [12, 25, 20, 10, 12, 10],
         wordWrap: true
       });
       cardTable.lists.forEach((column) => {
@@ -1740,13 +1728,12 @@ Total: ${cardTable.lists.length} columns`));
       }
       const table = new Table10({
         head: ["ID", "Title", "Due", "Assignees", "Position"],
-        colWidths: [12, 35, 12, 25, 10],
         wordWrap: true
       });
       cards.forEach((card) => {
         table.push([
           card.id,
-          card.title.substring(0, 32) + (card.title.length > 32 ? "..." : ""),
+          card.title,
           card.due_on || "-",
           card.assignees?.map((a) => a.name).join(", ") || "-",
           card.position
@@ -1954,7 +1941,6 @@ function createVaultsCommands() {
       }
       const table = new Table11({
         head: ["ID", "Title", "Documents", "Uploads", "Vaults", "Position"],
-        colWidths: [12, 30, 12, 12, 12, 10],
         wordWrap: true
       });
       vaultsList.forEach((vault) => {
@@ -2105,13 +2091,12 @@ function createDocumentsCommands() {
       }
       const table = new Table12({
         head: ["ID", "Title", "Comments", "Position", "Created"],
-        colWidths: [12, 35, 10, 10, 20],
         wordWrap: true
       });
       documentsList.forEach((doc) => {
         table.push([
           doc.id,
-          doc.title.substring(0, 32) + (doc.title.length > 32 ? "..." : ""),
+          doc.title,
           doc.comments_count,
           doc.position,
           new Date(doc.created_at).toLocaleDateString()
@@ -2268,14 +2253,13 @@ function createUploadsCommands() {
       }
       const table = new Table13({
         head: ["ID", "Filename", "Type", "Size", "Comments", "Created"],
-        colWidths: [12, 30, 15, 12, 10, 20],
         wordWrap: true
       });
       uploadsList.forEach((upload) => {
         const sizeKB = (upload.byte_size / 1024).toFixed(2);
         table.push([
           upload.id,
-          upload.filename.substring(0, 27) + (upload.filename.length > 27 ? "..." : ""),
+          upload.filename,
           upload.content_type,
           `${sizeKB} KB`,
           upload.comments_count,
@@ -2439,15 +2423,14 @@ function createWebhooksCommands() {
       }
       const table = new Table14({
         head: ["ID", "Status", "Payload URL", "Types"],
-        colWidths: [15, 10, 40, 30],
         wordWrap: true
       });
       webhookList.forEach((webhook) => {
         table.push([
           webhook.id,
           webhook.active ? chalk14.green("\u2713 Active") : chalk14.dim("\u25CB Inactive"),
-          webhook.payload_url.substring(0, 37) + (webhook.payload_url.length > 37 ? "..." : ""),
-          webhook.types.join(", ").substring(0, 27) + (webhook.types.join(", ").length > 27 ? "..." : "")
+          webhook.payload_url,
+          webhook.types.join(", ")
         ]);
       });
       console.log(table.toString());
@@ -2651,14 +2634,13 @@ function createRecordingsCommands() {
       }
       const table = new Table15({
         head: ["ID", "Type", "Title", "Project", "Created", "Status"],
-        colWidths: [12, 15, 30, 15, 12, 10],
         wordWrap: true
       });
       recordings2.forEach((rec) => {
         table.push([
           rec.id,
           rec.type,
-          rec.title?.substring(0, 28) + (rec.title?.length > 28 ? "..." : "") || "-",
+          rec.title || "-",
           rec.bucket?.name || "-",
           rec.created_at?.substring(0, 10) || "-",
           rec.status || "-"
@@ -2777,7 +2759,6 @@ function createEventsCommands() {
       }
       const table = new Table16({
         head: ["ID", "Action", "Creator", "Created At"],
-        colWidths: [12, 20, 25, 20],
         wordWrap: true
       });
       eventList.forEach((event) => {
@@ -2832,7 +2813,6 @@ function createSubscriptionsCommands() {
       }
       const table = new Table17({
         head: ["ID", "Name", "Email", "Title"],
-        colWidths: [12, 25, 30, 25],
         wordWrap: true
       });
       subs.subscribers.forEach((subscriber) => {

@@ -52,7 +52,6 @@ export function createVaultsCommands(): Command {
 
         const table = new Table({
           head: ['ID', 'Title', 'Documents', 'Uploads', 'Vaults', 'Position'],
-          colWidths: [12, 30, 12, 12, 12, 10],
           wordWrap: true
         });
 

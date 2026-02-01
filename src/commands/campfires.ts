@@ -39,7 +39,6 @@ export function createCampfiresCommands(): Command {
 
         const table = new Table({
           head: ['ID', 'Title', 'Topic'],
-          colWidths: [12, 30, 40],
           wordWrap: true
         });
 

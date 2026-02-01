@@ -127,7 +127,7 @@ export function createAccountsCommand(): Command {
 
         const table = new Table({
           head: ['ID', 'Name', 'Current'],
-          colWidths: [15, 40, 10]
+          wordWrap: true
         });
 
         bc3Accounts.forEach(account => {

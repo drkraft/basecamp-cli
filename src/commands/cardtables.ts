@@ -54,7 +54,6 @@ export function createCardTablesCommands(): Command {
           console.log(chalk.bold('\nColumns:'));
           const table = new Table({
             head: ['ID', 'Title', 'Type', 'Cards', 'Color'],
-            colWidths: [12, 25, 20, 10, 12],
             wordWrap: true
           });
 
@@ -107,7 +106,6 @@ export function createCardTablesCommands(): Command {
 
         const table = new Table({
           head: ['ID', 'Title', 'Type', 'Cards', 'Color', 'Position'],
-          colWidths: [12, 25, 20, 10, 12, 10],
           wordWrap: true
         });
 
@@ -276,14 +274,13 @@ export function createCardTablesCommands(): Command {
 
         const table = new Table({
           head: ['ID', 'Title', 'Due', 'Assignees', 'Position'],
-          colWidths: [12, 35, 12, 25, 10],
           wordWrap: true
         });
 
         cards.forEach(card => {
           table.push([
             card.id,
-            card.title.substring(0, 32) + (card.title.length > 32 ? '...' : ''),
+            card.title,
             card.due_on || '-',
             card.assignees?.map(a => a.name).join(', ') || '-',
             card.position
