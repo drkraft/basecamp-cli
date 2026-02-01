@@ -17,15 +17,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Schedules**: Get schedule, list/create/update/delete schedule entries
 - **Card Tables**: Full Kanban support - tables, columns, cards, card movement
 - **Webhooks**: List, get, create, update, delete webhook subscriptions
-- **Recordings**: Cross-project listing by type, archive/unarchive/trash
+- **Recordings**: Cross-project listing by type, archive/restore/trash
 - **Events**: Activity feed per project
 - **Search**: Global search with type/project/creator filters
 - **Subscriptions**: List subscribers, subscribe/unsubscribe from recordings
 - **Todo Groups**: List and create todolist groups
 - **Delete commands**: `todos delete` and `todolists delete` (move to trash)
+- **Move command**: `todos move` to move tasks between lists
+- **Restore command**: `recordings restore` to restore from archive or trash
 
 #### MCP Server
-- New MCP (Model Context Protocol) server with 43 tools
+- New MCP (Model Context Protocol) server with 44 tools
 - Full integration with AI assistants (Claude, OpenCode, etc.)
 - All tools documented with JSON Schema
 
