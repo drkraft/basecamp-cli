@@ -129,7 +129,7 @@ export async function startOAuthFlow(): Promise<BasecampTokens> {
       }
     });
 
-    server.listen(port, () => {
+    server.listen(port, '127.0.0.1', () => {
       // Build authorization URL with PKCE and state parameters
       const authParams = new URLSearchParams({
         type: 'web_server',
@@ -240,7 +240,7 @@ export async function getAuthorization(): Promise<BasecampAuthorization> {
   const response = await got.get(`${OAUTH_BASE}/authorization.json`, {
     headers: {
       'Authorization': `Bearer ${accessToken}`,
-      'User-Agent': 'Basecamp CLI (emredoganer@github.com)'
+      'User-Agent': '@drkraft/basecamp-cli (contact@drkraft.com)'
     }
   }).json<BasecampAuthorization>();
 

@@ -11,7 +11,20 @@ import type {
    BasecampCampfireLine,
    BasecampPerson,
    BasecampDock,
-   BasecampTodolistGroup
+   BasecampTodolistGroup,
+   BasecampComment,
+   BasecampVault,
+   BasecampDocument,
+   BasecampUpload,
+   BasecampSchedule,
+   BasecampScheduleEntry,
+   BasecampCardTable,
+   BasecampColumn,
+   BasecampCard,
+   BasecampRecording,
+   BasecampEvent,
+   BasecampSubscription,
+   BasecampSearchResult
  } from '../types/index.js';
 
 const USER_AGENT = '@drkraft/basecamp-cli (contact@drkraft.com)';
@@ -40,7 +53,7 @@ async function fetchAllPages<T>(
   let nextUrl: string | null = url;
 
   while (nextUrl) {
-    const response = await client.get(nextUrl, options);
+    const response = await client.get(nextUrl, { ...options, responseType: 'json' });
     const items = response.body as T[];
     allResults.push(...items);
 
@@ -55,11 +68,10 @@ async function fetchAllPages<T>(
 function getRetryConfig() {
   return {
     limit: 3,
-    methods: ['GET', 'HEAD', 'PUT', 'DELETE', 'OPTIONS', 'TRACE', 'POST'],
+    methods: ['GET', 'HEAD', 'PUT', 'DELETE', 'OPTIONS', 'TRACE'] as ('GET' | 'HEAD' | 'PUT' | 'DELETE' | 'OPTIONS' | 'TRACE')[],
     statusCodes: [429, 500, 502, 503, 504],
-    errorCodes: [],
+    errorCodes: [] as string[],
     calculateDelay: ({ attemptCount }: { attemptCount: number }) => {
-      // Exponential backoff: 1s, 2s, 4s
       return Math.pow(2, attemptCount - 1) * 1000;
     }
   };
@@ -104,7 +116,9 @@ async function createClient(): Promise<Got> {
     retry: getRetryConfig(),
     hooks: {
       beforeRetry: [
-        ({ response, retryCount }) => {
+        (error) => {
+          const response = (error as any).response;
+          const retryCount = (error as any).request?.retryCount ?? 1;
           if (response && response.statusCode === 429) {
             const retryAfter = getRetryAfterDelay(response);
             if (retryAfter !== undefined) {
@@ -847,4 +861,54 @@ export async function subscribe(projectId: number, recordingId: number): Promise
 export async function unsubscribe(projectId: number, recordingId: number): Promise<void> {
   const client = await createClient();
   await client.delete(`buckets/${projectId}/recordings/${recordingId}/subscription.json`);
+}
+
+export async function listWebhooks(projectId: number): Promise<any[]> {
+  const client = await createClient();
+  return fetchAllPages(client, `buckets/${projectId}/webhooks.json`);
+}
+
+export async function getWebhook(projectId: number, webhookId: number): Promise<any> {
+  const client = await createClient();
+  return client.get(`buckets/${projectId}/webhooks/${webhookId}.json`).json();
+}
+
+export async function createWebhook(
+  projectId: number,
+  payloadUrl: string,
+  options?: { types?: string[]; active?: boolean }
+): Promise<any> {
+  const client = await createClient();
+  return client.post(`buckets/${projectId}/webhooks.json`, {
+    json: {
+      payload_url: payloadUrl,
+      types: options?.types,
+      active: options?.active ?? true
+    }
+  }).json();
+}
+
+export async function updateWebhook(
+  projectId: number,
+  webhookId: number,
+  options: { payloadUrl?: string; types?: string[]; active?: boolean }
+): Promise<any> {
+  const client = await createClient();
+  return client.put(`buckets/${projectId}/webhooks/${webhookId}.json`, {
+    json: {
+      payload_url: options.payloadUrl,
+      types: options.types,
+      active: options.active
+    }
+  }).json();
+}
+
+export async function deleteWebhook(projectId: number, webhookId: number): Promise<void> {
+  const client = await createClient();
+  await client.delete(`buckets/${projectId}/webhooks/${webhookId}.json`);
+}
+
+export async function testWebhook(projectId: number, webhookId: number): Promise<void> {
+  const client = await createClient();
+  await client.post(`buckets/${projectId}/webhooks/${webhookId}/test.json`, { json: {} });
 }

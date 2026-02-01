@@ -307,7 +307,6 @@ Or with explicit path:
 | `BASECAMP_CLIENT_ID` | OAuth Client ID (required) |
 | `BASECAMP_CLIENT_SECRET` | OAuth Client Secret (required) |
 | `BASECAMP_REDIRECT_URI` | OAuth Redirect URI (default: `http://localhost:9292/callback`) |
-| `BASECAMP_ACCESS_TOKEN` | Access token (alternative to OAuth flow) |
 
 ## API Coverage
 
