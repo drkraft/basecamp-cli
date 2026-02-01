@@ -201,7 +201,7 @@ basecamp recordings restore <id> --project <project-id>
 basecamp recordings trash <id> --project <project-id>
 
 # Events (activity feed)
-basecamp events list --project <id>
+basecamp events list --project <id> --recording <recording-id>
 ```
 
 ### Subscriptions
