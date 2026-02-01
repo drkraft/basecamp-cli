@@ -12,7 +12,7 @@ interface ToolWithHandler extends Tool {
  * All MCP tools for Basecamp CLI
  */
 const tools: ToolWithHandler[] = [
-  // ============ PROJECTS (3) ============
+  // ============ PROJECTS (4) ============
   {
     name: 'basecamp_list_projects',
     description: 'List all Basecamp projects in the current account',
@@ -76,7 +76,7 @@ const tools: ToolWithHandler[] = [
     },
   },
 
-  // ============ TODO LISTS (2) ============
+  // ============ TODO LISTS (4) ============
   {
     name: 'basecamp_list_todolists',
     description: 'List all to-do lists in a project',
@@ -139,7 +139,7 @@ const tools: ToolWithHandler[] = [
     ),
   },
 
-  // ============ TODOS (6) ============
+  // ============ TODOS (8) ============
   {
     name: 'basecamp_list_todos',
     description: 'List to-dos in a to-do list. Can filter by completion status.',
@@ -568,7 +568,7 @@ const tools: ToolWithHandler[] = [
     handler: async () => api.getMe(),
   },
 
-  // ============ COMMENTS (3) ============
+  // ============ COMMENTS (5) ============
   {
     name: 'basecamp_list_comments',
     description: 'List comments on a recording (to-do, message, etc.)',
@@ -684,7 +684,7 @@ const tools: ToolWithHandler[] = [
     },
   },
 
-  // ============ VAULTS (2) ============
+  // ============ VAULTS (4) ============
   {
     name: 'basecamp_list_vaults',
     description: 'List vaults (folders) in a project or within a parent vault',
@@ -1002,7 +1002,7 @@ const tools: ToolWithHandler[] = [
     ),
   },
 
-  // ============ SCHEDULES (3) ============
+  // ============ SCHEDULES (6) ============
   {
     name: 'basecamp_get_schedule',
     description: 'Get schedule details for a project',
@@ -1184,7 +1184,7 @@ const tools: ToolWithHandler[] = [
     },
   },
 
-  // ============ CARD TABLES / KANBAN (4) ============
+  // ============ CARD TABLES / KANBAN (11) ============
   {
     name: 'basecamp_get_card_table',
     description: 'Get the card table (kanban board) for a project, including all columns',
@@ -1520,7 +1520,7 @@ const tools: ToolWithHandler[] = [
     ),
   },
 
-  // ============ RECORDINGS (2) ============
+  // ============ RECORDINGS (4) ============
   {
     name: 'basecamp_list_recordings',
     description: 'List recordings across projects by type (Todo, Message, Document, etc.)',
@@ -1630,7 +1630,7 @@ const tools: ToolWithHandler[] = [
     },
   },
 
-  // ============ SUBSCRIPTIONS (2) ============
+  // ============ SUBSCRIPTIONS (3) ============
   {
     name: 'basecamp_list_subscriptions',
     description: 'Get subscription info for a recording (who is subscribed)',
