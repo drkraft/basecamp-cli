@@ -4,7 +4,7 @@ import Table from 'cli-table3';
 import {
   listRecordings,
   archiveRecording,
-  unarchiveRecording,
+  restoreRecording,
   trashRecording
 } from '../lib/api.js';
 import { isAuthenticated } from '../lib/config.js';
@@ -106,8 +106,8 @@ export function createRecordingsCommands(): Command {
     });
 
   recordings
-    .command('unarchive <id>')
-    .description('Unarchive a recording')
+    .command('restore <id>')
+    .description('Restore a recording (from archive or trash)')
     .requiredOption('-p, --project <id>', 'Project ID')
     .action(async (id: string, options) => {
       if (!isAuthenticated()) {
@@ -127,10 +127,10 @@ export function createRecordingsCommands(): Command {
           process.exit(1);
         }
 
-        await unarchiveRecording(projectId, recordingId);
-        console.log(chalk.green(`✓ Recording ${recordingId} unarchived`));
+        await restoreRecording(projectId, recordingId);
+        console.log(chalk.green(`✓ Recording ${recordingId} restored`));
       } catch (error) {
-        console.error(chalk.red('Failed to unarchive recording:'), error instanceof Error ? error.message : error);
+        console.error(chalk.red('Failed to restore recording:'), error instanceof Error ? error.message : error);
         process.exit(1);
       }
     });
