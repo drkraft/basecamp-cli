@@ -1,31 +1,74 @@
 ---
 name: basecamp-cli
-description: Manage Basecamp (via bc3 API / 37signals Launchpad) projects, to-dos, messages, and campfires via a TypeScript CLI. Use when you want to list/create/update Basecamp projects and todos from the terminal, or when integrating Basecamp automation into Clawdbot workflows.
+description: Complete CLI and MCP server for Basecamp 4. Manage projects, todos, messages, kanban boards, schedules, documents, and more. Use when you need to interact with Basecamp from the terminal or integrate Basecamp operations into AI workflows.
+mcp: true
 ---
 
 # Basecamp CLI
 
-This repo contains a standalone CLI.
+Full-featured CLI and MCP server for Basecamp 4 API.
+
+## Features
+
+- **18 command groups** covering all Basecamp 4 domains
+- **41 MCP tools** for AI assistant integration
+- Automatic pagination and retry with backoff
+- OAuth 2.0 authentication
 
 ## Install
 
 ```bash
-npm i -g @emredoganer/basecamp-cli
+npm i -g @drkraft/basecamp-cli
 ```
 
 ## Auth
 
-Create an integration (OAuth app) in 37signals Launchpad:
-- https://launchpad.37signals.com/integrations
-
-Then:
+1. Create OAuth app at https://launchpad.37signals.com/integrations
+2. Configure:
 ```bash
 basecamp auth configure --client-id <id> --redirect-uri http://localhost:9292/callback
 export BASECAMP_CLIENT_SECRET="<secret>"
 basecamp auth login
 ```
 
-## Notes
+## MCP Usage
 
-- This uses the Basecamp API docs published under bc3-api: https://github.com/basecamp/bc3-api
-- `BASECAMP_CLIENT_SECRET` is intentionally NOT stored on disk by the CLI.
+Add to your MCP config:
+```json
+{
+  "mcpServers": {
+    "basecamp": {
+      "command": "basecamp-mcp"
+    }
+  }
+}
+```
+
+## Available MCP Tools
+
+| Category | Tools |
+|----------|-------|
+| Projects | list_projects, get_project, create_project |
+| Todos | list_todolists, list_todos, create_todo, complete_todo, update_todo |
+| Messages | list_messages, get_message, create_message |
+| Comments | list_comments, create_comment |
+| Documents | list_documents, create_document |
+| Schedules | list_schedule_entries, create_schedule_entry |
+| Card Tables | get_card_table, list_cards, create_card |
+| Search | search |
+| + more | 41 tools total |
+
+## CLI Commands
+
+```bash
+basecamp projects list
+basecamp todos list --project <id> --list <list-id>
+basecamp todos create --project <id> --list <list-id> --content "Task"
+basecamp cardtables cards --project <id> --column <col-id>
+basecamp search "keyword"
+```
+
+## Links
+
+- [Full Documentation](https://github.com/drkraft/basecamp-cli)
+- [Basecamp API](https://github.com/basecamp/bc3-api)
