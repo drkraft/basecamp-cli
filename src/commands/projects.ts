@@ -97,25 +97,25 @@ export function createProjectsCommands(): Command {
       }
     });
 
-  projects
-    .command('create')
-    .description('Create a new project')
-    .requiredOption('-n, --name <name>', 'Project name')
-    .option('-d, --description <description>', 'Project description')
-    .option('--json', 'Output as JSON')
-    .action(async (options) => {
-      if (!isAuthenticated()) {
-        console.log(chalk.yellow('Not authenticated. Run "basecamp auth login" to login.'));
-        return;
-      }
+   projects
+     .command('create')
+     .description('Create a new project')
+     .requiredOption('-n, --name <name>', 'Project name')
+     .option('-d, --description <description>', 'Project description')
+     .option('-f, --format <format>', 'Output format (table|json)', 'table')
+     .action(async (options) => {
+       if (!isAuthenticated()) {
+         console.log(chalk.yellow('Not authenticated. Run "basecamp auth login" to login.'));
+         return;
+       }
 
-      try {
-        const project = await createProject(options.name, options.description);
+       try {
+         const project = await createProject(options.name, options.description);
 
-        if (options.json) {
-          console.log(JSON.stringify(project, null, 2));
-          return;
-        }
+         if (options.format === 'json') {
+           console.log(JSON.stringify(project, null, 2));
+           return;
+         }
 
         console.log(chalk.green('✓ Project created'));
         console.log(chalk.dim(`ID: ${project.id}`));

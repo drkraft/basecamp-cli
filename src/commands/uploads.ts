@@ -128,48 +128,48 @@ export function createUploadsCommands(): Command {
       }
     });
 
-  uploads
-    .command('create')
-    .description('Create an upload (requires attachable_sgid from attachment API)')
-    .requiredOption('-p, --project <id>', 'Project ID')
-    .requiredOption('-v, --vault <id>', 'Vault ID')
-    .requiredOption('-a, --attachable-sgid <sgid>', 'Attachable SGID from attachment upload')
-    .option('-d, --description <description>', 'Upload description (HTML)')
-    .option('-n, --name <name>', 'Base name (filename without extension)')
-    .option('--json', 'Output as JSON')
-    .action(async (options) => {
-      if (!isAuthenticated()) {
-        console.log(chalk.yellow('Not authenticated. Run "basecamp auth login" to login.'));
-        return;
-      }
+   uploads
+     .command('create')
+     .description('Create an upload (requires attachable_sgid from attachment API)')
+     .requiredOption('-p, --project <id>', 'Project ID')
+     .requiredOption('-v, --vault <id>', 'Vault ID')
+     .requiredOption('-a, --attachable-sgid <sgid>', 'Attachable SGID from attachment upload')
+     .option('-d, --description <description>', 'Upload description (HTML)')
+     .option('-n, --name <name>', 'Base name (filename without extension)')
+     .option('-f, --format <format>', 'Output format (table|json)', 'table')
+     .action(async (options) => {
+       if (!isAuthenticated()) {
+         console.log(chalk.yellow('Not authenticated. Run "basecamp auth login" to login.'));
+         return;
+       }
 
-      try {
-        const projectId = parseInt(options.project, 10);
-        if (isNaN(projectId)) {
-          console.error(chalk.red('Invalid project ID: must be a number'));
-          process.exit(1);
-        }
-        const vaultId = parseInt(options.vault, 10);
-        if (isNaN(vaultId)) {
-          console.error(chalk.red('Invalid vault ID: must be a number'));
-          process.exit(1);
-        }
+       try {
+         const projectId = parseInt(options.project, 10);
+         if (isNaN(projectId)) {
+           console.error(chalk.red('Invalid project ID: must be a number'));
+           process.exit(1);
+         }
+         const vaultId = parseInt(options.vault, 10);
+         if (isNaN(vaultId)) {
+           console.error(chalk.red('Invalid vault ID: must be a number'));
+           process.exit(1);
+         }
 
-        const uploadOptions: { description?: string; base_name?: string } = {};
-        if (options.description) uploadOptions.description = options.description;
-        if (options.name) uploadOptions.base_name = options.name;
+         const uploadOptions: { description?: string; base_name?: string } = {};
+         if (options.description) uploadOptions.description = options.description;
+         if (options.name) uploadOptions.base_name = options.name;
 
-        const upload = await createUpload(
-          projectId,
-          vaultId,
-          options.attachableSgid,
-          uploadOptions
-        );
+         const upload = await createUpload(
+           projectId,
+           vaultId,
+           options.attachableSgid,
+           uploadOptions
+         );
 
-        if (options.json) {
-          console.log(JSON.stringify(upload, null, 2));
-          return;
-        }
+         if (options.format === 'json') {
+           console.log(JSON.stringify(upload, null, 2));
+           return;
+         }
 
         console.log(chalk.green('✓ Upload created'));
         console.log(chalk.dim(`ID: ${upload.id}`));
@@ -180,46 +180,46 @@ export function createUploadsCommands(): Command {
       }
     });
 
-  uploads
-    .command('update <id>')
-    .description('Update an upload')
-    .requiredOption('-p, --project <id>', 'Project ID')
-    .option('-d, --description <description>', 'New upload description (HTML)')
-    .option('-n, --name <name>', 'New base name (filename without extension)')
-    .option('--json', 'Output as JSON')
-    .action(async (id: string, options) => {
-      if (!isAuthenticated()) {
-        console.log(chalk.yellow('Not authenticated. Run "basecamp auth login" to login.'));
-        return;
-      }
+   uploads
+     .command('update <id>')
+     .description('Update an upload')
+     .requiredOption('-p, --project <id>', 'Project ID')
+     .option('-d, --description <description>', 'New upload description (HTML)')
+     .option('-n, --name <name>', 'New base name (filename without extension)')
+     .option('-f, --format <format>', 'Output format (table|json)', 'table')
+     .action(async (id: string, options) => {
+       if (!isAuthenticated()) {
+         console.log(chalk.yellow('Not authenticated. Run "basecamp auth login" to login.'));
+         return;
+       }
 
-      try {
-        const projectId = parseInt(options.project, 10);
-        if (isNaN(projectId)) {
-          console.error(chalk.red('Invalid project ID: must be a number'));
-          process.exit(1);
-        }
-        const uploadId = parseInt(id, 10);
-        if (isNaN(uploadId)) {
-          console.error(chalk.red('Invalid upload ID: must be a number'));
-          process.exit(1);
-        }
+       try {
+         const projectId = parseInt(options.project, 10);
+         if (isNaN(projectId)) {
+           console.error(chalk.red('Invalid project ID: must be a number'));
+           process.exit(1);
+         }
+         const uploadId = parseInt(id, 10);
+         if (isNaN(uploadId)) {
+           console.error(chalk.red('Invalid upload ID: must be a number'));
+           process.exit(1);
+         }
 
-        const updates: { description?: string; base_name?: string } = {};
-        if (options.description) updates.description = options.description;
-        if (options.name) updates.base_name = options.name;
+         const updates: { description?: string; base_name?: string } = {};
+         if (options.description) updates.description = options.description;
+         if (options.name) updates.base_name = options.name;
 
-        if (Object.keys(updates).length === 0) {
-          console.error(chalk.red('No updates provided. Use --description or --name'));
-          process.exit(1);
-        }
+         if (Object.keys(updates).length === 0) {
+           console.error(chalk.red('No updates provided. Use --description or --name'));
+           process.exit(1);
+         }
 
-        const upload = await updateUpload(projectId, uploadId, updates);
+         const upload = await updateUpload(projectId, uploadId, updates);
 
-        if (options.json) {
-          console.log(JSON.stringify(upload, null, 2));
-          return;
-        }
+         if (options.format === 'json') {
+           console.log(JSON.stringify(upload, null, 2));
+           return;
+         }
 
         console.log(chalk.green('✓ Upload updated'));
         console.log(chalk.dim(`ID: ${upload.id}`));

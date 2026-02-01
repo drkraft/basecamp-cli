@@ -114,36 +114,36 @@ export function createCampfiresCommands(): Command {
       }
     });
 
-  campfires
-    .command('send')
-    .description('Send a message to a campfire')
-    .requiredOption('-p, --project <id>', 'Project ID')
-    .requiredOption('-c, --campfire <id>', 'Campfire ID')
-    .requiredOption('-m, --message <message>', 'Message content')
-    .option('--json', 'Output as JSON')
-    .action(async (options) => {
-      if (!isAuthenticated()) {
-        console.log(chalk.yellow('Not authenticated. Run "basecamp auth login" to login.'));
-        return;
-      }
+   campfires
+     .command('send')
+     .description('Send a message to a campfire')
+     .requiredOption('-p, --project <id>', 'Project ID')
+     .requiredOption('-c, --campfire <id>', 'Campfire ID')
+     .requiredOption('-m, --message <message>', 'Message content')
+     .option('-f, --format <format>', 'Output format (table|json)', 'table')
+     .action(async (options) => {
+       if (!isAuthenticated()) {
+         console.log(chalk.yellow('Not authenticated. Run "basecamp auth login" to login.'));
+         return;
+       }
 
-      try {
-        const projectId = parseInt(options.project, 10);
-        if (isNaN(projectId)) {
-          console.error(chalk.red('Invalid project ID: must be a number'));
-          process.exit(1);
-        }
-        const campfireId = parseInt(options.campfire, 10);
-        if (isNaN(campfireId)) {
-          console.error(chalk.red('Invalid campfire ID: must be a number'));
-          process.exit(1);
-        }
-        const line = await sendCampfireLine(projectId, campfireId, options.message);
+       try {
+         const projectId = parseInt(options.project, 10);
+         if (isNaN(projectId)) {
+           console.error(chalk.red('Invalid project ID: must be a number'));
+           process.exit(1);
+         }
+         const campfireId = parseInt(options.campfire, 10);
+         if (isNaN(campfireId)) {
+           console.error(chalk.red('Invalid campfire ID: must be a number'));
+           process.exit(1);
+         }
+         const line = await sendCampfireLine(projectId, campfireId, options.message);
 
-        if (options.json) {
-          console.log(JSON.stringify(line, null, 2));
-          return;
-        }
+         if (options.format === 'json') {
+           console.log(JSON.stringify(line, null, 2));
+           return;
+         }
 
         console.log(chalk.green('✓ Message sent'));
       } catch (error) {

@@ -307,14 +307,14 @@ Total: ${projectList.length} projects`));
       process.exit(1);
     }
   });
-  projects.command("create").description("Create a new project").requiredOption("-n, --name <name>", "Project name").option("-d, --description <description>", "Project description").option("--json", "Output as JSON").action(async (options) => {
+  projects.command("create").description("Create a new project").requiredOption("-n, --name <name>", "Project name").option("-d, --description <description>", "Project description").option("-f, --format <format>", "Output format (table|json)", "table").action(async (options) => {
     if (!isAuthenticated()) {
       console.log(chalk2.yellow('Not authenticated. Run "basecamp auth login" to login.'));
       return;
     }
     try {
       const project = await createProject(options.name, options.description);
-      if (options.json) {
+      if (options.format === "json") {
         console.log(JSON.stringify(project, null, 2));
         return;
       }
@@ -395,7 +395,7 @@ Total: ${lists.length} lists`));
       process.exit(1);
     }
   });
-  todolists.command("create").description("Create a to-do list").requiredOption("-p, --project <id>", "Project ID").requiredOption("-n, --name <name>", "List name").option("-d, --description <description>", "List description").option("--json", "Output as JSON").action(async (options) => {
+  todolists.command("create").description("Create a to-do list").requiredOption("-p, --project <id>", "Project ID").requiredOption("-n, --name <name>", "List name").option("-d, --description <description>", "List description").option("-f, --format <format>", "Output format (table|json)", "table").action(async (options) => {
     if (!isAuthenticated()) {
       console.log(chalk3.yellow('Not authenticated. Run "basecamp auth login" to login.'));
       return;
@@ -407,7 +407,7 @@ Total: ${lists.length} lists`));
         process.exit(1);
       }
       const list = await createTodoList(projectId, options.name, options.description);
-      if (options.json) {
+      if (options.format === "json") {
         console.log(JSON.stringify(list, null, 2));
         return;
       }
@@ -564,7 +564,7 @@ Total: ${todoList.length} to-dos`));
       process.exit(1);
     }
   });
-  todos.command("update <id>").description("Update a to-do").requiredOption("-p, --project <id>", "Project ID").option("-c, --content <content>", "New content").option("-d, --description <description>", "New description").option("--due <date>", "Due date (YYYY-MM-DD)").option("--starts <date>", "Start date (YYYY-MM-DD)").option("--assignees <ids>", "Comma-separated assignee IDs").option("--json", "Output as JSON").action(async (id, options) => {
+  todos.command("update <id>").description("Update a to-do").requiredOption("-p, --project <id>", "Project ID").option("-c, --content <content>", "New content").option("-d, --description <description>", "New description").option("--due <date>", "Due date (YYYY-MM-DD)").option("--starts <date>", "Start date (YYYY-MM-DD)").option("--assignees <ids>", "Comma-separated assignee IDs").option("-f, --format <format>", "Output format (table|json)", "table").action(async (id, options) => {
     if (!isAuthenticated()) {
       console.log(chalk3.yellow('Not authenticated. Run "basecamp auth login" to login.'));
       return;
@@ -589,7 +589,7 @@ Total: ${todoList.length} to-dos`));
         updates.assignee_ids = options.assignees.split(",").map((id2) => parseInt(id2.trim(), 10));
       }
       const todo = await updateTodo(projectId, todoId, updates);
-      if (options.json) {
+      if (options.format === "json") {
         console.log(JSON.stringify(todo, null, 2));
         return;
       }
@@ -720,7 +720,7 @@ Total: ${groups.length} groups`));
       process.exit(1);
     }
   });
-  todogroups.command("create").description("Create a to-do group").requiredOption("-p, --project <id>", "Project ID").requiredOption("-l, --list <id>", "To-do list ID").requiredOption("-n, --name <name>", "Group name").option("--color <color>", "Group color (white|red|orange|yellow|green|blue|aqua|purple|gray|pink|brown)").option("--json", "Output as JSON").action(async (options) => {
+  todogroups.command("create").description("Create a to-do group").requiredOption("-p, --project <id>", "Project ID").requiredOption("-l, --list <id>", "To-do list ID").requiredOption("-n, --name <name>", "Group name").option("--color <color>", "Group color (white|red|orange|yellow|green|blue|aqua|purple|gray|pink|brown)").option("-f, --format <format>", "Output format (table|json)", "table").action(async (options) => {
     if (!isAuthenticated()) {
       console.log(chalk3.yellow('Not authenticated. Run "basecamp auth login" to login.'));
       return;
@@ -737,7 +737,7 @@ Total: ${groups.length} groups`));
         process.exit(1);
       }
       const group = await createTodolistGroup(projectId, listId, options.name, options.color);
-      if (options.json) {
+      if (options.format === "json") {
         console.log(JSON.stringify(group, null, 2));
         return;
       }
@@ -835,7 +835,7 @@ Total: ${messageList.length} messages`));
       process.exit(1);
     }
   });
-  messages.command("create").description("Create a message").requiredOption("-p, --project <id>", "Project ID").requiredOption("-s, --subject <subject>", "Message subject").option("-c, --content <content>", "Message content (HTML)").option("--json", "Output as JSON").action(async (options) => {
+  messages.command("create").description("Create a message").requiredOption("-p, --project <id>", "Project ID").requiredOption("-s, --subject <subject>", "Message subject").option("-c, --content <content>", "Message content (HTML)").option("-f, --format <format>", "Output format (table|json)", "table").action(async (options) => {
     if (!isAuthenticated()) {
       console.log(chalk4.yellow('Not authenticated. Run "basecamp auth login" to login.'));
       return;
@@ -847,7 +847,7 @@ Total: ${messageList.length} messages`));
         process.exit(1);
       }
       const message = await createMessage(projectId, options.subject, options.content);
-      if (options.json) {
+      if (options.format === "json") {
         console.log(JSON.stringify(message, null, 2));
         return;
       }
@@ -950,7 +950,7 @@ Showing ${displayLines.length} of ${lines.length} messages`));
       process.exit(1);
     }
   });
-  campfires.command("send").description("Send a message to a campfire").requiredOption("-p, --project <id>", "Project ID").requiredOption("-c, --campfire <id>", "Campfire ID").requiredOption("-m, --message <message>", "Message content").option("--json", "Output as JSON").action(async (options) => {
+  campfires.command("send").description("Send a message to a campfire").requiredOption("-p, --project <id>", "Project ID").requiredOption("-c, --campfire <id>", "Campfire ID").requiredOption("-m, --message <message>", "Message content").option("-f, --format <format>", "Output format (table|json)", "table").action(async (options) => {
     if (!isAuthenticated()) {
       console.log(chalk5.yellow('Not authenticated. Run "basecamp auth login" to login.'));
       return;
@@ -967,7 +967,7 @@ Showing ${displayLines.length} of ${lines.length} messages`));
         process.exit(1);
       }
       const line = await sendCampfireLine(projectId, campfireId, options.message);
-      if (options.json) {
+      if (options.format === "json") {
         console.log(JSON.stringify(line, null, 2));
         return;
       }
@@ -1184,7 +1184,7 @@ ${comment.content}`));
       process.exit(1);
     }
   });
-  comments.command("create").description("Create a comment on a recording").requiredOption("-p, --project <id>", "Project ID").requiredOption("-r, --recording <id>", "Recording ID (todo, message, etc.)").requiredOption("-c, --content <content>", "Comment content").option("--json", "Output as JSON").action(async (options) => {
+  comments.command("create").description("Create a comment on a recording").requiredOption("-p, --project <id>", "Project ID").requiredOption("-r, --recording <id>", "Recording ID (todo, message, etc.)").requiredOption("-c, --content <content>", "Comment content").option("-f, --format <format>", "Output format (table|json)", "table").action(async (options) => {
     if (!isAuthenticated()) {
       console.log(chalk7.yellow('Not authenticated. Run "basecamp auth login" to login.'));
       return;
@@ -1201,7 +1201,7 @@ ${comment.content}`));
         process.exit(1);
       }
       const comment = await createComment(projectId, recordingId, options.content);
-      if (options.json) {
+      if (options.format === "json") {
         console.log(JSON.stringify(comment, null, 2));
         return;
       }
@@ -1213,7 +1213,7 @@ ${comment.content}`));
       process.exit(1);
     }
   });
-  comments.command("update <id>").description("Update a comment").requiredOption("-p, --project <id>", "Project ID").requiredOption("-c, --content <content>", "New comment content").option("--json", "Output as JSON").action(async (id, options) => {
+  comments.command("update <id>").description("Update a comment").requiredOption("-p, --project <id>", "Project ID").requiredOption("-c, --content <content>", "New comment content").option("-f, --format <format>", "Output format (table|json)", "table").action(async (id, options) => {
     if (!isAuthenticated()) {
       console.log(chalk7.yellow('Not authenticated. Run "basecamp auth login" to login.'));
       return;
@@ -1230,7 +1230,7 @@ ${comment.content}`));
         process.exit(1);
       }
       const comment = await updateComment(projectId, commentId, options.content);
-      if (options.json) {
+      if (options.format === "json") {
         console.log(JSON.stringify(comment, null, 2));
         return;
       }
@@ -1302,7 +1302,7 @@ function createSchedulesCommands() {
       process.exit(1);
     }
   });
-  schedules.command("entries").description("List schedule entries in a project").requiredOption("-p, --project <id>", "Project ID").option("--status <status>", "Filter by status (active|archived|trashed)").option("-f, --format <format>", "Output format (table|json)", "table").action(async (options) => {
+  schedules.command("entries").description("List schedule entries in a project").requiredOption("-p, --project <id>", "Project ID").option("--status <status>", "Filter by status (upcoming|past)").option("-f, --format <format>", "Output format (table|json)", "table").action(async (options) => {
     if (!isAuthenticated()) {
       console.log(chalk8.yellow('Not authenticated. Run "basecamp auth login" to login.'));
       return;
@@ -1348,7 +1348,7 @@ Total: ${entries.length} entries`));
       process.exit(1);
     }
   });
-  schedules.command("create-entry").description("Create a schedule entry").requiredOption("-p, --project <id>", "Project ID").requiredOption("-s, --summary <summary>", "Event summary").requiredOption("--starts-at <datetime>", "Start date/time (ISO 8601)").option("--ends-at <datetime>", "End date/time (ISO 8601)").option("-d, --description <description>", "Event description").option("--all-day", "Mark as all-day event").option("--participants <ids>", "Comma-separated participant IDs").option("--json", "Output as JSON").action(async (options) => {
+  schedules.command("create-entry").description("Create a schedule entry").requiredOption("-p, --project <id>", "Project ID").requiredOption("-s, --summary <summary>", "Event summary").requiredOption("--starts-at <datetime>", "Start date/time (ISO 8601)").option("--ends-at <datetime>", "End date/time (ISO 8601)").option("-d, --description <description>", "Event description").option("--all-day", "Mark as all-day event").option("--participants <ids>", "Comma-separated participant IDs").option("-f, --format <format>", "Output format (table|json)", "table").action(async (options) => {
     if (!isAuthenticated()) {
       console.log(chalk8.yellow('Not authenticated. Run "basecamp auth login" to login.'));
       return;
@@ -1367,7 +1367,7 @@ Total: ${entries.length} entries`));
         entryOptions.participantIds = options.participants.split(",").map((id) => parseInt(id.trim(), 10));
       }
       const entry = await createScheduleEntry(projectId, options.summary, options.startsAt, entryOptions);
-      if (options.json) {
+      if (options.format === "json") {
         console.log(JSON.stringify(entry, null, 2));
         return;
       }
@@ -1380,7 +1380,7 @@ Total: ${entries.length} entries`));
       process.exit(1);
     }
   });
-  schedules.command("update-entry <id>").description("Update a schedule entry").requiredOption("-p, --project <id>", "Project ID").option("-s, --summary <summary>", "New summary").option("-d, --description <description>", "New description").option("--starts-at <datetime>", "New start date/time (ISO 8601)").option("--ends-at <datetime>", "New end date/time (ISO 8601)").option("--all-day", "Mark as all-day event").option("--participants <ids>", "Comma-separated participant IDs").option("--json", "Output as JSON").action(async (id, options) => {
+  schedules.command("update-entry <id>").description("Update a schedule entry").requiredOption("-p, --project <id>", "Project ID").option("-s, --summary <summary>", "New summary").option("-d, --description <description>", "New description").option("--starts-at <datetime>", "New start date/time (ISO 8601)").option("--ends-at <datetime>", "New end date/time (ISO 8601)").option("--all-day", "Mark as all-day event").option("--participants <ids>", "Comma-separated participant IDs").option("-f, --format <format>", "Output format (table|json)", "table").action(async (id, options) => {
     if (!isAuthenticated()) {
       console.log(chalk8.yellow('Not authenticated. Run "basecamp auth login" to login.'));
       return;
@@ -1406,7 +1406,7 @@ Total: ${entries.length} entries`));
         updates.participant_ids = options.participants.split(",").map((pid) => parseInt(pid.trim(), 10));
       }
       const entry = await updateScheduleEntry(projectId, entryId, updates);
-      if (options.json) {
+      if (options.format === "json") {
         console.log(JSON.stringify(entry, null, 2));
         return;
       }
@@ -1600,7 +1600,7 @@ Total: ${cardTable.lists.length} columns`));
       process.exit(1);
     }
   });
-  cardtables.command("create-column").description("Create a new column in a card table").requiredOption("-p, --project <id>", "Project ID").requiredOption("-t, --title <title>", "Column title").option("-d, --description <description>", "Column description").option("--json", "Output as JSON").action(async (options) => {
+  cardtables.command("create-column").description("Create a new column in a card table").requiredOption("-p, --project <id>", "Project ID").requiredOption("-t, --title <title>", "Column title").option("-d, --description <description>", "Column description").option("-f, --format <format>", "Output format (table|json)", "table").action(async (options) => {
     if (!isAuthenticated()) {
       console.log(chalk10.yellow('Not authenticated. Run "basecamp auth login" to login.'));
       return;
@@ -1612,7 +1612,7 @@ Total: ${cardTable.lists.length} columns`));
         process.exit(1);
       }
       const column = await createColumn(projectId, options.title, options.description);
-      if (options.json) {
+      if (options.format === "json") {
         console.log(JSON.stringify(column, null, 2));
         return;
       }
@@ -1624,7 +1624,7 @@ Total: ${cardTable.lists.length} columns`));
       process.exit(1);
     }
   });
-  cardtables.command("update-column <id>").description("Update a column").requiredOption("-p, --project <id>", "Project ID").option("-t, --title <title>", "New title").option("-d, --description <description>", "New description").option("--json", "Output as JSON").action(async (id, options) => {
+  cardtables.command("update-column <id>").description("Update a column").requiredOption("-p, --project <id>", "Project ID").option("-t, --title <title>", "New title").option("-d, --description <description>", "New description").option("-f, --format <format>", "Output format (table|json)", "table").action(async (id, options) => {
     if (!isAuthenticated()) {
       console.log(chalk10.yellow('Not authenticated. Run "basecamp auth login" to login.'));
       return;
@@ -1644,7 +1644,7 @@ Total: ${cardTable.lists.length} columns`));
       if (options.title) updates.title = options.title;
       if (options.description) updates.description = options.description;
       const column = await updateColumn(projectId, columnId, updates);
-      if (options.json) {
+      if (options.format === "json") {
         console.log(JSON.stringify(column, null, 2));
         return;
       }
@@ -1761,7 +1761,7 @@ Total: ${cards.length} cards`));
       process.exit(1);
     }
   });
-  cardtables.command("create-card").description("Create a new card").requiredOption("-p, --project <id>", "Project ID").requiredOption("-c, --column <id>", "Column ID").requiredOption("-t, --title <title>", "Card title").option("--content <content>", "Card content").option("--due <date>", "Due date (YYYY-MM-DD)").option("--assignees <ids>", "Comma-separated assignee IDs").option("--notify", "Notify assignees").option("--json", "Output as JSON").action(async (options) => {
+  cardtables.command("create-card").description("Create a new card").requiredOption("-p, --project <id>", "Project ID").requiredOption("-c, --column <id>", "Column ID").requiredOption("-t, --title <title>", "Card title").option("--content <content>", "Card content").option("--due <date>", "Due date (YYYY-MM-DD)").option("--assignees <ids>", "Comma-separated assignee IDs").option("--notify", "Notify assignees").option("-f, --format <format>", "Output format (table|json)", "table").action(async (options) => {
     if (!isAuthenticated()) {
       console.log(chalk10.yellow('Not authenticated. Run "basecamp auth login" to login.'));
       return;
@@ -1785,7 +1785,7 @@ Total: ${cards.length} cards`));
       }
       if (options.notify) cardOptions.notify = true;
       const card = await createCard(projectId, columnId, options.title, cardOptions);
-      if (options.json) {
+      if (options.format === "json") {
         console.log(JSON.stringify(card, null, 2));
         return;
       }
@@ -1797,7 +1797,7 @@ Total: ${cards.length} cards`));
       process.exit(1);
     }
   });
-  cardtables.command("update-card <id>").description("Update a card").requiredOption("-p, --project <id>", "Project ID").option("-t, --title <title>", "New title").option("--content <content>", "New content").option("--due <date>", "Due date (YYYY-MM-DD)").option("--assignees <ids>", "Comma-separated assignee IDs").option("--json", "Output as JSON").action(async (id, options) => {
+  cardtables.command("update-card <id>").description("Update a card").requiredOption("-p, --project <id>", "Project ID").option("-t, --title <title>", "New title").option("--content <content>", "New content").option("--due <date>", "Due date (YYYY-MM-DD)").option("--assignees <ids>", "Comma-separated assignee IDs").option("-f, --format <format>", "Output format (table|json)", "table").action(async (id, options) => {
     if (!isAuthenticated()) {
       console.log(chalk10.yellow('Not authenticated. Run "basecamp auth login" to login.'));
       return;
@@ -1821,7 +1821,7 @@ Total: ${cards.length} cards`));
         updates.assignee_ids = options.assignees.split(",").map((id2) => parseInt(id2.trim(), 10));
       }
       const card = await updateCard(projectId, cardId, updates);
-      if (options.json) {
+      if (options.format === "json") {
         console.log(JSON.stringify(card, null, 2));
         return;
       }
@@ -1893,7 +1893,7 @@ import chalk11 from "chalk";
 import Table11 from "cli-table3";
 function createVaultsCommands() {
   const vaults = new Command11("vaults").description("Manage vaults (file folders)");
-  vaults.command("list").description("List vaults in a project").requiredOption("-p, --project <id>", "Project ID").option("-v, --vault <id>", "Parent vault ID (optional, defaults to primary vault)").option("-f, --format <format>", "Output format (table|json)", "table").action(async (options) => {
+  vaults.command("list").description("List vaults in a project").requiredOption("-p, --project <id>", "Project ID").option("-V, --vault <id>", "Parent vault ID (optional, defaults to primary vault)").option("-f, --format <format>", "Output format (table|json)", "table").action(async (options) => {
     if (!isAuthenticated()) {
       console.log(chalk11.yellow('Not authenticated. Run "basecamp auth login" to login.'));
       return;
@@ -1977,7 +1977,7 @@ Total: ${vaultsList.length} vaults`));
       process.exit(1);
     }
   });
-  vaults.command("create").description("Create a vault (folder)").requiredOption("-p, --project <id>", "Project ID").requiredOption("-v, --vault <id>", "Parent vault ID").requiredOption("-t, --title <title>", "Vault title").option("--json", "Output as JSON").action(async (options) => {
+  vaults.command("create").description("Create a vault (folder)").requiredOption("-p, --project <id>", "Project ID").requiredOption("-V, --vault <id>", "Parent vault ID").requiredOption("-t, --title <title>", "Vault title").option("-f, --format <format>", "Output format (table|json)", "table").action(async (options) => {
     if (!isAuthenticated()) {
       console.log(chalk11.yellow('Not authenticated. Run "basecamp auth login" to login.'));
       return;
@@ -1994,7 +1994,7 @@ Total: ${vaultsList.length} vaults`));
         process.exit(1);
       }
       const vault = await createVault(projectId, vaultId, options.title);
-      if (options.json) {
+      if (options.format === "json") {
         console.log(JSON.stringify(vault, null, 2));
         return;
       }
@@ -2006,7 +2006,7 @@ Total: ${vaultsList.length} vaults`));
       process.exit(1);
     }
   });
-  vaults.command("update <id>").description("Update a vault").requiredOption("-p, --project <id>", "Project ID").requiredOption("-t, --title <title>", "New vault title").option("--json", "Output as JSON").action(async (id, options) => {
+  vaults.command("update <id>").description("Update a vault").requiredOption("-p, --project <id>", "Project ID").requiredOption("-t, --title <title>", "New vault title").option("-f, --format <format>", "Output format (table|json)", "table").action(async (id, options) => {
     if (!isAuthenticated()) {
       console.log(chalk11.yellow('Not authenticated. Run "basecamp auth login" to login.'));
       return;
@@ -2023,7 +2023,7 @@ Total: ${vaultsList.length} vaults`));
         process.exit(1);
       }
       const vault = await updateVault(projectId, vaultId, options.title);
-      if (options.json) {
+      if (options.format === "json") {
         console.log(JSON.stringify(vault, null, 2));
         return;
       }
@@ -2127,7 +2127,7 @@ Total: ${documentsList.length} documents`));
       process.exit(1);
     }
   });
-  documents.command("create").description("Create a document").requiredOption("-p, --project <id>", "Project ID").requiredOption("-v, --vault <id>", "Vault ID").requiredOption("-t, --title <title>", "Document title").requiredOption("-c, --content <content>", "Document content (HTML)").option("-s, --status <status>", "Status (active|draft)", "active").option("--json", "Output as JSON").action(async (options) => {
+  documents.command("create").description("Create a document").requiredOption("-p, --project <id>", "Project ID").requiredOption("-v, --vault <id>", "Vault ID").requiredOption("-t, --title <title>", "Document title").requiredOption("-c, --content <content>", "Document content (HTML)").option("-s, --status <status>", "Status (active|draft)", "active").option("-f, --format <format>", "Output format (table|json)", "table").action(async (options) => {
     if (!isAuthenticated()) {
       console.log(chalk12.yellow('Not authenticated. Run "basecamp auth login" to login.'));
       return;
@@ -2150,7 +2150,7 @@ Total: ${documentsList.length} documents`));
         options.content,
         options.status
       );
-      if (options.json) {
+      if (options.format === "json") {
         console.log(JSON.stringify(document, null, 2));
         return;
       }
@@ -2162,7 +2162,7 @@ Total: ${documentsList.length} documents`));
       process.exit(1);
     }
   });
-  documents.command("update <id>").description("Update a document").requiredOption("-p, --project <id>", "Project ID").option("-t, --title <title>", "New document title").option("-c, --content <content>", "New document content (HTML)").option("--json", "Output as JSON").action(async (id, options) => {
+  documents.command("update <id>").description("Update a document").requiredOption("-p, --project <id>", "Project ID").option("-t, --title <title>", "New document title").option("-c, --content <content>", "New document content (HTML)").option("-f, --format <format>", "Output format (table|json)", "table").action(async (id, options) => {
     if (!isAuthenticated()) {
       console.log(chalk12.yellow('Not authenticated. Run "basecamp auth login" to login.'));
       return;
@@ -2186,7 +2186,7 @@ Total: ${documentsList.length} documents`));
         process.exit(1);
       }
       const document = await updateDocument(projectId, documentId, updates);
-      if (options.json) {
+      if (options.format === "json") {
         console.log(JSON.stringify(document, null, 2));
         return;
       }
@@ -2301,7 +2301,7 @@ Total: ${uploadsList.length} uploads`));
       process.exit(1);
     }
   });
-  uploads.command("create").description("Create an upload (requires attachable_sgid from attachment API)").requiredOption("-p, --project <id>", "Project ID").requiredOption("-v, --vault <id>", "Vault ID").requiredOption("-a, --attachable-sgid <sgid>", "Attachable SGID from attachment upload").option("-d, --description <description>", "Upload description (HTML)").option("-n, --name <name>", "Base name (filename without extension)").option("--json", "Output as JSON").action(async (options) => {
+  uploads.command("create").description("Create an upload (requires attachable_sgid from attachment API)").requiredOption("-p, --project <id>", "Project ID").requiredOption("-v, --vault <id>", "Vault ID").requiredOption("-a, --attachable-sgid <sgid>", "Attachable SGID from attachment upload").option("-d, --description <description>", "Upload description (HTML)").option("-n, --name <name>", "Base name (filename without extension)").option("-f, --format <format>", "Output format (table|json)", "table").action(async (options) => {
     if (!isAuthenticated()) {
       console.log(chalk13.yellow('Not authenticated. Run "basecamp auth login" to login.'));
       return;
@@ -2326,7 +2326,7 @@ Total: ${uploadsList.length} uploads`));
         options.attachableSgid,
         uploadOptions
       );
-      if (options.json) {
+      if (options.format === "json") {
         console.log(JSON.stringify(upload, null, 2));
         return;
       }
@@ -2338,7 +2338,7 @@ Total: ${uploadsList.length} uploads`));
       process.exit(1);
     }
   });
-  uploads.command("update <id>").description("Update an upload").requiredOption("-p, --project <id>", "Project ID").option("-d, --description <description>", "New upload description (HTML)").option("-n, --name <name>", "New base name (filename without extension)").option("--json", "Output as JSON").action(async (id, options) => {
+  uploads.command("update <id>").description("Update an upload").requiredOption("-p, --project <id>", "Project ID").option("-d, --description <description>", "New upload description (HTML)").option("-n, --name <name>", "New base name (filename without extension)").option("-f, --format <format>", "Output format (table|json)", "table").action(async (id, options) => {
     if (!isAuthenticated()) {
       console.log(chalk13.yellow('Not authenticated. Run "basecamp auth login" to login.'));
       return;
@@ -2362,7 +2362,7 @@ Total: ${uploadsList.length} uploads`));
         process.exit(1);
       }
       const upload = await updateUpload(projectId, uploadId, updates);
-      if (options.json) {
+      if (options.format === "json") {
         console.log(JSON.stringify(upload, null, 2));
         return;
       }
@@ -2464,7 +2464,7 @@ Total: ${webhookList.length} webhooks`));
       process.exit(1);
     }
   });
-  webhooks.command("create").description("Create a webhook").requiredOption("-p, --project <id>", "Project ID").requiredOption("--payload-url <url>", "Webhook payload URL (must be HTTPS)").option("--types <types>", "Comma-separated event types (default: all)").option("--json", "Output as JSON").action(async (options) => {
+  webhooks.command("create").description("Create a webhook").requiredOption("-p, --project <id>", "Project ID").requiredOption("--payload-url <url>", "Webhook payload URL (must be HTTPS)").option("--types <types>", "Comma-separated event types (default: all)").option("-f, --format <format>", "Output format (table|json)", "table").action(async (options) => {
     if (!isAuthenticated()) {
       console.log(chalk14.yellow('Not authenticated. Run "basecamp auth login" to login.'));
       return;
@@ -2481,7 +2481,7 @@ Total: ${webhookList.length} webhooks`));
       }
       const types = options.types ? options.types.split(",").map((t) => t.trim()) : void 0;
       const webhook = await createWebhook(projectId, options.payloadUrl, types);
-      if (options.json) {
+      if (options.format === "json") {
         console.log(JSON.stringify(webhook, null, 2));
         return;
       }
@@ -2494,7 +2494,7 @@ Total: ${webhookList.length} webhooks`));
       process.exit(1);
     }
   });
-  webhooks.command("update <id>").description("Update a webhook").requiredOption("-p, --project <id>", "Project ID").option("--payload-url <url>", "New webhook payload URL (must be HTTPS)").option("--types <types>", "Comma-separated event types").option("--active <active>", "Activate/deactivate webhook (true|false)").option("--json", "Output as JSON").action(async (id, options) => {
+  webhooks.command("update <id>").description("Update a webhook").requiredOption("-p, --project <id>", "Project ID").option("--payload-url <url>", "New webhook payload URL (must be HTTPS)").option("--types <types>", "Comma-separated event types").option("--active <active>", "Activate/deactivate webhook (true|false)").option("-f, --format <format>", "Output format (table|json)", "table").action(async (id, options) => {
     if (!isAuthenticated()) {
       console.log(chalk14.yellow('Not authenticated. Run "basecamp auth login" to login.'));
       return;
@@ -2525,7 +2525,7 @@ Total: ${webhookList.length} webhooks`));
         updates.active = options.active === "true";
       }
       const webhook = await updateWebhook(projectId, webhookId, updates);
-      if (options.json) {
+      if (options.format === "json") {
         console.log(JSON.stringify(webhook, null, 2));
         return;
       }
@@ -2818,7 +2818,7 @@ Total: ${subs.subscribers.length} subscribers`));
       process.exit(1);
     }
   });
-  subscriptions.command("subscribe").description("Subscribe to a recording").requiredOption("-p, --project <id>", "Project ID").requiredOption("-r, --recording <id>", "Recording ID").option("--json", "Output as JSON").action(async (options) => {
+  subscriptions.command("subscribe").description("Subscribe to a recording").requiredOption("-p, --project <id>", "Project ID").requiredOption("-r, --recording <id>", "Recording ID").option("-f, --format <format>", "Output format (table|json)", "table").action(async (options) => {
     if (!isAuthenticated()) {
       console.log(chalk17.yellow('Not authenticated. Run "basecamp auth login" to login.'));
       return;
@@ -2835,7 +2835,7 @@ Total: ${subs.subscribers.length} subscribers`));
         process.exit(1);
       }
       const subs = await subscribe(projectId, recordingId);
-      if (options.json) {
+      if (options.format === "json") {
         console.log(JSON.stringify(subs, null, 2));
         return;
       }

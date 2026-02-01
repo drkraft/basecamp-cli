@@ -48,14 +48,14 @@ Add to your MCP config:
 
 | Category | Tools |
 |----------|-------|
-| Projects | list_projects, get_project, create_project |
-| Todos | list_todolists, list_todos, create_todo, complete_todo, update_todo, delete_todo, delete_todolist |
-| Messages | list_messages, get_message, create_message |
-| Comments | list_comments, create_comment |
-| Documents | list_documents, create_document |
-| Schedules | list_schedule_entries, create_schedule_entry |
-| Card Tables | get_card_table, list_cards, create_card |
-| Search | search |
+| Projects | basecamp_list_projects, basecamp_get_project, basecamp_create_project |
+| Todos | basecamp_list_todolists, basecamp_list_todos, basecamp_create_todo, basecamp_complete_todo, basecamp_update_todo, basecamp_delete_todo, basecamp_delete_todolist |
+| Messages | basecamp_list_messages, basecamp_get_message, basecamp_create_message |
+| Comments | basecamp_list_comments, basecamp_create_comment |
+| Documents | basecamp_list_documents, basecamp_create_document |
+| Schedules | basecamp_list_schedule_entries, basecamp_create_schedule_entry |
+| Card Tables | basecamp_get_card_table, basecamp_list_cards, basecamp_create_card |
+| Search | basecamp_search |
 | + more | 43 tools total |
 
 ## CLI Commands
