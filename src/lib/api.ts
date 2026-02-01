@@ -709,7 +709,7 @@ export async function archiveRecording(projectId: number, recordingId: number): 
   await client.put(`buckets/${projectId}/recordings/${recordingId}/status/archived.json`);
 }
 
-export async function unarchiveRecording(projectId: number, recordingId: number): Promise<void> {
+export async function restoreRecording(projectId: number, recordingId: number): Promise<void> {
   const client = await createClient();
   await client.put(`buckets/${projectId}/recordings/${recordingId}/status/active.json`);
 }

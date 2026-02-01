@@ -196,7 +196,7 @@ basecamp webhooks delete <id> --project <project-id>
 basecamp recordings list --type Todo
 basecamp recordings list --type Message --status archived
 basecamp recordings archive <id> --project <project-id>
-basecamp recordings unarchive <id> --project <project-id>
+basecamp recordings restore <id> --project <project-id>
 basecamp recordings trash <id> --project <project-id>
 
 # Events (activity feed)

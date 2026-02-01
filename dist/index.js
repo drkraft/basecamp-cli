@@ -58,6 +58,7 @@ import {
   listWebhooks,
   logout,
   moveCard,
+  restoreRecording,
   search,
   sendCampfireLine,
   setClientConfig,
@@ -66,7 +67,6 @@ import {
   subscribe,
   testWebhook,
   trashRecording,
-  unarchiveRecording,
   uncompleteTodo,
   unsubscribe,
   updateCard,
@@ -78,7 +78,7 @@ import {
   updateUpload,
   updateVault,
   updateWebhook
-} from "./chunk-OGBXAZAX.js";
+} from "./chunk-J3M6TH3D.js";
 
 // src/index.ts
 import { Command as Command18 } from "commander";
@@ -2661,7 +2661,7 @@ Total: ${recordings2.length} recordings`));
       process.exit(1);
     }
   });
-  recordings.command("unarchive <id>").description("Unarchive a recording").requiredOption("-p, --project <id>", "Project ID").action(async (id, options) => {
+  recordings.command("restore <id>").description("Restore a recording (from archive or trash)").requiredOption("-p, --project <id>", "Project ID").action(async (id, options) => {
     if (!isAuthenticated()) {
       console.log(chalk15.yellow('Not authenticated. Run "basecamp auth login" to login.'));
       return;
@@ -2677,10 +2677,10 @@ Total: ${recordings2.length} recordings`));
         console.error(chalk15.red("Invalid recording ID: must be a number"));
         process.exit(1);
       }
-      await unarchiveRecording(projectId, recordingId);
-      console.log(chalk15.green(`\u2713 Recording ${recordingId} unarchived`));
+      await restoreRecording(projectId, recordingId);
+      console.log(chalk15.green(`\u2713 Recording ${recordingId} restored`));
     } catch (error) {
-      console.error(chalk15.red("Failed to unarchive recording:"), error instanceof Error ? error.message : error);
+      console.error(chalk15.red("Failed to restore recording:"), error instanceof Error ? error.message : error);
       process.exit(1);
     }
   });
