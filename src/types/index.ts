@@ -504,6 +504,33 @@ export interface PaginatedResponse<T> {
   totalCount?: number;
 }
 
+export interface WebhookDelivery {
+  id: number;
+  created_at: string;
+  request: {
+    headers: Record<string, string>;
+    body: Record<string, any>;
+  };
+  response: {
+    code: number;
+    headers: Record<string, string>;
+    message: string;
+    body: string;
+  };
+}
+
+export interface BasecampWebhook {
+  id: number;
+  active: boolean;
+  created_at: string;
+  updated_at: string;
+  payload_url: string;
+  types: string[];
+  url: string;
+  app_url: string;
+  recent_deliveries?: WebhookDelivery[];
+}
+
 export interface BasecampSearchResult {
   id: number;
   status: string;

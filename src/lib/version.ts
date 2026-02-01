@@ -1,7 +1,3 @@
-import { createRequire } from 'module';
-
-const require = createRequire(import.meta.url);
-const pkg = require('../../package.json');
-
-export const VERSION: string = pkg.version;
-export const NAME: string = pkg.name;
+// Version injected at build time via tsup.config.ts
+export const VERSION: string = process.env.PKG_VERSION || '2.0.0';
+export const NAME: string = process.env.PKG_NAME || '@drkraft/basecamp-cli';
