@@ -285,6 +285,50 @@ const tools: ToolWithHandler[] = [
       return { success: true, message: 'To-do marked as incomplete' };
     },
   },
+  {
+    name: 'basecamp_delete_todo',
+    description: 'Delete (trash) a to-do',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        projectId: {
+          type: 'number',
+          description: 'The ID of the project',
+        },
+        todoId: {
+          type: 'number',
+          description: 'The ID of the to-do to delete',
+        },
+      },
+      required: ['projectId', 'todoId'],
+    },
+    handler: async (args) => {
+      await api.trashRecording(args.projectId as number, args.todoId as number);
+      return { success: true, message: 'To-do moved to trash' };
+    },
+  },
+  {
+    name: 'basecamp_delete_todolist',
+    description: 'Delete (trash) a to-do list',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        projectId: {
+          type: 'number',
+          description: 'The ID of the project',
+        },
+        todolistId: {
+          type: 'number',
+          description: 'The ID of the to-do list to delete',
+        },
+      },
+      required: ['projectId', 'todolistId'],
+    },
+    handler: async (args) => {
+      await api.trashRecording(args.projectId as number, args.todolistId as number);
+      return { success: true, message: 'To-do list moved to trash' };
+    },
+  },
 
   // ============ MESSAGES (3) ============
   {

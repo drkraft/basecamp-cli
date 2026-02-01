@@ -12,7 +12,8 @@ import {
   completeTodo,
   uncompleteTodo,
   listTodolistGroups,
-  createTodolistGroup
+  createTodolistGroup,
+  trashRecording
 } from '../lib/api.js';
 import { isAuthenticated } from '../lib/config.js';
 
@@ -103,6 +104,35 @@ export function createTodoListsCommands(): Command {
         console.log(chalk.dim(`Name: ${list.name}`));
       } catch (error) {
         console.error(chalk.red('Failed to create to-do list:'), error instanceof Error ? error.message : error);
+        process.exit(1);
+      }
+    });
+
+  todolists
+    .command('delete <id>')
+    .description('Delete (trash) a to-do list')
+    .requiredOption('-p, --project <id>', 'Project ID')
+    .action(async (id: string, options) => {
+      if (!isAuthenticated()) {
+        console.log(chalk.yellow('Not authenticated. Run "basecamp auth login" to login.'));
+        return;
+      }
+
+      try {
+        const projectId = parseInt(options.project, 10);
+        if (isNaN(projectId)) {
+          console.error(chalk.red('Invalid project ID: must be a number'));
+          process.exit(1);
+        }
+        const listId = parseInt(id, 10);
+        if (isNaN(listId)) {
+          console.error(chalk.red('Invalid to-do list ID: must be a number'));
+          process.exit(1);
+        }
+        await trashRecording(projectId, listId);
+        console.log(chalk.green(`✓ To-do list ${listId} moved to trash`));
+      } catch (error) {
+        console.error(chalk.red('Failed to delete to-do list:'), error instanceof Error ? error.message : error);
         process.exit(1);
       }
     });
@@ -391,6 +421,35 @@ export function createTodosCommands(): Command {
         console.log(chalk.green(`✓ To-do ${todoId} marked as incomplete`));
       } catch (error) {
         console.error(chalk.red('Failed to uncomplete to-do:'), error instanceof Error ? error.message : error);
+        process.exit(1);
+      }
+    });
+
+  todos
+    .command('delete <id>')
+    .description('Delete (trash) a to-do')
+    .requiredOption('-p, --project <id>', 'Project ID')
+    .action(async (id: string, options) => {
+      if (!isAuthenticated()) {
+        console.log(chalk.yellow('Not authenticated. Run "basecamp auth login" to login.'));
+        return;
+      }
+
+      try {
+        const projectId = parseInt(options.project, 10);
+        if (isNaN(projectId)) {
+          console.error(chalk.red('Invalid project ID: must be a number'));
+          process.exit(1);
+        }
+        const todoId = parseInt(id, 10);
+        if (isNaN(todoId)) {
+          console.error(chalk.red('Invalid todo ID: must be a number'));
+          process.exit(1);
+        }
+        await trashRecording(projectId, todoId);
+        console.log(chalk.green(`✓ To-do ${todoId} moved to trash`));
+      } catch (error) {
+        console.error(chalk.red('Failed to delete to-do:'), error instanceof Error ? error.message : error);
         process.exit(1);
       }
     });
