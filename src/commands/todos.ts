@@ -11,6 +11,7 @@ import {
   updateTodo,
   completeTodo,
   uncompleteTodo,
+  moveTodo,
   listTodolistGroups,
   createTodolistGroup,
   trashRecording
@@ -450,6 +451,47 @@ export function createTodosCommands(): Command {
         console.log(chalk.green(`✓ To-do ${todoId} moved to trash`));
       } catch (error) {
         console.error(chalk.red('Failed to delete to-do:'), error instanceof Error ? error.message : error);
+        process.exit(1);
+      }
+    });
+
+  todos
+    .command('move <id>')
+    .description('Move a to-do to a different list')
+    .requiredOption('-p, --project <id>', 'Project ID')
+    .requiredOption('-l, --list <id>', 'Target to-do list ID')
+    .option('--position <pos>', 'Position in target list (default: 1)', '1')
+    .action(async (id: string, options) => {
+      if (!isAuthenticated()) {
+        console.log(chalk.yellow('Not authenticated. Run "basecamp auth login" to login.'));
+        return;
+      }
+
+      try {
+        const projectId = parseInt(options.project, 10);
+        if (isNaN(projectId)) {
+          console.error(chalk.red('Invalid project ID: must be a number'));
+          process.exit(1);
+        }
+        const todoId = parseInt(id, 10);
+        if (isNaN(todoId)) {
+          console.error(chalk.red('Invalid todo ID: must be a number'));
+          process.exit(1);
+        }
+        const targetListId = parseInt(options.list, 10);
+        if (isNaN(targetListId)) {
+          console.error(chalk.red('Invalid target list ID: must be a number'));
+          process.exit(1);
+        }
+        const position = parseInt(options.position, 10);
+        if (isNaN(position) || position < 1) {
+          console.error(chalk.red('Invalid position: must be a number >= 1'));
+          process.exit(1);
+        }
+        await moveTodo(projectId, todoId, targetListId, position);
+        console.log(chalk.green(`✓ To-do ${todoId} moved to list ${targetListId}`));
+      } catch (error) {
+        console.error(chalk.red('Failed to move to-do:'), error instanceof Error ? error.message : error);
         process.exit(1);
       }
     });

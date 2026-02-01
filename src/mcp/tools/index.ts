@@ -329,6 +329,41 @@ const tools: ToolWithHandler[] = [
       return { success: true, message: 'To-do list moved to trash' };
     },
   },
+  {
+    name: 'basecamp_move_todo',
+    description: 'Move a to-do to a different to-do list',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        projectId: {
+          type: 'number',
+          description: 'The ID of the project',
+        },
+        todoId: {
+          type: 'number',
+          description: 'The ID of the to-do to move',
+        },
+        targetListId: {
+          type: 'number',
+          description: 'The ID of the destination to-do list',
+        },
+        position: {
+          type: 'number',
+          description: 'Position in the target list (default: 1)',
+        },
+      },
+      required: ['projectId', 'todoId', 'targetListId'],
+    },
+    handler: async (args) => {
+      await api.moveTodo(
+        args.projectId as number,
+        args.todoId as number,
+        args.targetListId as number,
+        (args.position as number) || 1
+      );
+      return { success: true, message: `To-do moved to list ${args.targetListId}` };
+    },
+  },
 
   // ============ MESSAGES (3) ============
   {

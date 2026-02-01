@@ -274,6 +274,21 @@ export async function uncompleteTodo(projectId: number, todoId: number): Promise
   await client.delete(`buckets/${projectId}/todos/${todoId}/completion.json`);
 }
 
+export async function moveTodo(
+  projectId: number,
+  todoId: number,
+  targetListId: number,
+  position: number = 1
+): Promise<void> {
+  const client = await createClient();
+  await client.put(`buckets/${projectId}/todos/${todoId}/position.json`, {
+    json: {
+      position,
+      parent_id: targetListId
+    }
+  });
+}
+
 // Todolist Groups
 export async function listTodolistGroups(projectId: number, todolistId: number): Promise<BasecampTodolistGroup[]> {
   const client = await createClient();

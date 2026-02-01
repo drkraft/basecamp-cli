@@ -11,7 +11,7 @@ Full-featured CLI and MCP server for Basecamp 4 API.
 ## Features
 
 - **18 command groups** covering all Basecamp 4 domains
-- **43 MCP tools** for AI assistant integration
+- **44 MCP tools** for AI assistant integration
 - Automatic pagination and retry with backoff
 - OAuth 2.0 authentication
 
@@ -49,14 +49,14 @@ Add to your MCP config:
 | Category | Tools |
 |----------|-------|
 | Projects | basecamp_list_projects, basecamp_get_project, basecamp_create_project |
-| Todos | basecamp_list_todolists, basecamp_list_todos, basecamp_create_todo, basecamp_complete_todo, basecamp_update_todo, basecamp_delete_todo, basecamp_delete_todolist |
+| Todos | basecamp_list_todolists, basecamp_list_todos, basecamp_create_todo, basecamp_complete_todo, basecamp_update_todo, basecamp_delete_todo, basecamp_delete_todolist, basecamp_move_todo |
 | Messages | basecamp_list_messages, basecamp_get_message, basecamp_create_message |
 | Comments | basecamp_list_comments, basecamp_create_comment |
 | Documents | basecamp_list_documents, basecamp_create_document |
 | Schedules | basecamp_list_schedule_entries, basecamp_create_schedule_entry |
 | Card Tables | basecamp_get_card_table, basecamp_list_cards, basecamp_create_card |
 | Search | basecamp_search |
-| + more | 43 tools total |
+| + more | 44 tools total |
 
 ## CLI Commands
 
@@ -65,6 +65,7 @@ basecamp projects list
 basecamp todos list --project <id> --list <list-id>
 basecamp todos create --project <id> --list <list-id> --content "Task"
 basecamp todos delete <id> --project <id>
+basecamp todos move <id> --project <id> --list <target-list-id>
 basecamp todolists delete <id> --project <id>
 basecamp cardtables cards --project <id> --column <col-id>
 basecamp search "keyword"
