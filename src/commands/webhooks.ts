@@ -106,7 +106,7 @@ export function createWebhooksCommands(): Command {
 
         if (webhook.recent_deliveries && webhook.recent_deliveries.length > 0) {
           console.log(chalk.bold('\nRecent Deliveries:'));
-          webhook.recent_deliveries.slice(0, 5).forEach((delivery, index) => {
+          webhook.recent_deliveries.slice(0, 5).forEach((delivery: { created_at: string; response: { code: number; message: string } }, index: number) => {
             console.log(chalk.dim(`  ${index + 1}. ${delivery.created_at} - Response: ${delivery.response.code} ${delivery.response.message}`));
           });
         }
@@ -142,7 +142,7 @@ export function createWebhooksCommands(): Command {
          }
 
          const types = options.types ? options.types.split(',').map((t: string) => t.trim()) : undefined;
-         const webhook = await createWebhook(projectId, options.payloadUrl, types);
+          const webhook = await createWebhook(projectId, options.payloadUrl, { types });
 
          if (options.format === 'json') {
            console.log(JSON.stringify(webhook, null, 2));
@@ -186,26 +186,26 @@ export function createWebhooksCommands(): Command {
          }
 
          const updates: {
-           payload_url?: string;
-           types?: string[];
-           active?: boolean;
-         } = {};
+            payloadUrl?: string;
+            types?: string[];
+            active?: boolean;
+          } = {};
 
-         if (options.payloadUrl) {
-           if (!options.payloadUrl.startsWith('https://')) {
-             console.error(chalk.red('Payload URL must be HTTPS'));
-             process.exit(1);
-           }
-           updates.payload_url = options.payloadUrl;
-         }
-         if (options.types) {
-           updates.types = options.types.split(',').map((t: string) => t.trim());
-         }
-         if (options.active !== undefined) {
-           updates.active = options.active === 'true';
-         }
+          if (options.payloadUrl) {
+            if (!options.payloadUrl.startsWith('https://')) {
+              console.error(chalk.red('Payload URL must be HTTPS'));
+              process.exit(1);
+            }
+            updates.payloadUrl = options.payloadUrl;
+          }
+          if (options.types) {
+            updates.types = options.types.split(',').map((t: string) => t.trim());
+          }
+          if (options.active !== undefined) {
+            updates.active = options.active === 'true';
+          }
 
-         const webhook = await updateWebhook(projectId, webhookId, updates);
+          const webhook = await updateWebhook(projectId, webhookId, updates);
 
          if (options.format === 'json') {
            console.log(JSON.stringify(webhook, null, 2));

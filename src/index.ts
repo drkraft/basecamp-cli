@@ -18,13 +18,14 @@ import { createWebhooksCommands } from './commands/webhooks.js';
 import { createRecordingsCommands } from './commands/recordings.js';
 import { createEventsCommands } from './commands/events.js';
 import { createSubscriptionsCommands } from './commands/subscriptions.js';
+import { VERSION } from './lib/version.js';
 
 const program = new Command();
 
 program
   .name('basecamp')
   .description('CLI for managing Basecamp 4 projects, to-dos, messages, and more')
-  .version('2.0.0')
+  .version(VERSION)
   .option('-v, --verbose', 'Enable verbose output for debugging');
 
 program.addCommand(createAuthCommands());

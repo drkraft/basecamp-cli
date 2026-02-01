@@ -5,6 +5,7 @@ import {
   ListToolsRequestSchema,
 } from '@modelcontextprotocol/sdk/types.js';
 import { getTools, executeTool } from './tools/index.js';
+import { VERSION, NAME } from '../lib/version.js';
 
 /**
  * Create and configure the MCP server
@@ -12,8 +13,8 @@ import { getTools, executeTool } from './tools/index.js';
 export function createServer(): Server {
   const server = new Server(
     {
-      name: '@drkraft/basecamp-cli',
-      version: '2.0.0',
+      name: NAME,
+      version: VERSION,
     },
     {
       capabilities: {
