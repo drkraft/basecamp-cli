@@ -71,7 +71,23 @@ function getRetryConfig() {
     methods: ['GET', 'HEAD', 'PUT', 'DELETE', 'OPTIONS', 'TRACE'] as ('GET' | 'HEAD' | 'PUT' | 'DELETE' | 'OPTIONS' | 'TRACE')[],
     statusCodes: [429, 500, 502, 503, 504],
     errorCodes: [] as string[],
-    calculateDelay: ({ attemptCount }: { attemptCount: number }) => {
+    enforceRetryRules: true,
+    calculateDelay: ({
+      attemptCount,
+      error,
+      retryAfter,
+      computedValue
+    }: {
+      attemptCount: number;
+      error: unknown;
+      retryAfter?: number;
+      computedValue: number;
+    }) => {
+      if (computedValue === 0) return 0;
+      const response = (error as any)?.response;
+      if (response?.statusCode === 429 && retryAfter !== undefined) {
+        return retryAfter;
+      }
       return Math.pow(2, attemptCount - 1) * 1000;
     }
   };
