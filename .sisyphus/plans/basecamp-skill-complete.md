@@ -924,7 +924,7 @@ Wave 4 (MCP & Publication - After Wave 3):
 
 ### Phase 5: Validation & Documentation
 
-- [ ] 18. Validation manuelle complète
+- [~] 18. Validation manuelle complète (USER ACTION - run scripts/validate.ts)
 
   **What to do**:
   - Créer `scripts/validate.ts` script de validation
@@ -966,7 +966,7 @@ Wave 4 (MCP & Publication - After Wave 3):
 
 ---
 
-- [ ] 19. Documentation & User Guide
+- [x] 19. Documentation & User Guide
 
   **What to do**:
   - Réécrire README.md complet avec:
