@@ -57,6 +57,24 @@ const tools: ToolWithHandler[] = [
     },
     handler: async (args) => api.createProject(args.name as string, args.description as string | undefined),
   },
+  {
+    name: 'basecamp_archive_project',
+    description: 'Archive a Basecamp project',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        projectId: {
+          type: 'number',
+          description: 'The ID of the project',
+        },
+      },
+      required: ['projectId'],
+    },
+    handler: async (args) => {
+      await api.archiveProject(args.projectId as number);
+      return { success: true, message: 'Project archived' };
+    },
+  },
 
   // ============ TODO LISTS (2) ============
   {
@@ -92,6 +110,33 @@ const tools: ToolWithHandler[] = [
       required: ['projectId', 'todolistId'],
     },
     handler: async (args) => api.getTodoList(args.projectId as number, args.todolistId as number),
+  },
+  {
+    name: 'basecamp_create_todolist',
+    description: 'Create a new to-do list in a project',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        projectId: {
+          type: 'number',
+          description: 'The ID of the project',
+        },
+        name: {
+          type: 'string',
+          description: 'Name of the to-do list',
+        },
+        description: {
+          type: 'string',
+          description: 'Optional description of the to-do list',
+        },
+      },
+      required: ['projectId', 'name'],
+    },
+    handler: async (args) => api.createTodoList(
+      args.projectId as number,
+      args.name as string,
+      args.description as string | undefined
+    ),
   },
 
   // ============ TODOS (6) ============
@@ -219,11 +264,11 @@ const tools: ToolWithHandler[] = [
           description: 'Array of person IDs to assign',
         },
         dueOn: {
-          type: 'string',
+          type: ['string', 'null'],
           description: 'Due date in YYYY-MM-DD format (use null to clear)',
         },
         startsOn: {
-          type: 'string',
+          type: ['string', 'null'],
           description: 'Start date in YYYY-MM-DD format (use null to clear)',
         },
       },
@@ -363,6 +408,59 @@ const tools: ToolWithHandler[] = [
       );
       return { success: true, message: `To-do moved to list ${args.targetListId}` };
     },
+  },
+
+  // ============ TODO GROUPS (2) ============
+  {
+    name: 'basecamp_list_todolist_groups',
+    description: 'List to-do groups in a to-do list',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        projectId: {
+          type: 'number',
+          description: 'The ID of the project',
+        },
+        todolistId: {
+          type: 'number',
+          description: 'The ID of the to-do list',
+        },
+      },
+      required: ['projectId', 'todolistId'],
+    },
+    handler: async (args) => api.listTodolistGroups(args.projectId as number, args.todolistId as number),
+  },
+  {
+    name: 'basecamp_create_todolist_group',
+    description: 'Create a to-do group in a to-do list',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        projectId: {
+          type: 'number',
+          description: 'The ID of the project',
+        },
+        todolistId: {
+          type: 'number',
+          description: 'The ID of the to-do list',
+        },
+        name: {
+          type: 'string',
+          description: 'Name of the to-do group',
+        },
+        color: {
+          type: 'string',
+          description: 'Optional color name',
+        },
+      },
+      required: ['projectId', 'todolistId', 'name'],
+    },
+    handler: async (args) => api.createTodolistGroup(
+      args.projectId as number,
+      args.todolistId as number,
+      args.name as string,
+      args.color as string | undefined
+    ),
   },
 
   // ============ MESSAGES (3) ============
@@ -536,6 +634,55 @@ const tools: ToolWithHandler[] = [
       args.content as string
     ),
   },
+  {
+    name: 'basecamp_update_comment',
+    description: 'Update a comment',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        projectId: {
+          type: 'number',
+          description: 'The ID of the project',
+        },
+        commentId: {
+          type: 'number',
+          description: 'The ID of the comment',
+        },
+        content: {
+          type: 'string',
+          description: 'Updated HTML content of the comment',
+        },
+      },
+      required: ['projectId', 'commentId', 'content'],
+    },
+    handler: async (args) => api.updateComment(
+      args.projectId as number,
+      args.commentId as number,
+      args.content as string
+    ),
+  },
+  {
+    name: 'basecamp_delete_comment',
+    description: 'Delete a comment',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        projectId: {
+          type: 'number',
+          description: 'The ID of the project',
+        },
+        commentId: {
+          type: 'number',
+          description: 'The ID of the comment',
+        },
+      },
+      required: ['projectId', 'commentId'],
+    },
+    handler: async (args) => {
+      await api.deleteComment(args.projectId as number, args.commentId as number);
+      return { success: true, message: 'Comment deleted' };
+    },
+  },
 
   // ============ VAULTS (2) ============
   {
@@ -575,6 +722,60 @@ const tools: ToolWithHandler[] = [
       required: ['projectId', 'vaultId'],
     },
     handler: async (args) => api.getVault(args.projectId as number, args.vaultId as number),
+  },
+  {
+    name: 'basecamp_create_vault',
+    description: 'Create a vault (folder) in a project',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        projectId: {
+          type: 'number',
+          description: 'The ID of the project',
+        },
+        parentVaultId: {
+          type: 'number',
+          description: 'The ID of the parent vault',
+        },
+        title: {
+          type: 'string',
+          description: 'Title of the vault',
+        },
+      },
+      required: ['projectId', 'parentVaultId', 'title'],
+    },
+    handler: async (args) => api.createVault(
+      args.projectId as number,
+      args.parentVaultId as number,
+      args.title as string
+    ),
+  },
+  {
+    name: 'basecamp_update_vault',
+    description: 'Update a vault (folder)',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        projectId: {
+          type: 'number',
+          description: 'The ID of the project',
+        },
+        vaultId: {
+          type: 'number',
+          description: 'The ID of the vault',
+        },
+        title: {
+          type: 'string',
+          description: 'New title of the vault',
+        },
+      },
+      required: ['projectId', 'vaultId', 'title'],
+    },
+    handler: async (args) => api.updateVault(
+      args.projectId as number,
+      args.vaultId as number,
+      args.title as string
+    ),
   },
 
   // ============ DOCUMENTS (4) ============
@@ -688,7 +889,135 @@ const tools: ToolWithHandler[] = [
     ),
   },
 
+  // ============ UPLOADS (4) ============
+  {
+    name: 'basecamp_list_uploads',
+    description: 'List uploads in a vault',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        projectId: {
+          type: 'number',
+          description: 'The ID of the project',
+        },
+        vaultId: {
+          type: 'number',
+          description: 'The ID of the vault',
+        },
+      },
+      required: ['projectId', 'vaultId'],
+    },
+    handler: async (args) => api.listUploads(args.projectId as number, args.vaultId as number),
+  },
+  {
+    name: 'basecamp_get_upload',
+    description: 'Get details of a specific upload',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        projectId: {
+          type: 'number',
+          description: 'The ID of the project',
+        },
+        uploadId: {
+          type: 'number',
+          description: 'The ID of the upload',
+        },
+      },
+      required: ['projectId', 'uploadId'],
+    },
+    handler: async (args) => api.getUpload(args.projectId as number, args.uploadId as number),
+  },
+  {
+    name: 'basecamp_create_upload',
+    description: 'Create an upload in a vault from an attachable SGID',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        projectId: {
+          type: 'number',
+          description: 'The ID of the project',
+        },
+        vaultId: {
+          type: 'number',
+          description: 'The ID of the vault',
+        },
+        attachableSgid: {
+          type: 'string',
+          description: 'Attachable SGID from the upload pipeline',
+        },
+        description: {
+          type: 'string',
+          description: 'Optional description of the upload',
+        },
+        baseName: {
+          type: 'string',
+          description: 'Optional base name for the upload',
+        },
+      },
+      required: ['projectId', 'vaultId', 'attachableSgid'],
+    },
+    handler: async (args) => api.createUpload(
+      args.projectId as number,
+      args.vaultId as number,
+      args.attachableSgid as string,
+      {
+        description: args.description as string | undefined,
+        base_name: args.baseName as string | undefined,
+      }
+    ),
+  },
+  {
+    name: 'basecamp_update_upload',
+    description: 'Update an upload',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        projectId: {
+          type: 'number',
+          description: 'The ID of the project',
+        },
+        uploadId: {
+          type: 'number',
+          description: 'The ID of the upload',
+        },
+        description: {
+          type: 'string',
+          description: 'New description of the upload',
+        },
+        baseName: {
+          type: 'string',
+          description: 'New base name for the upload',
+        },
+      },
+      required: ['projectId', 'uploadId'],
+    },
+    handler: async (args) => api.updateUpload(
+      args.projectId as number,
+      args.uploadId as number,
+      {
+        description: args.description as string | undefined,
+        base_name: args.baseName as string | undefined,
+      }
+    ),
+  },
+
   // ============ SCHEDULES (3) ============
+  {
+    name: 'basecamp_get_schedule',
+    description: 'Get schedule details for a project',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        projectId: {
+          type: 'number',
+          description: 'The ID of the project',
+        },
+      },
+      required: ['projectId'],
+    },
+    handler: async (args) => api.getSchedule(args.projectId as number),
+  },
   {
     name: 'basecamp_list_schedule_entries',
     description: 'List schedule entries (events) in a project',
@@ -777,6 +1106,83 @@ const tools: ToolWithHandler[] = [
       }
     ),
   },
+  {
+    name: 'basecamp_update_schedule_entry',
+    description: 'Update a schedule entry',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        projectId: {
+          type: 'number',
+          description: 'The ID of the project',
+        },
+        entryId: {
+          type: 'number',
+          description: 'The ID of the schedule entry',
+        },
+        summary: {
+          type: 'string',
+          description: 'Updated summary/title',
+        },
+        description: {
+          type: 'string',
+          description: 'Updated HTML description',
+        },
+        startsAt: {
+          type: 'string',
+          description: 'Updated start date/time in ISO 8601 format',
+        },
+        endsAt: {
+          type: 'string',
+          description: 'Updated end date/time in ISO 8601 format',
+        },
+        allDay: {
+          type: 'boolean',
+          description: 'Whether this is an all-day event',
+        },
+        participantIds: {
+          type: 'array',
+          items: { type: 'number' },
+          description: 'Array of person IDs to add as participants',
+        },
+      },
+      required: ['projectId', 'entryId'],
+    },
+    handler: async (args) => api.updateScheduleEntry(
+      args.projectId as number,
+      args.entryId as number,
+      {
+        summary: args.summary as string | undefined,
+        description: args.description as string | undefined,
+        starts_at: args.startsAt as string | undefined,
+        ends_at: args.endsAt as string | undefined,
+        all_day: args.allDay as boolean | undefined,
+        participant_ids: args.participantIds as number[] | undefined,
+      }
+    ),
+  },
+  {
+    name: 'basecamp_delete_schedule_entry',
+    description: 'Delete a schedule entry',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        projectId: {
+          type: 'number',
+          description: 'The ID of the project',
+        },
+        entryId: {
+          type: 'number',
+          description: 'The ID of the schedule entry',
+        },
+      },
+      required: ['projectId', 'entryId'],
+    },
+    handler: async (args) => {
+      await api.deleteScheduleEntry(args.projectId as number, args.entryId as number);
+      return { success: true, message: 'Schedule entry deleted' };
+    },
+  },
 
   // ============ CARD TABLES / KANBAN (4) ============
   {
@@ -812,6 +1218,89 @@ const tools: ToolWithHandler[] = [
       required: ['projectId', 'columnId'],
     },
     handler: async (args) => api.getColumn(args.projectId as number, args.columnId as number),
+  },
+  {
+    name: 'basecamp_create_column',
+    description: 'Create a new card table column',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        projectId: {
+          type: 'number',
+          description: 'The ID of the project',
+        },
+        title: {
+          type: 'string',
+          description: 'Title of the column',
+        },
+        description: {
+          type: 'string',
+          description: 'Optional description of the column',
+        },
+      },
+      required: ['projectId', 'title'],
+    },
+    handler: async (args) => api.createColumn(
+      args.projectId as number,
+      args.title as string,
+      args.description as string | undefined
+    ),
+  },
+  {
+    name: 'basecamp_update_column',
+    description: 'Update a card table column',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        projectId: {
+          type: 'number',
+          description: 'The ID of the project',
+        },
+        columnId: {
+          type: 'number',
+          description: 'The ID of the column',
+        },
+        title: {
+          type: 'string',
+          description: 'Updated title',
+        },
+        description: {
+          type: 'string',
+          description: 'Updated description',
+        },
+      },
+      required: ['projectId', 'columnId'],
+    },
+    handler: async (args) => api.updateColumn(
+      args.projectId as number,
+      args.columnId as number,
+      {
+        title: args.title as string | undefined,
+        description: args.description as string | undefined,
+      }
+    ),
+  },
+  {
+    name: 'basecamp_delete_column',
+    description: 'Delete a card table column',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        projectId: {
+          type: 'number',
+          description: 'The ID of the project',
+        },
+        columnId: {
+          type: 'number',
+          description: 'The ID of the column',
+        },
+      },
+      required: ['projectId', 'columnId'],
+    },
+    handler: async (args) => {
+      await api.deleteColumn(args.projectId as number, args.columnId as number);
+      return { success: true, message: 'Column deleted' };
+    },
   },
   {
     name: 'basecamp_list_cards',
@@ -876,6 +1365,118 @@ const tools: ToolWithHandler[] = [
         assignee_ids: args.assigneeIds as number[] | undefined,
       }
     ),
+  },
+  {
+    name: 'basecamp_get_card',
+    description: 'Get details of a specific card',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        projectId: {
+          type: 'number',
+          description: 'The ID of the project',
+        },
+        cardId: {
+          type: 'number',
+          description: 'The ID of the card',
+        },
+      },
+      required: ['projectId', 'cardId'],
+    },
+    handler: async (args) => api.getCard(args.projectId as number, args.cardId as number),
+  },
+  {
+    name: 'basecamp_update_card',
+    description: 'Update a card in a card table',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        projectId: {
+          type: 'number',
+          description: 'The ID of the project',
+        },
+        cardId: {
+          type: 'number',
+          description: 'The ID of the card',
+        },
+        title: {
+          type: 'string',
+          description: 'Updated card title',
+        },
+        content: {
+          type: 'string',
+          description: 'Updated HTML content',
+        },
+        dueOn: {
+          type: ['string', 'null'],
+          description: 'Due date in YYYY-MM-DD format (use null to clear)',
+        },
+        assigneeIds: {
+          type: 'array',
+          items: { type: 'number' },
+          description: 'Array of person IDs to assign',
+        },
+      },
+      required: ['projectId', 'cardId'],
+    },
+    handler: async (args) => api.updateCard(
+      args.projectId as number,
+      args.cardId as number,
+      {
+        title: args.title as string | undefined,
+        content: args.content as string | undefined,
+        due_on: args.dueOn as string | null | undefined,
+        assignee_ids: args.assigneeIds as number[] | undefined,
+      }
+    ),
+  },
+  {
+    name: 'basecamp_move_card',
+    description: 'Move a card to another column',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        projectId: {
+          type: 'number',
+          description: 'The ID of the project',
+        },
+        cardId: {
+          type: 'number',
+          description: 'The ID of the card',
+        },
+        columnId: {
+          type: 'number',
+          description: 'The ID of the destination column',
+        },
+      },
+      required: ['projectId', 'cardId', 'columnId'],
+    },
+    handler: async (args) => {
+      await api.moveCard(args.projectId as number, args.cardId as number, args.columnId as number);
+      return { success: true, message: 'Card moved' };
+    },
+  },
+  {
+    name: 'basecamp_delete_card',
+    description: 'Delete a card',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        projectId: {
+          type: 'number',
+          description: 'The ID of the project',
+        },
+        cardId: {
+          type: 'number',
+          description: 'The ID of the card',
+        },
+      },
+      required: ['projectId', 'cardId'],
+    },
+    handler: async (args) => {
+      await api.deleteCard(args.projectId as number, args.cardId as number);
+      return { success: true, message: 'Card deleted' };
+    },
   },
 
   // ============ SEARCH (1) ============
@@ -984,6 +1585,50 @@ const tools: ToolWithHandler[] = [
       return { success: true, message: 'Recording archived' };
     },
   },
+  {
+    name: 'basecamp_restore_recording',
+    description: 'Restore a recording (from archive or trash)',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        projectId: {
+          type: 'number',
+          description: 'The ID of the project',
+        },
+        recordingId: {
+          type: 'number',
+          description: 'The ID of the recording to restore',
+        },
+      },
+      required: ['projectId', 'recordingId'],
+    },
+    handler: async (args) => {
+      await api.restoreRecording(args.projectId as number, args.recordingId as number);
+      return { success: true, message: 'Recording restored' };
+    },
+  },
+  {
+    name: 'basecamp_trash_recording',
+    description: 'Move a recording to trash',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        projectId: {
+          type: 'number',
+          description: 'The ID of the project',
+        },
+        recordingId: {
+          type: 'number',
+          description: 'The ID of the recording to trash',
+        },
+      },
+      required: ['projectId', 'recordingId'],
+    },
+    handler: async (args) => {
+      await api.trashRecording(args.projectId as number, args.recordingId as number);
+      return { success: true, message: 'Recording moved to trash' };
+    },
+  },
 
   // ============ SUBSCRIPTIONS (2) ============
   {
@@ -1023,6 +1668,204 @@ const tools: ToolWithHandler[] = [
       required: ['projectId', 'recordingId'],
     },
     handler: async (args) => api.subscribe(args.projectId as number, args.recordingId as number),
+  },
+  {
+    name: 'basecamp_unsubscribe',
+    description: 'Unsubscribe the current user from a recording',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        projectId: {
+          type: 'number',
+          description: 'The ID of the project',
+        },
+        recordingId: {
+          type: 'number',
+          description: 'The ID of the recording to unsubscribe from',
+        },
+      },
+      required: ['projectId', 'recordingId'],
+    },
+    handler: async (args) => {
+      await api.unsubscribe(args.projectId as number, args.recordingId as number);
+      return { success: true, message: 'Unsubscribed from recording' };
+    },
+  },
+
+  // ============ WEBHOOKS (6) ============
+  {
+    name: 'basecamp_list_webhooks',
+    description: 'List webhooks in a project',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        projectId: {
+          type: 'number',
+          description: 'The ID of the project',
+        },
+      },
+      required: ['projectId'],
+    },
+    handler: async (args) => api.listWebhooks(args.projectId as number),
+  },
+  {
+    name: 'basecamp_get_webhook',
+    description: 'Get details of a webhook',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        projectId: {
+          type: 'number',
+          description: 'The ID of the project',
+        },
+        webhookId: {
+          type: 'number',
+          description: 'The ID of the webhook',
+        },
+      },
+      required: ['projectId', 'webhookId'],
+    },
+    handler: async (args) => api.getWebhook(args.projectId as number, args.webhookId as number),
+  },
+  {
+    name: 'basecamp_create_webhook',
+    description: 'Create a webhook in a project',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        projectId: {
+          type: 'number',
+          description: 'The ID of the project',
+        },
+        payloadUrl: {
+          type: 'string',
+          description: 'HTTPS webhook payload URL',
+        },
+        types: {
+          type: 'array',
+          items: { type: 'string' },
+          description: 'Optional list of event types',
+        },
+        active: {
+          type: 'boolean',
+          description: 'Whether the webhook is active',
+        },
+      },
+      required: ['projectId', 'payloadUrl'],
+    },
+    handler: async (args) => api.createWebhook(
+      args.projectId as number,
+      args.payloadUrl as string,
+      {
+        types: args.types as string[] | undefined,
+        active: args.active as boolean | undefined,
+      }
+    ),
+  },
+  {
+    name: 'basecamp_update_webhook',
+    description: 'Update a webhook in a project',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        projectId: {
+          type: 'number',
+          description: 'The ID of the project',
+        },
+        webhookId: {
+          type: 'number',
+          description: 'The ID of the webhook',
+        },
+        payloadUrl: {
+          type: 'string',
+          description: 'HTTPS webhook payload URL',
+        },
+        types: {
+          type: 'array',
+          items: { type: 'string' },
+          description: 'List of event types',
+        },
+        active: {
+          type: 'boolean',
+          description: 'Whether the webhook is active',
+        },
+      },
+      required: ['projectId', 'webhookId'],
+    },
+    handler: async (args) => api.updateWebhook(
+      args.projectId as number,
+      args.webhookId as number,
+      {
+        payloadUrl: args.payloadUrl as string | undefined,
+        types: args.types as string[] | undefined,
+        active: args.active as boolean | undefined,
+      }
+    ),
+  },
+  {
+    name: 'basecamp_delete_webhook',
+    description: 'Delete a webhook',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        projectId: {
+          type: 'number',
+          description: 'The ID of the project',
+        },
+        webhookId: {
+          type: 'number',
+          description: 'The ID of the webhook',
+        },
+      },
+      required: ['projectId', 'webhookId'],
+    },
+    handler: async (args) => {
+      await api.deleteWebhook(args.projectId as number, args.webhookId as number);
+      return { success: true, message: 'Webhook deleted' };
+    },
+  },
+  {
+    name: 'basecamp_test_webhook',
+    description: 'Send a test payload to a webhook',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        projectId: {
+          type: 'number',
+          description: 'The ID of the project',
+        },
+        webhookId: {
+          type: 'number',
+          description: 'The ID of the webhook',
+        },
+      },
+      required: ['projectId', 'webhookId'],
+    },
+    handler: async (args) => {
+      await api.testWebhook(args.projectId as number, args.webhookId as number);
+      return { success: true, message: 'Webhook test sent' };
+    },
+  },
+
+  // ============ EVENTS (1) ============
+  {
+    name: 'basecamp_list_events',
+    description: 'List events (activity) for a recording in a project',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        projectId: {
+          type: 'number',
+          description: 'The ID of the project',
+        },
+        recordingId: {
+          type: 'number',
+          description: 'The ID of the recording',
+        },
+      },
+      required: ['projectId', 'recordingId'],
+    },
+    handler: async (args) => api.listEvents(args.projectId as number, args.recordingId as number),
   },
 
   // ============ CAMPFIRES (3) ============

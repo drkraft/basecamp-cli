@@ -7,8 +7,8 @@ A comprehensive command-line interface and MCP server for Basecamp 4. Manage pro
 
 ## Features
 
-- **Full CLI** - 18 command groups covering the complete Basecamp 4 API
-- **MCP Server** - 44 tools for AI assistant integration (Claude, etc.)
+- **Full CLI** - 21 command groups covering the complete Basecamp 4 API
+- **MCP Server** - 76 tools for AI assistant integration (Claude, etc.)
 - **Multiple Output Formats** - Table or JSON output for all commands
 - **Pagination & Retry** - Automatic handling of large datasets and rate limits
 - **OAuth 2.0** - Secure authentication via browser
@@ -144,7 +144,7 @@ basecamp comments delete <id> --project <project-id>
 # Vaults (folders)
 basecamp vaults list --project <id>
 basecamp vaults get <id> --project <project-id>
-basecamp vaults create --project <id> --title "Folder Name"
+basecamp vaults create --project <id> --vault <parent-vault-id> --title "Folder Name"
 
 # Documents
 basecamp documents list --project <id> --vault <vault-id>
@@ -257,23 +257,27 @@ basecamp-mcp
 bun run mcp
 ```
 
-### Available Tools (44)
+### Available Tools (76)
 
 | Category | Tools |
 |----------|-------|
-| Projects | `basecamp_list_projects`, `basecamp_get_project`, `basecamp_create_project` |
-| Todo Lists | `basecamp_list_todolists`, `basecamp_get_todolist` |
-| Todos | `basecamp_list_todos`, `basecamp_get_todo`, `basecamp_create_todo`, `basecamp_update_todo`, `basecamp_complete_todo`, `basecamp_uncomplete_todo`, `basecamp_delete_todo`, `basecamp_delete_todolist`, `basecamp_move_todo` |
+| Projects | `basecamp_list_projects`, `basecamp_get_project`, `basecamp_create_project`, `basecamp_archive_project` |
+| Todo Lists | `basecamp_list_todolists`, `basecamp_get_todolist`, `basecamp_create_todolist`, `basecamp_delete_todolist` |
+| Todo Groups | `basecamp_list_todolist_groups`, `basecamp_create_todolist_group` |
+| Todos | `basecamp_list_todos`, `basecamp_get_todo`, `basecamp_create_todo`, `basecamp_update_todo`, `basecamp_complete_todo`, `basecamp_uncomplete_todo`, `basecamp_delete_todo`, `basecamp_move_todo` |
 | Messages | `basecamp_list_messages`, `basecamp_get_message`, `basecamp_create_message` |
 | People | `basecamp_list_people`, `basecamp_get_person`, `basecamp_get_me` |
-| Comments | `basecamp_list_comments`, `basecamp_get_comment`, `basecamp_create_comment` |
-| Vaults | `basecamp_list_vaults`, `basecamp_get_vault` |
+| Comments | `basecamp_list_comments`, `basecamp_get_comment`, `basecamp_create_comment`, `basecamp_update_comment`, `basecamp_delete_comment` |
+| Vaults | `basecamp_list_vaults`, `basecamp_get_vault`, `basecamp_create_vault`, `basecamp_update_vault` |
 | Documents | `basecamp_list_documents`, `basecamp_get_document`, `basecamp_create_document`, `basecamp_update_document` |
-| Schedules | `basecamp_list_schedule_entries`, `basecamp_get_schedule_entry`, `basecamp_create_schedule_entry` |
-| Card Tables | `basecamp_get_card_table`, `basecamp_get_column`, `basecamp_list_cards`, `basecamp_create_card` |
+| Uploads | `basecamp_list_uploads`, `basecamp_get_upload`, `basecamp_create_upload`, `basecamp_update_upload` |
+| Schedules | `basecamp_get_schedule`, `basecamp_list_schedule_entries`, `basecamp_get_schedule_entry`, `basecamp_create_schedule_entry`, `basecamp_update_schedule_entry`, `basecamp_delete_schedule_entry` |
+| Card Tables | `basecamp_get_card_table`, `basecamp_get_column`, `basecamp_create_column`, `basecamp_update_column`, `basecamp_delete_column`, `basecamp_list_cards`, `basecamp_get_card`, `basecamp_create_card`, `basecamp_update_card`, `basecamp_move_card`, `basecamp_delete_card` |
 | Search | `basecamp_search` |
-| Recordings | `basecamp_list_recordings`, `basecamp_archive_recording` |
-| Subscriptions | `basecamp_list_subscriptions`, `basecamp_subscribe` |
+| Recordings | `basecamp_list_recordings`, `basecamp_archive_recording`, `basecamp_restore_recording`, `basecamp_trash_recording` |
+| Subscriptions | `basecamp_list_subscriptions`, `basecamp_subscribe`, `basecamp_unsubscribe` |
+| Webhooks | `basecamp_list_webhooks`, `basecamp_get_webhook`, `basecamp_create_webhook`, `basecamp_update_webhook`, `basecamp_delete_webhook`, `basecamp_test_webhook` |
+| Events | `basecamp_list_events` |
 | Campfires | `basecamp_list_campfires`, `basecamp_get_campfire_lines`, `basecamp_send_campfire_line` |
 
 ### Using with OpenCode/Claude

@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 import {
+  VERSION,
   archiveProject,
   archiveRecording,
   completeTodo,
@@ -79,7 +80,7 @@ import {
   updateUpload,
   updateVault,
   updateWebhook
-} from "./chunk-R7GNOAVE.js";
+} from "./chunk-SNQLEFIO.js";
 
 // src/index.ts
 import { Command as Command18 } from "commander";
@@ -2497,7 +2498,7 @@ Total: ${webhookList.length} webhooks`));
         process.exit(1);
       }
       const types = options.types ? options.types.split(",").map((t) => t.trim()) : void 0;
-      const webhook = await createWebhook(projectId, options.payloadUrl, types);
+      const webhook = await createWebhook(projectId, options.payloadUrl, { types });
       if (options.format === "json") {
         console.log(JSON.stringify(webhook, null, 2));
         return;
@@ -2533,7 +2534,7 @@ Total: ${webhookList.length} webhooks`));
           console.error(chalk14.red("Payload URL must be HTTPS"));
           process.exit(1);
         }
-        updates.payload_url = options.payloadUrl;
+        updates.payloadUrl = options.payloadUrl;
       }
       if (options.types) {
         updates.types = options.types.split(",").map((t) => t.trim());
@@ -2888,7 +2889,7 @@ Total: ${subs.subscribers.length} subscribers`));
 
 // src/index.ts
 var program = new Command18();
-program.name("basecamp").description("CLI for managing Basecamp 4 projects, to-dos, messages, and more").version("2.0.0").option("-v, --verbose", "Enable verbose output for debugging");
+program.name("basecamp").description("CLI for managing Basecamp 4 projects, to-dos, messages, and more").version(VERSION).option("-v, --verbose", "Enable verbose output for debugging");
 program.addCommand(createAuthCommands());
 program.addCommand(createAccountsCommand());
 program.addCommand(createAccountCommand());
