@@ -73,31 +73,31 @@ export function createTodoListsCommands(): Command {
       }
     });
 
-  todolists
-    .command('create')
-    .description('Create a to-do list')
-    .requiredOption('-p, --project <id>', 'Project ID')
-    .requiredOption('-n, --name <name>', 'List name')
-    .option('-d, --description <description>', 'List description')
-    .option('--json', 'Output as JSON')
-    .action(async (options) => {
-      if (!isAuthenticated()) {
-        console.log(chalk.yellow('Not authenticated. Run "basecamp auth login" to login.'));
-        return;
-      }
+   todolists
+     .command('create')
+     .description('Create a to-do list')
+     .requiredOption('-p, --project <id>', 'Project ID')
+     .requiredOption('-n, --name <name>', 'List name')
+     .option('-d, --description <description>', 'List description')
+     .option('-f, --format <format>', 'Output format (table|json)', 'table')
+     .action(async (options) => {
+       if (!isAuthenticated()) {
+         console.log(chalk.yellow('Not authenticated. Run "basecamp auth login" to login.'));
+         return;
+       }
 
-      try {
-        const projectId = parseInt(options.project, 10);
-        if (isNaN(projectId)) {
-          console.error(chalk.red('Invalid project ID: must be a number'));
-          process.exit(1);
-        }
-        const list = await createTodoList(projectId, options.name, options.description);
+       try {
+         const projectId = parseInt(options.project, 10);
+         if (isNaN(projectId)) {
+           console.error(chalk.red('Invalid project ID: must be a number'));
+           process.exit(1);
+         }
+         const list = await createTodoList(projectId, options.name, options.description);
 
-        if (options.json) {
-          console.log(JSON.stringify(list, null, 2));
-          return;
-        }
+         if (options.format === 'json') {
+           console.log(JSON.stringify(list, null, 2));
+           return;
+         }
 
         console.log(chalk.green('✓ To-do list created'));
         console.log(chalk.dim(`ID: ${list.id}`));
@@ -307,56 +307,56 @@ export function createTodosCommands(): Command {
       }
     });
 
-  todos
-    .command('update <id>')
-    .description('Update a to-do')
-    .requiredOption('-p, --project <id>', 'Project ID')
-    .option('-c, --content <content>', 'New content')
-    .option('-d, --description <description>', 'New description')
-    .option('--due <date>', 'Due date (YYYY-MM-DD)')
-    .option('--starts <date>', 'Start date (YYYY-MM-DD)')
-    .option('--assignees <ids>', 'Comma-separated assignee IDs')
-    .option('--json', 'Output as JSON')
-    .action(async (id: string, options) => {
-      if (!isAuthenticated()) {
-        console.log(chalk.yellow('Not authenticated. Run "basecamp auth login" to login.'));
-        return;
-      }
+   todos
+     .command('update <id>')
+     .description('Update a to-do')
+     .requiredOption('-p, --project <id>', 'Project ID')
+     .option('-c, --content <content>', 'New content')
+     .option('-d, --description <description>', 'New description')
+     .option('--due <date>', 'Due date (YYYY-MM-DD)')
+     .option('--starts <date>', 'Start date (YYYY-MM-DD)')
+     .option('--assignees <ids>', 'Comma-separated assignee IDs')
+     .option('-f, --format <format>', 'Output format (table|json)', 'table')
+     .action(async (id: string, options) => {
+       if (!isAuthenticated()) {
+         console.log(chalk.yellow('Not authenticated. Run "basecamp auth login" to login.'));
+         return;
+       }
 
-      try {
-        const projectId = parseInt(options.project, 10);
-        if (isNaN(projectId)) {
-          console.error(chalk.red('Invalid project ID: must be a number'));
-          process.exit(1);
-        }
-        const todoId = parseInt(id, 10);
-        if (isNaN(todoId)) {
-          console.error(chalk.red('Invalid todo ID: must be a number'));
-          process.exit(1);
-        }
+       try {
+         const projectId = parseInt(options.project, 10);
+         if (isNaN(projectId)) {
+           console.error(chalk.red('Invalid project ID: must be a number'));
+           process.exit(1);
+         }
+         const todoId = parseInt(id, 10);
+         if (isNaN(todoId)) {
+           console.error(chalk.red('Invalid todo ID: must be a number'));
+           process.exit(1);
+         }
 
-        const updates: {
-          content?: string;
-          description?: string;
-          due_on?: string | null;
-          starts_on?: string | null;
-          assignee_ids?: number[];
-        } = {};
+         const updates: {
+           content?: string;
+           description?: string;
+           due_on?: string | null;
+           starts_on?: string | null;
+           assignee_ids?: number[];
+         } = {};
 
-        if (options.content) updates.content = options.content;
-        if (options.description) updates.description = options.description;
-        if (options.due) updates.due_on = options.due;
-        if (options.starts) updates.starts_on = options.starts;
-        if (options.assignees) {
-          updates.assignee_ids = options.assignees.split(',').map((id: string) => parseInt(id.trim(), 10));
-        }
+         if (options.content) updates.content = options.content;
+         if (options.description) updates.description = options.description;
+         if (options.due) updates.due_on = options.due;
+         if (options.starts) updates.starts_on = options.starts;
+         if (options.assignees) {
+           updates.assignee_ids = options.assignees.split(',').map((id: string) => parseInt(id.trim(), 10));
+         }
 
-        const todo = await updateTodo(projectId, todoId, updates);
+         const todo = await updateTodo(projectId, todoId, updates);
 
-        if (options.json) {
-          console.log(JSON.stringify(todo, null, 2));
-          return;
-        }
+         if (options.format === 'json') {
+           console.log(JSON.stringify(todo, null, 2));
+           return;
+         }
 
         console.log(chalk.green('✓ To-do updated'));
         console.log(chalk.dim(`ID: ${todo.id}`));
@@ -519,37 +519,37 @@ export function createTodosCommands(): Command {
        }
      });
 
-   todogroups
-     .command('create')
-     .description('Create a to-do group')
-     .requiredOption('-p, --project <id>', 'Project ID')
-     .requiredOption('-l, --list <id>', 'To-do list ID')
-     .requiredOption('-n, --name <name>', 'Group name')
-     .option('--color <color>', 'Group color (white|red|orange|yellow|green|blue|aqua|purple|gray|pink|brown)')
-     .option('--json', 'Output as JSON')
-     .action(async (options) => {
-       if (!isAuthenticated()) {
-         console.log(chalk.yellow('Not authenticated. Run "basecamp auth login" to login.'));
-         return;
-       }
+    todogroups
+      .command('create')
+      .description('Create a to-do group')
+      .requiredOption('-p, --project <id>', 'Project ID')
+      .requiredOption('-l, --list <id>', 'To-do list ID')
+      .requiredOption('-n, --name <name>', 'Group name')
+      .option('--color <color>', 'Group color (white|red|orange|yellow|green|blue|aqua|purple|gray|pink|brown)')
+      .option('-f, --format <format>', 'Output format (table|json)', 'table')
+      .action(async (options) => {
+        if (!isAuthenticated()) {
+          console.log(chalk.yellow('Not authenticated. Run "basecamp auth login" to login.'));
+          return;
+        }
 
-       try {
-         const projectId = parseInt(options.project, 10);
-         if (isNaN(projectId)) {
-           console.error(chalk.red('Invalid project ID: must be a number'));
-           process.exit(1);
-         }
-         const listId = parseInt(options.list, 10);
-         if (isNaN(listId)) {
-           console.error(chalk.red('Invalid list ID: must be a number'));
-           process.exit(1);
-         }
-         const group = await createTodolistGroup(projectId, listId, options.name, options.color);
+        try {
+          const projectId = parseInt(options.project, 10);
+          if (isNaN(projectId)) {
+            console.error(chalk.red('Invalid project ID: must be a number'));
+            process.exit(1);
+          }
+          const listId = parseInt(options.list, 10);
+          if (isNaN(listId)) {
+            console.error(chalk.red('Invalid list ID: must be a number'));
+            process.exit(1);
+          }
+          const group = await createTodolistGroup(projectId, listId, options.name, options.color);
 
-         if (options.json) {
-           console.log(JSON.stringify(group, null, 2));
-           return;
-         }
+          if (options.format === 'json') {
+            console.log(JSON.stringify(group, null, 2));
+            return;
+          }
 
          console.log(chalk.green('✓ To-do group created'));
          console.log(chalk.dim(`ID: ${group.id}`));

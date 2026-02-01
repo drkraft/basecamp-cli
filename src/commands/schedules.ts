@@ -57,7 +57,7 @@ export function createSchedulesCommands(): Command {
     .command('entries')
     .description('List schedule entries in a project')
     .requiredOption('-p, --project <id>', 'Project ID')
-    .option('--status <status>', 'Filter by status (active|archived|trashed)')
+    .option('--status <status>', 'Filter by status (upcoming|past)')
     .option('-f, --format <format>', 'Output format (table|json)', 'table')
     .action(async (options) => {
       if (!isAuthenticated()) {
@@ -113,50 +113,50 @@ export function createSchedulesCommands(): Command {
       }
     });
 
-  schedules
-    .command('create-entry')
-    .description('Create a schedule entry')
-    .requiredOption('-p, --project <id>', 'Project ID')
-    .requiredOption('-s, --summary <summary>', 'Event summary')
-    .requiredOption('--starts-at <datetime>', 'Start date/time (ISO 8601)')
-    .option('--ends-at <datetime>', 'End date/time (ISO 8601)')
-    .option('-d, --description <description>', 'Event description')
-    .option('--all-day', 'Mark as all-day event')
-    .option('--participants <ids>', 'Comma-separated participant IDs')
-    .option('--json', 'Output as JSON')
-    .action(async (options) => {
-      if (!isAuthenticated()) {
-        console.log(chalk.yellow('Not authenticated. Run "basecamp auth login" to login.'));
-        return;
-      }
+   schedules
+     .command('create-entry')
+     .description('Create a schedule entry')
+     .requiredOption('-p, --project <id>', 'Project ID')
+     .requiredOption('-s, --summary <summary>', 'Event summary')
+     .requiredOption('--starts-at <datetime>', 'Start date/time (ISO 8601)')
+     .option('--ends-at <datetime>', 'End date/time (ISO 8601)')
+     .option('-d, --description <description>', 'Event description')
+     .option('--all-day', 'Mark as all-day event')
+     .option('--participants <ids>', 'Comma-separated participant IDs')
+     .option('-f, --format <format>', 'Output format (table|json)', 'table')
+     .action(async (options) => {
+       if (!isAuthenticated()) {
+         console.log(chalk.yellow('Not authenticated. Run "basecamp auth login" to login.'));
+         return;
+       }
 
-      try {
-        const projectId = parseInt(options.project, 10);
-        if (isNaN(projectId)) {
-          console.error(chalk.red('Invalid project ID: must be a number'));
-          process.exit(1);
-        }
+       try {
+         const projectId = parseInt(options.project, 10);
+         if (isNaN(projectId)) {
+           console.error(chalk.red('Invalid project ID: must be a number'));
+           process.exit(1);
+         }
 
-        const entryOptions: {
-          description?: string;
-          endsAt?: string;
-          allDay?: boolean;
-          participantIds?: number[];
-        } = {};
+         const entryOptions: {
+           description?: string;
+           endsAt?: string;
+           allDay?: boolean;
+           participantIds?: number[];
+         } = {};
 
-        if (options.description) entryOptions.description = options.description;
-        if (options.endsAt) entryOptions.endsAt = options.endsAt;
-        if (options.allDay) entryOptions.allDay = true;
-        if (options.participants) {
-          entryOptions.participantIds = options.participants.split(',').map((id: string) => parseInt(id.trim(), 10));
-        }
+         if (options.description) entryOptions.description = options.description;
+         if (options.endsAt) entryOptions.endsAt = options.endsAt;
+         if (options.allDay) entryOptions.allDay = true;
+         if (options.participants) {
+           entryOptions.participantIds = options.participants.split(',').map((id: string) => parseInt(id.trim(), 10));
+         }
 
-        const entry = await createScheduleEntry(projectId, options.summary, options.startsAt, entryOptions);
+         const entry = await createScheduleEntry(projectId, options.summary, options.startsAt, entryOptions);
 
-        if (options.json) {
-          console.log(JSON.stringify(entry, null, 2));
-          return;
-        }
+         if (options.format === 'json') {
+           console.log(JSON.stringify(entry, null, 2));
+           return;
+         }
 
         console.log(chalk.green('✓ Schedule entry created'));
         console.log(chalk.dim(`ID: ${entry.id}`));
@@ -168,60 +168,60 @@ export function createSchedulesCommands(): Command {
       }
     });
 
-  schedules
-    .command('update-entry <id>')
-    .description('Update a schedule entry')
-    .requiredOption('-p, --project <id>', 'Project ID')
-    .option('-s, --summary <summary>', 'New summary')
-    .option('-d, --description <description>', 'New description')
-    .option('--starts-at <datetime>', 'New start date/time (ISO 8601)')
-    .option('--ends-at <datetime>', 'New end date/time (ISO 8601)')
-    .option('--all-day', 'Mark as all-day event')
-    .option('--participants <ids>', 'Comma-separated participant IDs')
-    .option('--json', 'Output as JSON')
-    .action(async (id: string, options) => {
-      if (!isAuthenticated()) {
-        console.log(chalk.yellow('Not authenticated. Run "basecamp auth login" to login.'));
-        return;
-      }
+   schedules
+     .command('update-entry <id>')
+     .description('Update a schedule entry')
+     .requiredOption('-p, --project <id>', 'Project ID')
+     .option('-s, --summary <summary>', 'New summary')
+     .option('-d, --description <description>', 'New description')
+     .option('--starts-at <datetime>', 'New start date/time (ISO 8601)')
+     .option('--ends-at <datetime>', 'New end date/time (ISO 8601)')
+     .option('--all-day', 'Mark as all-day event')
+     .option('--participants <ids>', 'Comma-separated participant IDs')
+     .option('-f, --format <format>', 'Output format (table|json)', 'table')
+     .action(async (id: string, options) => {
+       if (!isAuthenticated()) {
+         console.log(chalk.yellow('Not authenticated. Run "basecamp auth login" to login.'));
+         return;
+       }
 
-      try {
-        const projectId = parseInt(options.project, 10);
-        if (isNaN(projectId)) {
-          console.error(chalk.red('Invalid project ID: must be a number'));
-          process.exit(1);
-        }
+       try {
+         const projectId = parseInt(options.project, 10);
+         if (isNaN(projectId)) {
+           console.error(chalk.red('Invalid project ID: must be a number'));
+           process.exit(1);
+         }
 
-        const entryId = parseInt(id, 10);
-        if (isNaN(entryId)) {
-          console.error(chalk.red('Invalid entry ID: must be a number'));
-          process.exit(1);
-        }
+         const entryId = parseInt(id, 10);
+         if (isNaN(entryId)) {
+           console.error(chalk.red('Invalid entry ID: must be a number'));
+           process.exit(1);
+         }
 
-        const updates: {
-          summary?: string;
-          description?: string;
-          starts_at?: string;
-          ends_at?: string;
-          all_day?: boolean;
-          participant_ids?: number[];
-        } = {};
+         const updates: {
+           summary?: string;
+           description?: string;
+           starts_at?: string;
+           ends_at?: string;
+           all_day?: boolean;
+           participant_ids?: number[];
+         } = {};
 
-        if (options.summary) updates.summary = options.summary;
-        if (options.description) updates.description = options.description;
-        if (options.startsAt) updates.starts_at = options.startsAt;
-        if (options.endsAt) updates.ends_at = options.endsAt;
-        if (options.allDay) updates.all_day = true;
-        if (options.participants) {
-          updates.participant_ids = options.participants.split(',').map((pid: string) => parseInt(pid.trim(), 10));
-        }
+         if (options.summary) updates.summary = options.summary;
+         if (options.description) updates.description = options.description;
+         if (options.startsAt) updates.starts_at = options.startsAt;
+         if (options.endsAt) updates.ends_at = options.endsAt;
+         if (options.allDay) updates.all_day = true;
+         if (options.participants) {
+           updates.participant_ids = options.participants.split(',').map((pid: string) => parseInt(pid.trim(), 10));
+         }
 
-        const entry = await updateScheduleEntry(projectId, entryId, updates);
+         const entry = await updateScheduleEntry(projectId, entryId, updates);
 
-        if (options.json) {
-          console.log(JSON.stringify(entry, null, 2));
-          return;
-        }
+         if (options.format === 'json') {
+           console.log(JSON.stringify(entry, null, 2));
+           return;
+         }
 
         console.log(chalk.green('✓ Schedule entry updated'));
         console.log(chalk.dim(`ID: ${entry.id}`));

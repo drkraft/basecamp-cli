@@ -116,37 +116,37 @@ export function createCommentsCommands(): Command {
       }
     });
 
-  comments
-    .command('create')
-    .description('Create a comment on a recording')
-    .requiredOption('-p, --project <id>', 'Project ID')
-    .requiredOption('-r, --recording <id>', 'Recording ID (todo, message, etc.)')
-    .requiredOption('-c, --content <content>', 'Comment content')
-    .option('--json', 'Output as JSON')
-    .action(async (options) => {
-      if (!isAuthenticated()) {
-        console.log(chalk.yellow('Not authenticated. Run "basecamp auth login" to login.'));
-        return;
-      }
+   comments
+     .command('create')
+     .description('Create a comment on a recording')
+     .requiredOption('-p, --project <id>', 'Project ID')
+     .requiredOption('-r, --recording <id>', 'Recording ID (todo, message, etc.)')
+     .requiredOption('-c, --content <content>', 'Comment content')
+     .option('-f, --format <format>', 'Output format (table|json)', 'table')
+     .action(async (options) => {
+       if (!isAuthenticated()) {
+         console.log(chalk.yellow('Not authenticated. Run "basecamp auth login" to login.'));
+         return;
+       }
 
-      try {
-        const projectId = parseInt(options.project, 10);
-        if (isNaN(projectId)) {
-          console.error(chalk.red('Invalid project ID: must be a number'));
-          process.exit(1);
-        }
-        const recordingId = parseInt(options.recording, 10);
-        if (isNaN(recordingId)) {
-          console.error(chalk.red('Invalid recording ID: must be a number'));
-          process.exit(1);
-        }
+       try {
+         const projectId = parseInt(options.project, 10);
+         if (isNaN(projectId)) {
+           console.error(chalk.red('Invalid project ID: must be a number'));
+           process.exit(1);
+         }
+         const recordingId = parseInt(options.recording, 10);
+         if (isNaN(recordingId)) {
+           console.error(chalk.red('Invalid recording ID: must be a number'));
+           process.exit(1);
+         }
 
-        const comment = await createComment(projectId, recordingId, options.content);
+         const comment = await createComment(projectId, recordingId, options.content);
 
-        if (options.json) {
-          console.log(JSON.stringify(comment, null, 2));
-          return;
-        }
+         if (options.format === 'json') {
+           console.log(JSON.stringify(comment, null, 2));
+           return;
+         }
 
         console.log(chalk.green('✓ Comment created'));
         console.log(chalk.dim(`ID: ${comment.id}`));
@@ -157,36 +157,36 @@ export function createCommentsCommands(): Command {
       }
     });
 
-  comments
-    .command('update <id>')
-    .description('Update a comment')
-    .requiredOption('-p, --project <id>', 'Project ID')
-    .requiredOption('-c, --content <content>', 'New comment content')
-    .option('--json', 'Output as JSON')
-    .action(async (id: string, options) => {
-      if (!isAuthenticated()) {
-        console.log(chalk.yellow('Not authenticated. Run "basecamp auth login" to login.'));
-        return;
-      }
+   comments
+     .command('update <id>')
+     .description('Update a comment')
+     .requiredOption('-p, --project <id>', 'Project ID')
+     .requiredOption('-c, --content <content>', 'New comment content')
+     .option('-f, --format <format>', 'Output format (table|json)', 'table')
+     .action(async (id: string, options) => {
+       if (!isAuthenticated()) {
+         console.log(chalk.yellow('Not authenticated. Run "basecamp auth login" to login.'));
+         return;
+       }
 
-      try {
-        const projectId = parseInt(options.project, 10);
-        if (isNaN(projectId)) {
-          console.error(chalk.red('Invalid project ID: must be a number'));
-          process.exit(1);
-        }
-        const commentId = parseInt(id, 10);
-        if (isNaN(commentId)) {
-          console.error(chalk.red('Invalid comment ID: must be a number'));
-          process.exit(1);
-        }
+       try {
+         const projectId = parseInt(options.project, 10);
+         if (isNaN(projectId)) {
+           console.error(chalk.red('Invalid project ID: must be a number'));
+           process.exit(1);
+         }
+         const commentId = parseInt(id, 10);
+         if (isNaN(commentId)) {
+           console.error(chalk.red('Invalid comment ID: must be a number'));
+           process.exit(1);
+         }
 
-        const comment = await updateComment(projectId, commentId, options.content);
+         const comment = await updateComment(projectId, commentId, options.content);
 
-        if (options.json) {
-          console.log(JSON.stringify(comment, null, 2));
-          return;
-        }
+         if (options.format === 'json') {
+           console.log(JSON.stringify(comment, null, 2));
+           return;
+         }
 
         console.log(chalk.green('✓ Comment updated'));
         console.log(chalk.dim(`ID: ${comment.id}`));

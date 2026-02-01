@@ -48,7 +48,7 @@ export BASECAMP_CLIENT_SECRET="your-client-secret"
 Or configure via CLI:
 
 ```bash
-basecamp auth configure --client-id "your-client-id" --client-secret "your-client-secret"
+basecamp auth configure --client-id "your-client-id"
 ```
 
 ### 3. Login

@@ -130,31 +130,31 @@ export function createCardTablesCommands(): Command {
       }
     });
 
-  cardtables
-    .command('create-column')
-    .description('Create a new column in a card table')
-    .requiredOption('-p, --project <id>', 'Project ID')
-    .requiredOption('-t, --title <title>', 'Column title')
-    .option('-d, --description <description>', 'Column description')
-    .option('--json', 'Output as JSON')
-    .action(async (options) => {
-      if (!isAuthenticated()) {
-        console.log(chalk.yellow('Not authenticated. Run "basecamp auth login" to login.'));
-        return;
-      }
+   cardtables
+     .command('create-column')
+     .description('Create a new column in a card table')
+     .requiredOption('-p, --project <id>', 'Project ID')
+     .requiredOption('-t, --title <title>', 'Column title')
+     .option('-d, --description <description>', 'Column description')
+     .option('-f, --format <format>', 'Output format (table|json)', 'table')
+     .action(async (options) => {
+       if (!isAuthenticated()) {
+         console.log(chalk.yellow('Not authenticated. Run "basecamp auth login" to login.'));
+         return;
+       }
 
-      try {
-        const projectId = parseInt(options.project, 10);
-        if (isNaN(projectId)) {
-          console.error(chalk.red('Invalid project ID: must be a number'));
-          process.exit(1);
-        }
-        const column = await createColumn(projectId, options.title, options.description);
+       try {
+         const projectId = parseInt(options.project, 10);
+         if (isNaN(projectId)) {
+           console.error(chalk.red('Invalid project ID: must be a number'));
+           process.exit(1);
+         }
+         const column = await createColumn(projectId, options.title, options.description);
 
-        if (options.json) {
-          console.log(JSON.stringify(column, null, 2));
-          return;
-        }
+         if (options.format === 'json') {
+           console.log(JSON.stringify(column, null, 2));
+           return;
+         }
 
         console.log(chalk.green('✓ Column created'));
         console.log(chalk.dim(`ID: ${column.id}`));
@@ -165,39 +165,39 @@ export function createCardTablesCommands(): Command {
       }
     });
 
-  cardtables
-    .command('update-column <id>')
-    .description('Update a column')
-    .requiredOption('-p, --project <id>', 'Project ID')
-    .option('-t, --title <title>', 'New title')
-    .option('-d, --description <description>', 'New description')
-    .option('--json', 'Output as JSON')
-    .action(async (id: string, options) => {
-      if (!isAuthenticated()) {
-        console.log(chalk.yellow('Not authenticated. Run "basecamp auth login" to login.'));
-        return;
-      }
+   cardtables
+     .command('update-column <id>')
+     .description('Update a column')
+     .requiredOption('-p, --project <id>', 'Project ID')
+     .option('-t, --title <title>', 'New title')
+     .option('-d, --description <description>', 'New description')
+     .option('-f, --format <format>', 'Output format (table|json)', 'table')
+     .action(async (id: string, options) => {
+       if (!isAuthenticated()) {
+         console.log(chalk.yellow('Not authenticated. Run "basecamp auth login" to login.'));
+         return;
+       }
 
-      try {
-        const projectId = parseInt(options.project, 10);
-        if (isNaN(projectId)) {
-          console.error(chalk.red('Invalid project ID: must be a number'));
-          process.exit(1);
-        }
-        const columnId = parseInt(id, 10);
-        if (isNaN(columnId)) {
-          console.error(chalk.red('Invalid column ID: must be a number'));
-          process.exit(1);
-        }
+       try {
+         const projectId = parseInt(options.project, 10);
+         if (isNaN(projectId)) {
+           console.error(chalk.red('Invalid project ID: must be a number'));
+           process.exit(1);
+         }
+         const columnId = parseInt(id, 10);
+         if (isNaN(columnId)) {
+           console.error(chalk.red('Invalid column ID: must be a number'));
+           process.exit(1);
+         }
 
-        const updates: { title?: string; description?: string } = {};
-        if (options.title) updates.title = options.title;
-        if (options.description) updates.description = options.description;
+         const updates: { title?: string; description?: string } = {};
+         if (options.title) updates.title = options.title;
+         if (options.description) updates.description = options.description;
 
-        const column = await updateColumn(projectId, columnId, updates);
+         const column = await updateColumn(projectId, columnId, updates);
 
-        if (options.json) {
-          console.log(JSON.stringify(column, null, 2));
+         if (options.format === 'json') {
+           console.log(JSON.stringify(column, null, 2));
           return;
         }
 
@@ -342,55 +342,55 @@ export function createCardTablesCommands(): Command {
       }
     });
 
-  cardtables
-    .command('create-card')
-    .description('Create a new card')
-    .requiredOption('-p, --project <id>', 'Project ID')
-    .requiredOption('-c, --column <id>', 'Column ID')
-    .requiredOption('-t, --title <title>', 'Card title')
-    .option('--content <content>', 'Card content')
-    .option('--due <date>', 'Due date (YYYY-MM-DD)')
-    .option('--assignees <ids>', 'Comma-separated assignee IDs')
-    .option('--notify', 'Notify assignees')
-    .option('--json', 'Output as JSON')
-    .action(async (options) => {
-      if (!isAuthenticated()) {
-        console.log(chalk.yellow('Not authenticated. Run "basecamp auth login" to login.'));
-        return;
-      }
+   cardtables
+     .command('create-card')
+     .description('Create a new card')
+     .requiredOption('-p, --project <id>', 'Project ID')
+     .requiredOption('-c, --column <id>', 'Column ID')
+     .requiredOption('-t, --title <title>', 'Card title')
+     .option('--content <content>', 'Card content')
+     .option('--due <date>', 'Due date (YYYY-MM-DD)')
+     .option('--assignees <ids>', 'Comma-separated assignee IDs')
+     .option('--notify', 'Notify assignees')
+     .option('-f, --format <format>', 'Output format (table|json)', 'table')
+     .action(async (options) => {
+       if (!isAuthenticated()) {
+         console.log(chalk.yellow('Not authenticated. Run "basecamp auth login" to login.'));
+         return;
+       }
 
-      try {
-        const projectId = parseInt(options.project, 10);
-        if (isNaN(projectId)) {
-          console.error(chalk.red('Invalid project ID: must be a number'));
-          process.exit(1);
-        }
-        const columnId = parseInt(options.column, 10);
-        if (isNaN(columnId)) {
-          console.error(chalk.red('Invalid column ID: must be a number'));
-          process.exit(1);
-        }
+       try {
+         const projectId = parseInt(options.project, 10);
+         if (isNaN(projectId)) {
+           console.error(chalk.red('Invalid project ID: must be a number'));
+           process.exit(1);
+         }
+         const columnId = parseInt(options.column, 10);
+         if (isNaN(columnId)) {
+           console.error(chalk.red('Invalid column ID: must be a number'));
+           process.exit(1);
+         }
 
-        const cardOptions: {
-          content?: string;
-          due_on?: string;
-          assignee_ids?: number[];
-          notify?: boolean;
-        } = {};
+         const cardOptions: {
+           content?: string;
+           due_on?: string;
+           assignee_ids?: number[];
+           notify?: boolean;
+         } = {};
 
-        if (options.content) cardOptions.content = options.content;
-        if (options.due) cardOptions.due_on = options.due;
-        if (options.assignees) {
-          cardOptions.assignee_ids = options.assignees.split(',').map((id: string) => parseInt(id.trim(), 10));
-        }
-        if (options.notify) cardOptions.notify = true;
+         if (options.content) cardOptions.content = options.content;
+         if (options.due) cardOptions.due_on = options.due;
+         if (options.assignees) {
+           cardOptions.assignee_ids = options.assignees.split(',').map((id: string) => parseInt(id.trim(), 10));
+         }
+         if (options.notify) cardOptions.notify = true;
 
-        const card = await createCard(projectId, columnId, options.title, cardOptions);
+         const card = await createCard(projectId, columnId, options.title, cardOptions);
 
-        if (options.json) {
-          console.log(JSON.stringify(card, null, 2));
-          return;
-        }
+         if (options.format === 'json') {
+           console.log(JSON.stringify(card, null, 2));
+           return;
+         }
 
         console.log(chalk.green('✓ Card created'));
         console.log(chalk.dim(`ID: ${card.id}`));
@@ -401,53 +401,53 @@ export function createCardTablesCommands(): Command {
       }
     });
 
-  cardtables
-    .command('update-card <id>')
-    .description('Update a card')
-    .requiredOption('-p, --project <id>', 'Project ID')
-    .option('-t, --title <title>', 'New title')
-    .option('--content <content>', 'New content')
-    .option('--due <date>', 'Due date (YYYY-MM-DD)')
-    .option('--assignees <ids>', 'Comma-separated assignee IDs')
-    .option('--json', 'Output as JSON')
-    .action(async (id: string, options) => {
-      if (!isAuthenticated()) {
-        console.log(chalk.yellow('Not authenticated. Run "basecamp auth login" to login.'));
-        return;
-      }
+   cardtables
+     .command('update-card <id>')
+     .description('Update a card')
+     .requiredOption('-p, --project <id>', 'Project ID')
+     .option('-t, --title <title>', 'New title')
+     .option('--content <content>', 'New content')
+     .option('--due <date>', 'Due date (YYYY-MM-DD)')
+     .option('--assignees <ids>', 'Comma-separated assignee IDs')
+     .option('-f, --format <format>', 'Output format (table|json)', 'table')
+     .action(async (id: string, options) => {
+       if (!isAuthenticated()) {
+         console.log(chalk.yellow('Not authenticated. Run "basecamp auth login" to login.'));
+         return;
+       }
 
-      try {
-        const projectId = parseInt(options.project, 10);
-        if (isNaN(projectId)) {
-          console.error(chalk.red('Invalid project ID: must be a number'));
-          process.exit(1);
-        }
-        const cardId = parseInt(id, 10);
-        if (isNaN(cardId)) {
-          console.error(chalk.red('Invalid card ID: must be a number'));
-          process.exit(1);
-        }
+       try {
+         const projectId = parseInt(options.project, 10);
+         if (isNaN(projectId)) {
+           console.error(chalk.red('Invalid project ID: must be a number'));
+           process.exit(1);
+         }
+         const cardId = parseInt(id, 10);
+         if (isNaN(cardId)) {
+           console.error(chalk.red('Invalid card ID: must be a number'));
+           process.exit(1);
+         }
 
-        const updates: {
-          title?: string;
-          content?: string;
-          due_on?: string | null;
-          assignee_ids?: number[];
-        } = {};
+         const updates: {
+           title?: string;
+           content?: string;
+           due_on?: string | null;
+           assignee_ids?: number[];
+         } = {};
 
-        if (options.title) updates.title = options.title;
-        if (options.content) updates.content = options.content;
-        if (options.due) updates.due_on = options.due;
-        if (options.assignees) {
-          updates.assignee_ids = options.assignees.split(',').map((id: string) => parseInt(id.trim(), 10));
-        }
+         if (options.title) updates.title = options.title;
+         if (options.content) updates.content = options.content;
+         if (options.due) updates.due_on = options.due;
+         if (options.assignees) {
+           updates.assignee_ids = options.assignees.split(',').map((id: string) => parseInt(id.trim(), 10));
+         }
 
-        const card = await updateCard(projectId, cardId, updates);
+         const card = await updateCard(projectId, cardId, updates);
 
-        if (options.json) {
-          console.log(JSON.stringify(card, null, 2));
-          return;
-        }
+         if (options.format === 'json') {
+           console.log(JSON.stringify(card, null, 2));
+           return;
+         }
 
         console.log(chalk.green('✓ Card updated'));
         console.log(chalk.dim(`ID: ${card.id}`));

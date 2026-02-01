@@ -117,38 +117,38 @@ export function createWebhooksCommands(): Command {
       }
     });
 
-  webhooks
-    .command('create')
-    .description('Create a webhook')
-    .requiredOption('-p, --project <id>', 'Project ID')
-    .requiredOption('--payload-url <url>', 'Webhook payload URL (must be HTTPS)')
-    .option('--types <types>', 'Comma-separated event types (default: all)')
-    .option('--json', 'Output as JSON')
-    .action(async (options) => {
-      if (!isAuthenticated()) {
-        console.log(chalk.yellow('Not authenticated. Run "basecamp auth login" to login.'));
-        return;
-      }
+   webhooks
+     .command('create')
+     .description('Create a webhook')
+     .requiredOption('-p, --project <id>', 'Project ID')
+     .requiredOption('--payload-url <url>', 'Webhook payload URL (must be HTTPS)')
+     .option('--types <types>', 'Comma-separated event types (default: all)')
+     .option('-f, --format <format>', 'Output format (table|json)', 'table')
+     .action(async (options) => {
+       if (!isAuthenticated()) {
+         console.log(chalk.yellow('Not authenticated. Run "basecamp auth login" to login.'));
+         return;
+       }
 
-      try {
-        const projectId = parseInt(options.project, 10);
-        if (isNaN(projectId)) {
-          console.error(chalk.red('Invalid project ID: must be a number'));
-          process.exit(1);
-        }
+       try {
+         const projectId = parseInt(options.project, 10);
+         if (isNaN(projectId)) {
+           console.error(chalk.red('Invalid project ID: must be a number'));
+           process.exit(1);
+         }
 
-        if (!options.payloadUrl.startsWith('https://')) {
-          console.error(chalk.red('Payload URL must be HTTPS'));
-          process.exit(1);
-        }
+         if (!options.payloadUrl.startsWith('https://')) {
+           console.error(chalk.red('Payload URL must be HTTPS'));
+           process.exit(1);
+         }
 
-        const types = options.types ? options.types.split(',').map((t: string) => t.trim()) : undefined;
-        const webhook = await createWebhook(projectId, options.payloadUrl, types);
+         const types = options.types ? options.types.split(',').map((t: string) => t.trim()) : undefined;
+         const webhook = await createWebhook(projectId, options.payloadUrl, types);
 
-        if (options.json) {
-          console.log(JSON.stringify(webhook, null, 2));
-          return;
-        }
+         if (options.format === 'json') {
+           console.log(JSON.stringify(webhook, null, 2));
+           return;
+         }
 
         console.log(chalk.green('✓ Webhook created'));
         console.log(chalk.dim(`ID: ${webhook.id}`));
@@ -160,58 +160,58 @@ export function createWebhooksCommands(): Command {
       }
     });
 
-  webhooks
-    .command('update <id>')
-    .description('Update a webhook')
-    .requiredOption('-p, --project <id>', 'Project ID')
-    .option('--payload-url <url>', 'New webhook payload URL (must be HTTPS)')
-    .option('--types <types>', 'Comma-separated event types')
-    .option('--active <active>', 'Activate/deactivate webhook (true|false)')
-    .option('--json', 'Output as JSON')
-    .action(async (id: string, options) => {
-      if (!isAuthenticated()) {
-        console.log(chalk.yellow('Not authenticated. Run "basecamp auth login" to login.'));
-        return;
-      }
+   webhooks
+     .command('update <id>')
+     .description('Update a webhook')
+     .requiredOption('-p, --project <id>', 'Project ID')
+     .option('--payload-url <url>', 'New webhook payload URL (must be HTTPS)')
+     .option('--types <types>', 'Comma-separated event types')
+     .option('--active <active>', 'Activate/deactivate webhook (true|false)')
+     .option('-f, --format <format>', 'Output format (table|json)', 'table')
+     .action(async (id: string, options) => {
+       if (!isAuthenticated()) {
+         console.log(chalk.yellow('Not authenticated. Run "basecamp auth login" to login.'));
+         return;
+       }
 
-      try {
-        const projectId = parseInt(options.project, 10);
-        if (isNaN(projectId)) {
-          console.error(chalk.red('Invalid project ID: must be a number'));
-          process.exit(1);
-        }
-        const webhookId = parseInt(id, 10);
-        if (isNaN(webhookId)) {
-          console.error(chalk.red('Invalid webhook ID: must be a number'));
-          process.exit(1);
-        }
+       try {
+         const projectId = parseInt(options.project, 10);
+         if (isNaN(projectId)) {
+           console.error(chalk.red('Invalid project ID: must be a number'));
+           process.exit(1);
+         }
+         const webhookId = parseInt(id, 10);
+         if (isNaN(webhookId)) {
+           console.error(chalk.red('Invalid webhook ID: must be a number'));
+           process.exit(1);
+         }
 
-        const updates: {
-          payload_url?: string;
-          types?: string[];
-          active?: boolean;
-        } = {};
+         const updates: {
+           payload_url?: string;
+           types?: string[];
+           active?: boolean;
+         } = {};
 
-        if (options.payloadUrl) {
-          if (!options.payloadUrl.startsWith('https://')) {
-            console.error(chalk.red('Payload URL must be HTTPS'));
-            process.exit(1);
-          }
-          updates.payload_url = options.payloadUrl;
-        }
-        if (options.types) {
-          updates.types = options.types.split(',').map((t: string) => t.trim());
-        }
-        if (options.active !== undefined) {
-          updates.active = options.active === 'true';
-        }
+         if (options.payloadUrl) {
+           if (!options.payloadUrl.startsWith('https://')) {
+             console.error(chalk.red('Payload URL must be HTTPS'));
+             process.exit(1);
+           }
+           updates.payload_url = options.payloadUrl;
+         }
+         if (options.types) {
+           updates.types = options.types.split(',').map((t: string) => t.trim());
+         }
+         if (options.active !== undefined) {
+           updates.active = options.active === 'true';
+         }
 
-        const webhook = await updateWebhook(projectId, webhookId, updates);
+         const webhook = await updateWebhook(projectId, webhookId, updates);
 
-        if (options.json) {
-          console.log(JSON.stringify(webhook, null, 2));
-          return;
-        }
+         if (options.format === 'json') {
+           console.log(JSON.stringify(webhook, null, 2));
+           return;
+         }
 
         console.log(chalk.green('✓ Webhook updated'));
         console.log(chalk.dim(`ID: ${webhook.id}`));

@@ -72,36 +72,36 @@ export function createSubscriptionsCommands(): Command {
       }
     });
 
-  subscriptions
-    .command('subscribe')
-    .description('Subscribe to a recording')
-    .requiredOption('-p, --project <id>', 'Project ID')
-    .requiredOption('-r, --recording <id>', 'Recording ID')
-    .option('--json', 'Output as JSON')
-    .action(async (options) => {
-      if (!isAuthenticated()) {
-        console.log(chalk.yellow('Not authenticated. Run "basecamp auth login" to login.'));
-        return;
-      }
+   subscriptions
+     .command('subscribe')
+     .description('Subscribe to a recording')
+     .requiredOption('-p, --project <id>', 'Project ID')
+     .requiredOption('-r, --recording <id>', 'Recording ID')
+     .option('-f, --format <format>', 'Output format (table|json)', 'table')
+     .action(async (options) => {
+       if (!isAuthenticated()) {
+         console.log(chalk.yellow('Not authenticated. Run "basecamp auth login" to login.'));
+         return;
+       }
 
-      try {
-        const projectId = parseInt(options.project, 10);
-        if (isNaN(projectId)) {
-          console.error(chalk.red('Invalid project ID: must be a number'));
-          process.exit(1);
-        }
-        const recordingId = parseInt(options.recording, 10);
-        if (isNaN(recordingId)) {
-          console.error(chalk.red('Invalid recording ID: must be a number'));
-          process.exit(1);
-        }
+       try {
+         const projectId = parseInt(options.project, 10);
+         if (isNaN(projectId)) {
+           console.error(chalk.red('Invalid project ID: must be a number'));
+           process.exit(1);
+         }
+         const recordingId = parseInt(options.recording, 10);
+         if (isNaN(recordingId)) {
+           console.error(chalk.red('Invalid recording ID: must be a number'));
+           process.exit(1);
+         }
 
-        const subs = await subscribe(projectId, recordingId);
+         const subs = await subscribe(projectId, recordingId);
 
-        if (options.json) {
-          console.log(JSON.stringify(subs, null, 2));
-          return;
-        }
+         if (options.format === 'json') {
+           console.log(JSON.stringify(subs, null, 2));
+           return;
+         }
 
         console.log(chalk.green('✓ Subscribed to recording'));
         console.log(chalk.dim(`Total subscribers: ${subs.count}`));
