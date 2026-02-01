@@ -905,6 +905,11 @@ export const handlers = [
     ]);
   }),
 
+  // Move todo (reposition)
+  http.put(`${BASECAMP_API_BASE}/:accountId/buckets/:projectId/todos/:id/position.json`, () => {
+    return new HttpResponse(null, { status: 204 });
+  }),
+
   http.put(`${BASECAMP_API_BASE}/:accountId/buckets/:projectId/recordings/:id/status/archived.json`, () => {
     return HttpResponse.json({});
   }),
