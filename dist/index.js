@@ -505,7 +505,7 @@ Total: ${todoList.length} to-dos`));
       process.exit(1);
     }
   });
-  todos.command("create").description("Create a to-do").requiredOption("-p, --project <id>", "Project ID").requiredOption("-l, --list <id>", "To-do list ID").requiredOption("-c, --content <content>", "To-do content").option("-d, --description <description>", "To-do description").option("--due <date>", "Due date (YYYY-MM-DD)").option("--starts <date>", "Start date (YYYY-MM-DD)").option("--assignees <ids>", "Comma-separated assignee IDs").option("--json", "Output as JSON").action(async (options) => {
+  todos.command("create").description("Create a to-do").requiredOption("-p, --project <id>", "Project ID").requiredOption("-l, --list <id>", "To-do list ID").requiredOption("-c, --content <content>", "To-do content").option("-d, --description <description>", "To-do description").option("--due <date>", "Due date (YYYY-MM-DD)").option("--starts <date>", "Start date (YYYY-MM-DD)").option("--assignees <ids>", "Comma-separated assignee IDs").option("-f, --format <format>", "Output format (table|json)", "table").action(async (options) => {
     if (!isAuthenticated()) {
       console.log(chalk3.yellow('Not authenticated. Run "basecamp auth login" to login.'));
       return;
@@ -529,7 +529,7 @@ Total: ${todoList.length} to-dos`));
         todoOptions.assignee_ids = options.assignees.split(",").map((id) => parseInt(id.trim(), 10));
       }
       const todo = await createTodo(projectId, listId, options.content, todoOptions);
-      if (options.json) {
+      if (options.format === "json") {
         console.log(JSON.stringify(todo, null, 2));
         return;
       }
