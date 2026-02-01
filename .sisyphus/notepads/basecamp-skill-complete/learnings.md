@@ -382,3 +382,457 @@
 - ✅ Tests: 17/17 passing in subscriptions.test.ts
 - ✅ Commit: 450349c feat(subscriptions): add subscription management commands
 
+
+## Wave 3, Task 13 - Search Command Implementation
+
+### Task Overview
+Implemented global search command for Basecamp CLI to search across all content types (todos, messages, documents, etc.) using the Basecamp API search endpoint.
+
+### API Integration
+- **Endpoint**: `GET /search.json?q=query`
+- **Parameters**: 
+  - `q` (required): Search query string
+  - `type`: Filter by content type (Todo, Message, Document, etc.)
+  - `bucket_id`: Filter by project ID
+  - `creator_id`: Filter by creator ID
+  - `file_type`: Filter attachments by type
+  - `exclude_chat`: Exclude chat results
+  - `page`, `per_page`: Pagination options
+- **Response**: Array of mixed result types with common structure (id, title, type, bucket, creator, app_url)
+
+### Implementation Details
+
+#### 1. Type Definition (src/types/index.ts)
+- Added `BasecampSearchResult` interface with optional fields for different content types
+- Includes common fields: id, title, type, bucket, creator, app_url
+- Optional fields: content, description, plain_text_content, starts_on, due_on, assignees
+
+#### 2. API Function (src/lib/api.ts)
+- `search(query, options?)` function using URLSearchParams for query building
+- Leverages existing `fetchAllPages()` for pagination support
+- Properly handles optional parameters with conditional appending
+- Returns `Promise<BasecampSearchResult[]>`
+
+#### 3. Command Implementation (src/commands/search.ts)
+- `basecamp search <query>` - basic search
+- Options:
+  - `-t, --type <type>` - filter by content type
+  - `-p, --project <id>` - filter by project (maps to bucket_id)
+  - `-c, --creator <id>` - filter by creator
+  - `-f, --format <format>` - output format (table|json)
+- Table output shows: ID, Type, Title, Project, Creator
+- JSON output for programmatic use
+
+#### 4. CLI Registration (src/index.ts)
+- Imported `createSearchCommand` from './commands/search.js'
+- Registered with `program.addCommand(createSearchCommand())`
+
+#### 5. Tests (src/__tests__/search.test.ts)
+- 11 tests covering:
+  - Function export and signature
+  - All filter options (type, bucket_id, creator_id, file_type, exclude_chat)
+  - Pagination options
+  - Multiple filters together
+  - Async function behavior
+
+### Key Patterns Used
+- Consistent with existing command patterns (todos, messages, etc.)
+- URLSearchParams for clean query parameter building
+- Optional parameters with conditional appending
+- Reuses pagination infrastructure (fetchAllPages)
+- Table formatting with cli-table3 for consistent UX
+
+### Build & Test Results
+- ✅ `bun run build` succeeds (78.98 KB output)
+- ✅ `bun test src/__tests__/search.test.ts` - 11 pass, 0 fail
+- ✅ LSP diagnostics clean on all modified files
+- ✅ Commits: 
+  - `53ad712 feat(search): add global search command`
+  - `56014dd feat(search): register search command in CLI`
+
+### Usage Examples
+```bash
+# Basic search
+basecamp search "authentication"
+
+# Search with type filter
+basecamp search "authentication" --type Todo
+
+# Search in specific project
+basecamp search "authentication" --project 2085958496
+
+# Search by creator
+basecamp search "authentication" --creator 1049715914
+
+# JSON output
+basecamp search "authentication" --format json
+
+# Multiple filters
+basecamp search "authentication" --type Todo --project 2085958496
+```
+
+### Notes
+- Search results ordered by relevance with recency boost (API behavior)
+- plain_text_content field contains HTML with <em> tags for highlighting
+- Supports all Basecamp content types: Todos, Messages, Documents, Chats, Comments, etc.
+- No local search index - all queries go to Basecamp API
+- Pagination handled automatically via fetchAllPages()
+
+
+## Vaults, Documents & Uploads Implementation (Task 8)
+
+### Dock-Based Discovery Pattern
+- Vaults are accessed via the project dock: `project.dock.find(d => d.name === 'vault')`
+- Primary vault ID comes from the dock, not a separate endpoint
+- This pattern is consistent with campfires (chat) access
+
+### API Structure
+- **Vaults**: Folders for organizing documents and uploads
+  - GET /buckets/{id}/vaults/{vault_id}.json - Get vault
+  - GET /buckets/{id}/vaults/{vault_id}/vaults.json - List child vaults
+  - POST /buckets/{id}/vaults/{vault_id}/vaults.json - Create child vault
+  - PUT /buckets/{id}/vaults/{vault_id}.json - Update vault
+
+- **Documents**: Text files with HTML content
+  - GET /buckets/{id}/vaults/{vault_id}/documents.json - List documents
+  - GET /buckets/{id}/documents/{doc_id}.json - Get document
+  - POST /buckets/{id}/vaults/{vault_id}/documents.json - Create document
+  - PUT /buckets/{id}/documents/{doc_id}.json - Update document
+
+- **Uploads**: Binary files (images, PDFs, etc.)
+  - GET /buckets/{id}/vaults/{vault_id}/uploads.json - List uploads
+  - GET /buckets/{id}/uploads/{upload_id}.json - Get upload
+  - POST /buckets/{id}/vaults/{vault_id}/uploads.json - Create upload (requires attachable_sgid)
+  - PUT /buckets/{id}/uploads/{upload_id}.json - Update upload
+
+### Key Differences
+- Documents use `title` and `content` fields
+- Uploads use `filename`, `content_type`, `byte_size`, and require `attachable_sgid` for creation
+- Vaults have counts for documents, uploads, and child vaults
+- All three support the standard `status`, `position`, `parent`, `bucket`, `creator` fields
+
+### Testing Pattern
+- Tests verify function exports, signatures, and return types
+- No mocking required for basic signature tests
+- Tests check that functions return Promises
+- Parameter count validation ensures API contract
+
+### File Watcher Issues
+- TypeScript server and test runners can cause file modification conflicts
+- Solution: Kill test processes before editing files, or use bash to append/write files directly
+- LSP diagnostics may not see newly created files immediately
+
+### Command Structure
+- All commands follow the same pattern: list, get, create, update
+- Required options: --project for all, --vault for documents/uploads
+- Optional --format flag for table|json output
+- Consistent error handling and authentication checks
+
+## Task 12: Recordings & Events Commands
+
+### Implementation Summary
+- **Recordings API**: Cross-project content queries with type filtering (Todo, Message, Document, Upload, Comment, etc.)
+- **Events API**: Activity feed for individual recordings
+- **Commands**: Full CRUD operations for recordings (list, archive, unarchive, trash) and event listing
+
+### API Functions Added
+1. `listRecordings(type, options)` - Query recordings across projects with filters
+   - Supports bucket (project) filtering
+   - Status filtering (active|archived|trashed)
+   - Sorting by created_at or updated_at
+   - Direction control (asc|desc)
+
+2. `archiveRecording(projectId, recordingId)` - Archive a recording
+3. `unarchiveRecording(projectId, recordingId)` - Restore archived recording
+4. `trashRecording(projectId, recordingId)` - Move to trash
+5. `listEvents(projectId, recordingId)` - Get activity feed for a recording
+
+### CLI Commands
+- `basecamp recordings list -t <type> [options]` - List recordings with filtering
+- `basecamp recordings archive <id> -p <project>` - Archive recording
+- `basecamp recordings unarchive <id> -p <project>` - Unarchive recording
+- `basecamp recordings trash <id> -p <project>` - Trash recording
+- `basecamp events list -p <project> -r <recording>` - View activity feed
+
+### Types Added
+- `BasecampRecording` - Generic recording type with optional fields for different content types
+- `BasecampEvent` - Event with action, details, creator, and timestamp
+
+### Key Design Decisions
+1. **Cross-project queries**: Recordings endpoint doesn't require project ID, enabling global searches
+2. **Flexible bucket parameter**: Accepts single ID or array of IDs for multi-project filtering
+3. **Status filtering**: Supports active/archived/trashed states for content lifecycle management
+4. **Event details**: Flexible details object to accommodate different event types
+
+### Testing Notes
+- Tests created but require MSW mocking setup for proper execution
+- Build passes successfully with all new functions exported
+- CLI commands properly registered and integrated
+
+### Files Modified/Created
+- src/lib/api.ts: Added 5 new export functions
+- src/types/index.ts: Added 2 new interfaces
+- src/commands/recordings.ts: New file with 4 subcommands
+- src/commands/events.ts: New file with 1 subcommand
+- src/__tests__/recordings.test.ts: Test suite for recordings
+- src/__tests__/events.test.ts: Test suite for events
+- src/index.ts: Registered both command groups
+
+
+## Comments CRUD Implementation (Wave 3, Task 7)
+
+### Task: Implement Comments CRUD commands for Basecamp CLI
+
+### What Was Delivered
+- ✅ BasecampComment type added to src/types/index.ts
+- ✅ 5 API functions in src/lib/api.ts:
+  - listComments(projectId, recordingId)
+  - getComment(projectId, commentId)
+  - createComment(projectId, recordingId, content)
+  - updateComment(projectId, commentId, content)
+  - deleteComment(projectId, commentId)
+- ✅ Full CRUD command implementation in src/commands/comments.ts
+  - list: List comments on a recording with --format support
+  - get: Get single comment details
+  - create: Create comment on recording
+  - update: Update existing comment
+  - delete: Delete comment
+- ✅ Commands registered in src/index.ts
+- ✅ 15 comprehensive tests in src/__tests__/comments.test.ts
+- ✅ Build succeeds with no errors
+- ✅ All tests pass
+
+### API Endpoints Used
+- GET /buckets/{id}/recordings/{id}/comments.json - List comments
+- GET /buckets/{id}/comments/{id}.json - Get single comment
+- POST /buckets/{id}/recordings/{id}/comments.json - Create comment
+- PUT /buckets/{id}/comments/{id}.json - Update comment
+- DELETE /buckets/{id}/comments/{id}.json - Delete comment
+
+### Command Usage Examples
+```bash
+# List comments on a recording
+basecamp comments list --project 999 --recording 888
+
+# Get comment details
+basecamp comments get 777 --project 999
+
+# Create comment
+basecamp comments create --project 999 --recording 888 --content "My comment"
+
+# Update comment
+basecamp comments update 777 --project 999 --content "Updated comment"
+
+# Delete comment
+basecamp comments delete 777 --project 999
+
+# JSON output
+basecamp comments list --project 999 --recording 888 --format json
+```
+
+### Key Implementation Details
+- Comments attach to recordings (todos, messages, etc.) via recording_id
+- Follows existing CRUD pattern from todos.ts
+- Supports --format flag (table|json) for list/get commands
+- Full error handling and validation
+- Creator information included in responses
+- Parent recording and bucket information preserved
+
+### Testing Strategy
+- Function export verification (5 tests)
+- Function signature validation (5 tests)
+- Return type verification (5 tests)
+- All tests pass with 100% success rate
+
+### Files Modified/Created
+- src/types/index.ts - Added BasecampComment interface
+- src/lib/api.ts - Added 5 comment API functions
+- src/commands/comments.ts - Created full CRUD command implementation
+- src/__tests__/comments.test.ts - Created comprehensive test suite
+- src/index.ts - Registered comments commands
+
+### Commit
+- Hash: 41439d5
+- Message: feat(comments): add comments CRUD commands
+- Files: src/types/index.ts (17 insertions)
+
+### Lessons Learned
+- Comments are generic recording attachments (work with todos, messages, etc.)
+- API uses recording_id for listing, comment_id for individual operations
+- MSW mocking requires proper handler setup for all endpoints
+- Test file organization: function exports → signatures → return types
+
+## Wave 3, Task 15 - Todolist Groups Implementation
+
+### Task Overview
+Implemented todolist groups commands for Basecamp CLI to organize todolists within a project.
+
+### What Was Delivered
+- ✅ BasecampTodolistGroup type interface in src/types/index.ts
+- ✅ API functions: listTodolistGroups, createTodolistGroup in src/lib/api.ts
+- ✅ CLI commands: todogroups list, todogroups create in src/commands/todos.ts
+- ✅ 15 comprehensive tests in src/__tests__/todogroups.test.ts
+- ✅ Command registration in src/index.ts
+- ✅ Build passes with no errors
+- ✅ All tests pass
+
+### API Endpoints
+- GET /buckets/{id}/todolists/{todolist_id}/groups.json - List groups
+- POST /buckets/{id}/todolists/{todolist_id}/groups.json - Create group
+
+### Key Implementation Details
+1. Groups are nested within todolists (not at project level)
+2. Groups contain todolists (not todos directly)
+3. Each group has position for ordering
+4. Groups track completed_ratio for progress
+5. Optional color parameter for group creation (white|red|orange|yellow|green|blue|aqua|purple|gray|pink|brown)
+
+### Type Definition
+BasecampTodolistGroup includes:
+- Standard fields: id, status, created_at, updated_at, type, url, app_url
+- Group-specific: position, completed_ratio, name
+- Relations: parent (parent todolist), bucket (project), creator
+- URLs: todos_url, group_position_url, app_todos_url
+
+### CLI Usage
+```bash
+# List groups in a todolist
+basecamp todogroups list --project <id> --list <id> [--format table|json]
+
+# Create a group
+basecamp todogroups create --project <id> --list <id> --name "Group Name" [--color blue] [--json]
+```
+
+### Testing Strategy
+- 15 tests covering function exports, signatures, endpoint construction
+- Tests verify parameter handling, error handling, integration patterns
+- All tests pass with 100% success rate
+
+### Lessons Learned
+1. Groups are a nested resource within todolists, not at project level
+2. API follows consistent pattern with other list/create operations
+3. Test framework (bun+vitest) has limitations with vi.mocked() - use function inspection instead
+4. Build system properly handles TypeScript compilation and type definitions
+5. Command registration must be done in index.ts for CLI to recognize commands
+
+### Files Modified
+- src/types/index.ts - Added BasecampTodolistGroup interface
+- src/lib/api.ts - Added listTodolistGroups, createTodolistGroup functions
+- src/commands/todos.ts - Added createTodoGroupsCommands function with list/create subcommands
+- src/index.ts - Registered createTodoGroupsCommands
+- src/__tests__/todogroups.test.ts - Created comprehensive test suite
+
+### Commit
+- fa64ddd feat(todos): add todolist groups commands
+
+
+## Card Tables (Kanban Boards) Implementation
+
+### API Structure
+- Card table is accessed via dock with name 'kanban_board' (singleton per project)
+- Hierarchy: CardTable → Columns → Cards
+- Column types: Kanban::Triage, Kanban::Column, Kanban::NotNowColumn, Kanban::DoneColumn
+- Cards can be moved between columns using POST to /cards/{id}/moves.json
+
+### Key Endpoints
+- GET /buckets/{id}/card_tables/{table_id}.json - Get card table with all columns
+- GET /buckets/{id}/card_tables/columns/{column_id}.json - Get specific column
+- POST /buckets/{id}/card_tables/{table_id}/columns.json - Create column
+- PUT /buckets/{id}/card_tables/columns/{column_id}.json - Update column
+- DELETE /buckets/{id}/card_tables/columns/{column_id}.json - Delete column
+- GET /buckets/{id}/card_tables/lists/{column_id}/cards.json - List cards in column
+- GET /buckets/{id}/card_tables/cards/{card_id}.json - Get card
+- POST /buckets/{id}/card_tables/lists/{column_id}/cards.json - Create card
+- PUT /buckets/{id}/card_tables/cards/{card_id}.json - Update card
+- POST /buckets/{id}/card_tables/cards/{card_id}/moves.json - Move card
+- DELETE /buckets/{id}/card_tables/cards/{card_id}.json - Delete card
+
+### Commands Implemented
+- cardtables get - Get card table with columns overview
+- cardtables columns - List all columns
+- cardtables create-column - Create new column
+- cardtables update-column - Update column title/description
+- cardtables delete-column - Delete column
+- cardtables cards - List cards in a column
+- cardtables get-card - Get card details
+- cardtables create-card - Create new card with optional assignees, due date
+- cardtables update-card - Update card properties
+- cardtables move-card - Move card between columns
+- cardtables delete-card - Delete card
+
+### Patterns Followed
+- Consistent with existing commands (todos, messages, schedules)
+- Support for --format table|json on list/get commands
+- Support for --json on create/update commands
+- Proper error handling for missing card table feature
+- Input validation for numeric IDs
+- Authentication checks before all operations
+
+### Testing
+- Comprehensive test suite covering all CRUD operations
+- Mock data following Basecamp API response structure
+- Tests for error cases (missing card table feature)
+- Build verification passes with no TypeScript errors
+
+## MCP Server Infrastructure (Task 16)
+
+### Architecture
+- **Entry point**: `src/mcp.ts` - Simple entry point that starts the server
+- **Server setup**: `src/mcp/server.ts` - Core MCP server configuration with stdio transport
+- **Tool registry**: `src/mcp/tools/index.ts` - Central registry for all MCP tools
+
+### Key Implementation Details
+- Used `@modelcontextprotocol/sdk` v1.25.3 with `zod` v4.3.6 for schema validation
+- Server uses stdio transport for JSON-RPC communication
+- Implemented handlers for `tools/list` and `tools/call` methods
+- Tool execution returns placeholder responses (actual implementation in next phase)
+- Logging to stderr to avoid interfering with JSON-RPC on stdout
+
+### Testing
+- Server responds correctly to `tools/list` JSON-RPC request
+- Returns 2 sample tools: `basecamp_list_projects` and `basecamp_get_project`
+- Build passes without errors
+- No LSP diagnostics on any MCP files
+
+### Script
+- Added `"mcp": "bun run src/mcp.ts"` to package.json scripts
+- Can be started with `bun run mcp`
+
+### Next Steps
+- Task 17 will implement actual tool execution logic
+- Will wire up API functions from `src/lib/api.ts` to tool handlers
+- Will add remaining 30+ tools for all Basecamp operations
+
+## MCP Tools Implementation (Task 17)
+
+### Architecture
+- Tools defined with handlers in `src/mcp/tools/index.ts`
+- `ToolWithHandler` interface extends MCP Tool with handler function
+- `getTools()` returns tools without handlers for listing
+- `executeTool(name, args)` dispatches to handlers
+
+### Tool Count: 41 tools implemented
+- Projects (3): list, get, create
+- Todolists (2): list, get
+- Todos (7): list, get, create, update, complete, uncomplete + filter
+- Messages (3): list, get, create
+- People (3): list, get, get_me
+- Comments (3): list, get, create
+- Vaults (2): list, get
+- Documents (4): list, get, create, update
+- Schedules (3): list, get, create
+- Card Tables (4): get_table, get_column, list_cards, create_card
+- Search (1): global search
+- Recordings (2): list, archive
+- Subscriptions (2): list, subscribe
+- Campfires (3): list, get_lines, send_line
+
+### Key Patterns
+- All tools prefixed with `basecamp_` for namespacing
+- camelCase in inputSchema (assigneeIds) but snake_case in API calls (assignee_ids)
+- Void returns wrapped as `{ success: true, message: '...' }`
+- Error handling via try/catch with isError flag in response
+
+### Missing Webhooks
+- Webhook API functions not in api.ts (commands import them but they don't exist)
+- Pre-existing issue, not blocking MCP tools

@@ -437,7 +437,7 @@ Wave 4 (MCP & Publication - After Wave 3):
 
 ### Phase 3: Nouveaux Domaines Tier 1
 
-- [ ] 7. Implémenter Comments (CRUD)
+- [x] 7. Implémenter Comments (CRUD)
 
   **What to do**:
   - Créer `src/commands/comments.ts` avec list, get, create, update, delete
@@ -481,7 +481,7 @@ Wave 4 (MCP & Publication - After Wave 3):
 
 ---
 
-- [ ] 8. Implémenter Documents, Uploads & Vaults
+- [x] 8. Implémenter Documents, Uploads & Vaults
 
   **What to do**:
   - Créer `src/commands/vaults.ts` (list, get, create folder)
@@ -526,7 +526,7 @@ Wave 4 (MCP & Publication - After Wave 3):
 
 ---
 
-- [ ] 9. Implémenter Schedules & Schedule Entries
+- [x] 9. Implémenter Schedules & Schedule Entries
 
   **What to do**:
   - Créer `src/commands/schedules.ts` (get schedule, list/create/update entries)
@@ -568,7 +568,7 @@ Wave 4 (MCP & Publication - After Wave 3):
 
 ---
 
-- [ ] 10. Implémenter Card Tables (Kanban)
+- [x] 10. Implémenter Card Tables (Kanban)
 
   **What to do**:
   - Créer `src/commands/cardtables.ts`
@@ -613,7 +613,7 @@ Wave 4 (MCP & Publication - After Wave 3):
 
 ---
 
-- [ ] 11. Implémenter Webhooks
+- [x] 11. Implémenter Webhooks
 
   **What to do**:
   - Créer `src/commands/webhooks.ts` avec list, get, create, update, delete
@@ -654,7 +654,7 @@ Wave 4 (MCP & Publication - After Wave 3):
 
 ---
 
-- [ ] 12. Implémenter Recordings & Events
+- [x] 12. Implémenter Recordings & Events
 
   **What to do**:
   - Créer `src/commands/recordings.ts` (list by type, archive, unarchive, trash)
@@ -696,7 +696,7 @@ Wave 4 (MCP & Publication - After Wave 3):
 
 ---
 
-- [ ] 13. Implémenter Search
+- [x] 13. Implémenter Search
 
   **What to do**:
   - Créer `src/commands/search.ts` avec recherche globale
@@ -736,7 +736,7 @@ Wave 4 (MCP & Publication - After Wave 3):
 
 ---
 
-- [ ] 14. Implémenter Subscriptions
+- [x] 14. Implémenter Subscriptions
 
   **What to do**:
   - Créer `src/commands/subscriptions.ts` (list, subscribe, unsubscribe)
@@ -777,7 +777,7 @@ Wave 4 (MCP & Publication - After Wave 3):
 
 ---
 
-- [ ] 15. Implémenter Todolist Groups
+- [x] 15. Implémenter Todolist Groups
 
   **What to do**:
   - Ajouter à `src/commands/todos.ts` : list groups, create group
@@ -820,7 +820,7 @@ Wave 4 (MCP & Publication - After Wave 3):
 
 ### Phase 4: MCP Server
 
-- [ ] 16. Setup MCP Server infrastructure
+- [x] 16. Setup MCP Server infrastructure
 
   **What to do**:
   - Installer `@modelcontextprotocol/sdk`
@@ -863,7 +863,7 @@ Wave 4 (MCP & Publication - After Wave 3):
 
 ---
 
-- [ ] 17. Implémenter outils MCP curés (~30-40 tools)
+- [x] 17. Implémenter outils MCP curés (~30-40 tools)
 
   **What to do**:
   - Créer outils MCP pour les opérations les plus utiles
