@@ -419,6 +419,29 @@ Total: ${lists.length} lists`));
       process.exit(1);
     }
   });
+  todolists.command("delete <id>").description("Delete (trash) a to-do list").requiredOption("-p, --project <id>", "Project ID").action(async (id, options) => {
+    if (!isAuthenticated()) {
+      console.log(chalk3.yellow('Not authenticated. Run "basecamp auth login" to login.'));
+      return;
+    }
+    try {
+      const projectId = parseInt(options.project, 10);
+      if (isNaN(projectId)) {
+        console.error(chalk3.red("Invalid project ID: must be a number"));
+        process.exit(1);
+      }
+      const listId = parseInt(id, 10);
+      if (isNaN(listId)) {
+        console.error(chalk3.red("Invalid to-do list ID: must be a number"));
+        process.exit(1);
+      }
+      await trashRecording(projectId, listId);
+      console.log(chalk3.green(`\u2713 To-do list ${listId} moved to trash`));
+    } catch (error) {
+      console.error(chalk3.red("Failed to delete to-do list:"), error instanceof Error ? error.message : error);
+      process.exit(1);
+    }
+  });
   return todolists;
 }
 function createTodosCommands() {
@@ -621,6 +644,29 @@ Total: ${todoList.length} to-dos`));
       console.log(chalk3.green(`\u2713 To-do ${todoId} marked as incomplete`));
     } catch (error) {
       console.error(chalk3.red("Failed to uncomplete to-do:"), error instanceof Error ? error.message : error);
+      process.exit(1);
+    }
+  });
+  todos.command("delete <id>").description("Delete (trash) a to-do").requiredOption("-p, --project <id>", "Project ID").action(async (id, options) => {
+    if (!isAuthenticated()) {
+      console.log(chalk3.yellow('Not authenticated. Run "basecamp auth login" to login.'));
+      return;
+    }
+    try {
+      const projectId = parseInt(options.project, 10);
+      if (isNaN(projectId)) {
+        console.error(chalk3.red("Invalid project ID: must be a number"));
+        process.exit(1);
+      }
+      const todoId = parseInt(id, 10);
+      if (isNaN(todoId)) {
+        console.error(chalk3.red("Invalid todo ID: must be a number"));
+        process.exit(1);
+      }
+      await trashRecording(projectId, todoId);
+      console.log(chalk3.green(`\u2713 To-do ${todoId} moved to trash`));
+    } catch (error) {
+      console.error(chalk3.red("Failed to delete to-do:"), error instanceof Error ? error.message : error);
       process.exit(1);
     }
   });
