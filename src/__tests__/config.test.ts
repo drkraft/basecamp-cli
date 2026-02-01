@@ -1,8 +1,14 @@
-import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
+import { describe, it, expect, beforeAll, beforeEach, vi, afterEach } from 'vitest';
 import crypto from 'crypto';
 import os from 'os';
 import type { BasecampTokens } from '../types';
-import * as config from '../lib/config';
+
+let config: typeof import('../lib/config.js');
+
+beforeAll(async () => {
+  vi.unmock('../lib/config.js');
+  config = await import('../lib/config.js');
+});
 
 describe('Config Module', () => {
   beforeEach(() => {

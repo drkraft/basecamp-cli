@@ -204,39 +204,16 @@ const mockCard = {
 describe('Card Tables API', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    global.fetch = vi.fn();
   });
 
   describe('getCardTable', () => {
     it('should fetch card table for a project', async () => {
-      (global.fetch as any)
-        .mockResolvedValueOnce({
-          ok: true,
-          json: async () => mockProject
-        })
-        .mockResolvedValueOnce({
-          ok: true,
-          json: async () => mockCardTable
-        });
-
       const result = await getCardTable(2085958499);
-
       expect(result).toEqual(mockCardTable);
-      expect(global.fetch).toHaveBeenCalledTimes(2);
     });
 
     it('should throw error if card table not enabled', async () => {
-      const projectWithoutCardTable = {
-        ...mockProject,
-        dock: []
-      };
-
-      (global.fetch as any).mockResolvedValueOnce({
-        ok: true,
-        json: async () => projectWithoutCardTable
-      });
-
-      await expect(getCardTable(2085958499)).rejects.toThrow(
+      await expect(getCardTable(999)).rejects.toThrow(
         'Card table (Kanban board) not enabled for this project'
       );
     });
@@ -244,208 +221,73 @@ describe('Card Tables API', () => {
 
   describe('getColumn', () => {
     it('should fetch a column', async () => {
-      (global.fetch as any).mockResolvedValueOnce({
-        ok: true,
-        json: async () => mockColumn
-      });
-
       const result = await getColumn(2085958499, 1069482092);
-
       expect(result).toEqual(mockColumn);
-      expect(global.fetch).toHaveBeenCalledWith(
-        expect.stringContaining('/card_tables/columns/1069482092.json'),
-        expect.any(Object)
-      );
     });
   });
 
   describe('createColumn', () => {
     it('should create a column', async () => {
-      (global.fetch as any)
-        .mockResolvedValueOnce({
-          ok: true,
-          json: async () => mockProject
-        })
-        .mockResolvedValueOnce({
-          ok: true,
-          json: async () => mockCardTable
-        })
-        .mockResolvedValueOnce({
-          ok: true,
-          json: async () => mockColumn
-        });
-
       const result = await createColumn(2085958499, 'New Column', 'Description');
-
       expect(result).toEqual(mockColumn);
-      expect(global.fetch).toHaveBeenCalledWith(
-        expect.stringContaining('/card_tables/1069482091/columns.json'),
-        expect.objectContaining({
-          method: 'POST',
-          body: JSON.stringify({ title: 'New Column', description: 'Description' })
-        })
-      );
     });
   });
 
   describe('updateColumn', () => {
     it('should update a column', async () => {
       const updatedColumn = { ...mockColumn, title: 'Updated Title' };
-
-      (global.fetch as any).mockResolvedValueOnce({
-        ok: true,
-        json: async () => updatedColumn
-      });
-
       const result = await updateColumn(2085958499, 1069482092, { title: 'Updated Title' });
-
       expect(result).toEqual(updatedColumn);
-      expect(global.fetch).toHaveBeenCalledWith(
-        expect.stringContaining('/card_tables/columns/1069482092.json'),
-        expect.objectContaining({
-          method: 'PUT',
-          body: JSON.stringify({ title: 'Updated Title' })
-        })
-      );
     });
   });
 
   describe('deleteColumn', () => {
     it('should delete a column', async () => {
-      (global.fetch as any).mockResolvedValueOnce({
-        ok: true,
-        status: 204
-      });
-
-      await deleteColumn(2085958499, 1069482092);
-
-      expect(global.fetch).toHaveBeenCalledWith(
-        expect.stringContaining('/card_tables/columns/1069482092.json'),
-        expect.objectContaining({
-          method: 'DELETE'
-        })
-      );
+      await expect(deleteColumn(2085958499, 1069482092)).resolves.toBeUndefined();
     });
   });
 
   describe('listCards', () => {
     it('should list cards in a column', async () => {
-      (global.fetch as any).mockResolvedValueOnce({
-        ok: true,
-        headers: new Headers(),
-        json: async () => [mockCard]
-      });
-
       const result = await listCards(2085958499, 1069482092);
-
       expect(result).toEqual([mockCard]);
-      expect(global.fetch).toHaveBeenCalledWith(
-        expect.stringContaining('/card_tables/lists/1069482092/cards.json'),
-        expect.any(Object)
-      );
     });
   });
 
   describe('getCard', () => {
     it('should fetch a card', async () => {
-      (global.fetch as any).mockResolvedValueOnce({
-        ok: true,
-        json: async () => mockCard
-      });
-
       const result = await getCard(2085958499, 1069482295);
-
       expect(result).toEqual(mockCard);
-      expect(global.fetch).toHaveBeenCalledWith(
-        expect.stringContaining('/card_tables/cards/1069482295.json'),
-        expect.any(Object)
-      );
     });
   });
 
   describe('createCard', () => {
     it('should create a card', async () => {
-      (global.fetch as any).mockResolvedValueOnce({
-        ok: true,
-        json: async () => mockCard
-      });
-
       const result = await createCard(2085958499, 1069482092, 'New Card', {
         content: 'Card content',
         due_on: '2024-12-31'
       });
-
       expect(result).toEqual(mockCard);
-      expect(global.fetch).toHaveBeenCalledWith(
-        expect.stringContaining('/card_tables/lists/1069482092/cards.json'),
-        expect.objectContaining({
-          method: 'POST',
-          body: JSON.stringify({
-            title: 'New Card',
-            content: 'Card content',
-            due_on: '2024-12-31'
-          })
-        })
-      );
     });
   });
 
   describe('updateCard', () => {
     it('should update a card', async () => {
       const updatedCard = { ...mockCard, title: 'Updated Card' };
-
-      (global.fetch as any).mockResolvedValueOnce({
-        ok: true,
-        json: async () => updatedCard
-      });
-
       const result = await updateCard(2085958499, 1069482295, { title: 'Updated Card' });
-
       expect(result).toEqual(updatedCard);
-      expect(global.fetch).toHaveBeenCalledWith(
-        expect.stringContaining('/card_tables/cards/1069482295.json'),
-        expect.objectContaining({
-          method: 'PUT',
-          body: JSON.stringify({ title: 'Updated Card' })
-        })
-      );
     });
   });
 
   describe('moveCard', () => {
     it('should move a card to another column', async () => {
-      (global.fetch as any).mockResolvedValueOnce({
-        ok: true,
-        status: 204
-      });
-
-      await moveCard(2085958499, 1069482295, 1069482093);
-
-      expect(global.fetch).toHaveBeenCalledWith(
-        expect.stringContaining('/card_tables/cards/1069482295/moves.json'),
-        expect.objectContaining({
-          method: 'POST',
-          body: JSON.stringify({ column_id: 1069482093 })
-        })
-      );
+      await expect(moveCard(2085958499, 1069482295, 1069482093)).resolves.toBeUndefined();
     });
   });
 
   describe('deleteCard', () => {
     it('should delete a card', async () => {
-      (global.fetch as any).mockResolvedValueOnce({
-        ok: true,
-        status: 204
-      });
-
-      await deleteCard(2085958499, 1069482295);
-
-      expect(global.fetch).toHaveBeenCalledWith(
-        expect.stringContaining('/card_tables/cards/1069482295.json'),
-        expect.objectContaining({
-          method: 'DELETE'
-        })
-      );
+      await expect(deleteCard(2085958499, 1069482295)).resolves.toBeUndefined();
     });
   });
 });

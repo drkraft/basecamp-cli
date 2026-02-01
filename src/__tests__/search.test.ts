@@ -55,7 +55,8 @@ describe('search', () => {
 
   it('should be async function', async () => {
     const { search } = await import('../lib/api.js');
-    const result = search('test');
-    expect(result).toBeInstanceOf(Promise);
+    const result = await search('test');
+    expect(Array.isArray(result)).toBe(true);
+    expect(result[0]?.id).toBe(7001);
   });
 });

@@ -1,6 +1,7 @@
 import { setupServer } from 'msw/node';
 import { handlers } from './mocks/handlers';
 import { afterAll, afterEach, beforeAll, vi } from 'vitest';
+import path from 'path';
 
 // Create MSW server with handlers
 export const server = setupServer(...handlers);
@@ -24,6 +25,8 @@ afterAll(() => {
 process.env.BASECAMP_CLIENT_ID = 'test-client-id';
 process.env.BASECAMP_CLIENT_SECRET = 'test-client-secret';
 process.env.BASECAMP_ACCESS_TOKEN = 'test-access-token';
+process.env.NODE_ENV = 'test';
+process.env.BASECAMP_CONFIG_DIR = path.join(process.cwd(), '.tmp', 'basecamp-cli-test');
 
 // Mock auth module to bypass token validation in API tests
 vi.mock('../lib/auth.js', async (importOriginal) => {

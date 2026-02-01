@@ -43,24 +43,25 @@ describe('Uploads API Functions', () => {
   });
 
   describe('Function return types', () => {
-    it('listUploads should return a Promise', () => {
-      const result = api.listUploads(1, 1);
-      expect(result instanceof Promise).toBe(true);
+    it('listUploads should return a Promise', async () => {
+      const result = await api.listUploads(1, 1);
+      expect(Array.isArray(result)).toBe(true);
+      expect(result[0]?.id).toBe(1);
     });
 
-    it('getUpload should return a Promise', () => {
-      const result = api.getUpload(1, 1);
-      expect(result instanceof Promise).toBe(true);
+    it('getUpload should return a Promise', async () => {
+      const result = await api.getUpload(1, 1);
+      expect(result.id).toBe(1);
     });
 
-    it('createUpload should return a Promise', () => {
-      const result = api.createUpload(1, 1, 'test-sgid');
-      expect(result instanceof Promise).toBe(true);
+    it('createUpload should return a Promise', async () => {
+      const result = await api.createUpload(1, 1, 'test-sgid');
+      expect(result.id).toBe(2);
     });
 
-    it('updateUpload should return a Promise', () => {
-      const result = api.updateUpload(1, 1, { description: 'Updated' });
-      expect(result instanceof Promise).toBe(true);
+    it('updateUpload should return a Promise', async () => {
+      const result = await api.updateUpload(1, 1, { description: 'Updated' });
+      expect(result.id).toBe(1);
     });
   });
 });
