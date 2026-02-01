@@ -1,29 +1,44 @@
-# Basecamp CLI
+# @drkraft/basecamp-cli
 
-A command-line interface for managing Basecamp (via the official bc3 API / 37signals Launchpad) projects, to-dos, messages, and campfires.
+A comprehensive command-line interface and MCP server for Basecamp 4. Manage projects, to-dos, messages, schedules, kanban boards, and more from your terminal or AI assistant.
+
+[![npm version](https://badge.fury.io/js/%40drkraft%2Fbasecamp-cli.svg)](https://www.npmjs.com/package/@drkraft/basecamp-cli)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
+## Features
+
+- **Full CLI** - 18 command groups covering the complete Basecamp 4 API
+- **MCP Server** - 41 tools for AI assistant integration (Claude, etc.)
+- **Multiple Output Formats** - Table or JSON output for all commands
+- **Pagination & Retry** - Automatic handling of large datasets and rate limits
+- **OAuth 2.0** - Secure authentication via browser
 
 ## Installation
 
 ```bash
-npm install -g @emredoganer/basecamp-cli
+npm install -g @drkraft/basecamp-cli
 ```
 
-## Setup
+Or with bun:
+
+```bash
+bun add -g @drkraft/basecamp-cli
+```
+
+## Quick Start
 
 ### 1. Create a Basecamp Integration
 
 1. Go to [Basecamp Integrations](https://launchpad.37signals.com/integrations)
 2. Click "Register another application"
 3. Fill in the details:
-   - Name: Your app name
-   - Company: Your company
-   - Website: Your website
-   - Redirect URI: `http://localhost:9292/callback`
-4. Note your Client ID and Client Secret
+   - **Name**: Your app name
+   - **Company**: Your company
+   - **Website**: Your website
+   - **Redirect URI**: `http://localhost:9292/callback`
+4. Note your **Client ID** and **Client Secret**
 
 ### 2. Configure Credentials
-
-Set environment variables:
 
 ```bash
 export BASECAMP_CLIENT_ID="your-client-id"
@@ -42,164 +57,311 @@ basecamp auth configure --client-id "your-client-id" --client-secret "your-clien
 basecamp auth login
 ```
 
-This will open your browser for OAuth authentication.
+This opens your browser for OAuth authentication.
 
-## Usage
+## CLI Reference
 
 ### Authentication
 
 ```bash
-# Login via OAuth
-basecamp auth login
-
-# Check auth status
-basecamp auth status
-
-# Logout
-basecamp auth logout
+basecamp auth login          # Login via OAuth
+basecamp auth status         # Check auth status
+basecamp auth logout         # Logout
 ```
 
 ### Accounts
 
 ```bash
-# List available accounts
-basecamp accounts
-
-# Set current account
-basecamp account set <id>
-
-# Show current account
-basecamp account current
+basecamp accounts            # List available accounts
+basecamp account set <id>    # Set current account
+basecamp account current     # Show current account
 ```
 
 ### Projects
 
 ```bash
-# List all projects
-basecamp projects list
-
-# Get project details
-basecamp projects get <id>
-
-# Create a project
-basecamp projects create --name "My Project" --description "Description"
-
-# Archive a project
-basecamp projects archive <id>
+basecamp projects list                                    # List all projects
+basecamp projects get <id>                                # Get project details
+basecamp projects create --name "Project" --description "Desc"  # Create project
+basecamp projects archive <id>                            # Archive project
 ```
 
-### To-do Lists
+### To-do Lists & To-dos
 
 ```bash
-# List to-do lists in a project
+# To-do lists
 basecamp todolists list --project <id>
-
-# Create a to-do list
 basecamp todolists create --project <id> --name "Tasks"
-```
 
-### To-dos
-
-```bash
-# List to-dos
+# To-dos
 basecamp todos list --project <id> --list <list-id>
-
-# Show completed to-dos
 basecamp todos list --project <id> --list <list-id> --completed
-
-# Get to-do details
 basecamp todos get <id> --project <project-id>
-
-# Create a to-do
-basecamp todos create --project <id> --list <list-id> --content "Task description"
-
-# Create with options
+basecamp todos create --project <id> --list <list-id> --content "Task"
 basecamp todos create --project <id> --list <list-id> --content "Task" \
-  --due "2024-12-31" --assignees "123,456"
-
-# Update a to-do
-basecamp todos update <id> --project <project-id> --content "Updated content"
-
-# Complete a to-do
+  --due "2025-12-31" --assignees "123,456"
+basecamp todos update <id> --project <project-id> --content "Updated"
 basecamp todos complete <id> --project <project-id>
-
-# Uncomplete a to-do
 basecamp todos uncomplete <id> --project <project-id>
+
+# To-do groups
+basecamp todogroups list --project <id>
+basecamp todogroups create --project <id> --name "Sprint 1"
 ```
 
 ### Messages
 
 ```bash
-# List messages
 basecamp messages list --project <id>
-
-# Get message details
 basecamp messages get <id> --project <project-id>
-
-# Create a message
-basecamp messages create --project <id> --subject "Subject" --content "<p>HTML content</p>"
+basecamp messages create --project <id> --subject "Subject" --content "<p>HTML</p>"
 ```
 
 ### Campfires (Chat)
 
 ```bash
-# List campfires
 basecamp campfires list --project <id>
-
-# Get recent messages
 basecamp campfires lines --project <id> --campfire <campfire-id>
-
-# Send a message
 basecamp campfires send --project <id> --campfire <campfire-id> --message "Hello!"
+```
+
+### Comments
+
+```bash
+basecamp comments list --project <id> --recording <recording-id>
+basecamp comments get <id> --project <project-id>
+basecamp comments create --project <id> --recording <recording-id> --content "<p>Comment</p>"
+basecamp comments update <id> --project <project-id> --content "<p>Updated</p>"
+basecamp comments delete <id> --project <project-id>
+```
+
+### Documents & Vaults
+
+```bash
+# Vaults (folders)
+basecamp vaults list --project <id>
+basecamp vaults get <id> --project <project-id>
+basecamp vaults create --project <id> --title "Folder Name"
+
+# Documents
+basecamp documents list --project <id> --vault <vault-id>
+basecamp documents get <id> --project <project-id>
+basecamp documents create --project <id> --vault <vault-id> --title "Doc" --content "<p>...</p>"
+basecamp documents update <id> --project <project-id> --title "New Title"
+
+# Uploads
+basecamp uploads list --project <id> --vault <vault-id>
+basecamp uploads get <id> --project <project-id>
+```
+
+### Schedules
+
+```bash
+basecamp schedules get --project <id>
+basecamp schedules entries --project <id>
+basecamp schedules entries --project <id> --status upcoming
+basecamp schedules create-entry --project <id> --summary "Meeting" \
+  --starts-at "2025-02-15T10:00:00" --ends-at "2025-02-15T11:00:00"
+basecamp schedules update-entry <id> --project <project-id> --summary "Updated"
+basecamp schedules delete-entry <id> --project <project-id>
+```
+
+### Card Tables (Kanban)
+
+```bash
+basecamp cardtables get --project <id>
+basecamp cardtables columns --project <id>
+basecamp cardtables create-column --project <id> --title "In Progress"
+basecamp cardtables cards --project <id> --column <column-id>
+basecamp cardtables create-card --project <id> --column <column-id> --title "Card"
+basecamp cardtables move-card <card-id> --project <id> --column <new-column-id>
+```
+
+### Webhooks
+
+```bash
+basecamp webhooks list --project <id>
+basecamp webhooks get <id> --project <project-id>
+basecamp webhooks create --project <id> --payload-url "https://..."
+basecamp webhooks update <id> --project <project-id> --active false
+basecamp webhooks delete <id> --project <project-id>
+```
+
+### Recordings & Events
+
+```bash
+# Recordings (cross-project content)
+basecamp recordings list --type Todo
+basecamp recordings list --type Message --status archived
+basecamp recordings archive <id> --project <project-id>
+basecamp recordings unarchive <id> --project <project-id>
+basecamp recordings trash <id> --project <project-id>
+
+# Events (activity feed)
+basecamp events list --project <id>
+```
+
+### Subscriptions
+
+```bash
+basecamp subscriptions list --project <id> --recording <recording-id>
+basecamp subscriptions subscribe --project <id> --recording <recording-id>
+basecamp subscriptions unsubscribe --project <id> --recording <recording-id>
+```
+
+### Search
+
+```bash
+basecamp search "keyword"
+basecamp search "keyword" --type Todo
+basecamp search "keyword" --project <id>
 ```
 
 ### People
 
 ```bash
-# List all people
 basecamp people list
-
-# List people in a project
 basecamp people list --project <id>
-
-# Get person details
 basecamp people get <id>
-
-# Get your profile
 basecamp people me
 ```
 
 ## Output Formats
 
-All list and get commands support `--format` flag for controlling output format:
+All commands support `--format` flag:
 
 ```bash
-# Table format (default)
-basecamp projects list
-basecamp projects list --format table
-
-# JSON format
-basecamp projects list --format json
-basecamp todos get <id> --project <project-id> --format json
+basecamp projects list --format table   # Default, human-readable
+basecamp projects list --format json    # JSON for scripting
 ```
 
 ## Global Options
 
 ```bash
-# Enable verbose output for debugging
-basecamp --verbose projects list
-basecamp -v people me
+basecamp --verbose projects list   # Enable debug output
+basecamp -v people me              # Short form
+```
+
+## MCP Server
+
+The CLI includes an MCP (Model Context Protocol) server for AI assistant integration.
+
+### Starting the Server
+
+```bash
+basecamp-mcp
+# Or
+bun run mcp
+```
+
+### Available Tools (41)
+
+| Category | Tools |
+|----------|-------|
+| Projects | `basecamp_list_projects`, `basecamp_get_project`, `basecamp_create_project` |
+| Todo Lists | `basecamp_list_todolists`, `basecamp_get_todolist` |
+| Todos | `basecamp_list_todos`, `basecamp_get_todo`, `basecamp_create_todo`, `basecamp_update_todo`, `basecamp_complete_todo`, `basecamp_uncomplete_todo` |
+| Messages | `basecamp_list_messages`, `basecamp_get_message`, `basecamp_create_message` |
+| People | `basecamp_list_people`, `basecamp_get_person`, `basecamp_get_me` |
+| Comments | `basecamp_list_comments`, `basecamp_get_comment`, `basecamp_create_comment` |
+| Vaults | `basecamp_list_vaults`, `basecamp_get_vault` |
+| Documents | `basecamp_list_documents`, `basecamp_get_document`, `basecamp_create_document`, `basecamp_update_document` |
+| Schedules | `basecamp_list_schedule_entries`, `basecamp_get_schedule_entry`, `basecamp_create_schedule_entry` |
+| Card Tables | `basecamp_get_card_table`, `basecamp_get_column`, `basecamp_list_cards`, `basecamp_create_card` |
+| Search | `basecamp_search` |
+| Recordings | `basecamp_list_recordings`, `basecamp_archive_recording` |
+| Subscriptions | `basecamp_list_subscriptions`, `basecamp_subscribe` |
+| Campfires | `basecamp_list_campfires`, `basecamp_get_campfire_lines`, `basecamp_send_campfire_line` |
+
+### Using with OpenCode/Claude
+
+Add to your MCP configuration:
+
+```json
+{
+  "mcpServers": {
+    "basecamp": {
+      "command": "basecamp-mcp"
+    }
+  }
+}
+```
+
+Or with explicit path:
+
+```json
+{
+  "mcpServers": {
+    "basecamp": {
+      "command": "node",
+      "args": ["/path/to/node_modules/@drkraft/basecamp-cli/dist/mcp.js"]
+    }
+  }
+}
 ```
 
 ## Environment Variables
 
 | Variable | Description |
 |----------|-------------|
-| `BASECAMP_CLIENT_ID` | OAuth Client ID |
-| `BASECAMP_CLIENT_SECRET` | OAuth Client Secret |
+| `BASECAMP_CLIENT_ID` | OAuth Client ID (required) |
+| `BASECAMP_CLIENT_SECRET` | OAuth Client Secret (required) |
 | `BASECAMP_REDIRECT_URI` | OAuth Redirect URI (default: `http://localhost:9292/callback`) |
 | `BASECAMP_ACCESS_TOKEN` | Access token (alternative to OAuth flow) |
 
+## API Coverage
+
+This CLI covers the complete Basecamp 4 API Tier 1 domains:
+
+| Domain | Status |
+|--------|--------|
+| Projects | Complete |
+| Todolists | Complete |
+| Todos | Complete |
+| Todolist Groups | Complete |
+| Messages | Complete |
+| Campfires | Complete |
+| Comments | Complete |
+| Vaults | Complete |
+| Documents | Complete |
+| Uploads | Complete |
+| Schedules | Complete |
+| Card Tables | Complete |
+| Webhooks | Complete |
+| Recordings | Complete |
+| Events | Complete |
+| Search | Complete |
+| Subscriptions | Complete |
+| People | Complete |
+
+## Development
+
+```bash
+# Clone the repo
+git clone https://github.com/drkraft/basecamp-cli
+cd basecamp-cli
+
+# Install dependencies
+bun install
+
+# Build
+bun run build
+
+# Run tests
+bun test
+
+# Run validation against real Basecamp
+bun run scripts/validate.ts
+```
+
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+
 ## License
 
-MIT
+MIT - see [LICENSE](LICENSE) for details.
+
+## Credits
+
+Originally forked from [@emredoganer/basecamp-cli](https://github.com/emredoganer/basecamp-cli).
