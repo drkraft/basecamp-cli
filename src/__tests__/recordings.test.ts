@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { listRecordings, archiveRecording, unarchiveRecording, trashRecording } from '../lib/api.js';
+import { listRecordings, archiveRecording, restoreRecording, trashRecording } from '../lib/api.js';
 
 vi.mock('../lib/auth.js', () => ({
   getValidAccessToken: vi.fn().mockResolvedValue('test-token')
@@ -64,13 +64,13 @@ describe('Recordings API', () => {
     });
   });
 
-  describe('unarchiveRecording', () => {
-    it('should unarchive a recording', async () => {
-      await expect(unarchiveRecording(1, 100)).resolves.toBeUndefined();
+  describe('restoreRecording', () => {
+    it('should restore a recording', async () => {
+      await expect(restoreRecording(1, 100)).resolves.toBeUndefined();
     });
 
-    it('should handle unarchive errors', async () => {
-      await expect(unarchiveRecording(999, 999)).rejects.toThrow();
+    it('should handle restore errors', async () => {
+      await expect(restoreRecording(999, 999)).rejects.toThrow();
     });
   });
 

@@ -17,7 +17,7 @@
   },
   "type": "module",
   "scripts": {
-    "build": "tsup src/index.ts src/mcp.ts --format esm --dts --clean",
+    "build": "tsup",
     "dev": "tsup src/index.ts --format esm --watch",
     "mcp": "bun run src/mcp.ts",
     "test": "vitest run",
