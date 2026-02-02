@@ -29,10 +29,14 @@
   "keywords": [
     "basecamp",
     "cli",
+    "mcp",
+    "ai",
     "project-management",
     "todos",
     "37signals"
   ],
+  "homepage": "https://github.com/drkraft/basecamp-cli#readme",
+  "bugs": "https://github.com/drkraft/basecamp-cli/issues",
   "author": "drkraft",
   "license": "MIT",
   "repository": {
