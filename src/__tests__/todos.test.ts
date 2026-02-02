@@ -163,13 +163,6 @@ describe('Todos API', () => {
 
   describe('createTodo', () => {
     it('should create a new todo', async () => {
-      const newTodo = {
-        content: 'New Todo',
-        description: 'Description here',
-        due_on: '2024-03-01',
-        assignee_ids: [1],
-      };
-
       server.use(
         http.post(
           `https://3.basecampapi.com/:accountId/buckets/:projectId/todolists/:todolistId/todos.json`,
@@ -189,7 +182,11 @@ describe('Todos API', () => {
         )
       );
 
-      const todo = await createTodo(PROJECT_ID, TODOLIST_ID, newTodo);
+      const todo = await createTodo(PROJECT_ID, TODOLIST_ID, 'New Todo', {
+        description: 'Description here',
+        due_on: '2024-03-01',
+        assignee_ids: [1],
+      });
 
       expect(todo.id).toBe(2001);
       expect(todo.content).toBe('New Todo');
@@ -214,9 +211,7 @@ describe('Todos API', () => {
         )
       );
 
-      const todo = await createTodo(PROJECT_ID, TODOLIST_ID, {
-        content: 'Simple Todo',
-      });
+      const todo = await createTodo(PROJECT_ID, TODOLIST_ID, 'Simple Todo');
 
       expect(todo.id).toBe(2002);
       expect(todo.content).toBe('Simple Todo');
@@ -382,9 +377,7 @@ describe('Todos Edge Cases', () => {
       )
     );
 
-    const todo = await createTodo(PROJECT_ID, TODOLIST_ID, {
-      content: specialContent,
-    });
+    const todo = await createTodo(PROJECT_ID, TODOLIST_ID, specialContent);
 
     expect(todo.content).toBe(specialContent);
   });

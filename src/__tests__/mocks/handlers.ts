@@ -497,8 +497,8 @@ export const handlers = [
     if (projectId === 1) {
       return HttpResponse.json({
         id: projectId,
-        name: 'Schedule Project',
-        description: 'Project with schedule enabled',
+        name: 'Test Project',
+        description: 'Project with all tools enabled',
         status: 'active',
         purpose: 'topic',
         clients_enabled: false,
@@ -526,6 +526,24 @@ export const handlers = [
             position: 2,
             url: mockSchedule.url,
             app_url: mockSchedule.app_url
+          },
+          {
+            id: 50,
+            title: 'To-dos',
+            name: 'todoset',
+            enabled: true,
+            position: 3,
+            url: `https://3.basecampapi.com/195539477/buckets/${projectId}/todosets/50.json`,
+            app_url: `https://3.basecamp.com/195539477/buckets/${projectId}/todosets/50`
+          },
+          {
+            id: 3000,
+            title: 'Message Board',
+            name: 'message_board',
+            enabled: true,
+            position: 4,
+            url: `https://3.basecampapi.com/195539477/buckets/${projectId}/message_boards/3000.json`,
+            app_url: `https://3.basecamp.com/195539477/buckets/${projectId}/message_boards/3000`
           }
         ]
       });
