@@ -2,7 +2,7 @@
 name: basecamp-cli
 description: CLI and MCP server for Basecamp 4. Use when you need to interact with Basecamp projects, todos, messages, schedules, kanban cards, documents, or campfires. Provides 76 MCP tools for AI-driven project management workflows.
 mcp: true
-metadata: {"openclaw":{"emoji":"🏕️","homepage":"https://github.com/drkraft/basecamp-cli","primaryEnv":"BASECAMP_CLIENT_SECRET","requires":{"bins":["basecamp-mcp"],"env":["BASECAMP_CLIENT_SECRET"]},"install":[{"id":"npm","kind":"node","package":"@drkraft/basecamp-cli","bins":["basecamp","basecamp-mcp"],"label":"Install @drkraft/basecamp-cli (npm)","global":true}]}}
+metadata: {"openclaw":{"emoji":"🏕️","homepage":"https://github.com/drkraft/basecamp-cli","primaryEnv":"BASECAMP_CLIENT_SECRET","requires":{"bins":["basecamp-mcp"],"env":["BASECAMP_CLIENT_ID","BASECAMP_CLIENT_SECRET"]},"install":[{"id":"npm","kind":"node","package":"@drkraft/basecamp-cli","bins":["basecamp","basecamp-mcp"],"label":"Install @drkraft/basecamp-cli (npm)","global":true}]}}
 ---
 
 # Basecamp CLI
@@ -22,6 +22,10 @@ Full-featured CLI and MCP server for Basecamp 4 API.
 npm install -g @drkraft/basecamp-cli
 ```
 
+## Requirements
+
+- Node.js >= 18
+
 ## Authentication Setup
 
 1. Create an OAuth app at https://launchpad.37signals.com/integrations
@@ -30,6 +34,7 @@ npm install -g @drkraft/basecamp-cli
 ```bash
 basecamp auth configure --client-id <your-client-id>
 export BASECAMP_CLIENT_SECRET="<your-client-secret>"
+export BASECAMP_CLIENT_ID="<your-client-id>"
 ```
 3. Login:
 ```bash
@@ -46,6 +51,7 @@ Add to your MCP config (e.g., `~/.config/claude/claude_desktop_config.json`):
     "basecamp": {
       "command": "basecamp-mcp",
       "env": {
+        "BASECAMP_CLIENT_ID": "<your-client-id>",
         "BASECAMP_CLIENT_SECRET": "<your-client-secret>"
       }
     }
