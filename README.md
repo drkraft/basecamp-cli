@@ -4,6 +4,7 @@ A comprehensive command-line interface and MCP server for Basecamp 4. Manage pro
 
 [![npm version](https://badge.fury.io/js/%40drkraft%2Fbasecamp-cli.svg)](https://www.npmjs.com/package/@drkraft/basecamp-cli)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![codecov](https://codecov.io/gh/drkraft/basecamp-cli/branch/main/graph/badge.svg)](https://codecov.io/gh/drkraft/basecamp-cli)
 
 ## Features
 
