@@ -4,3 +4,7 @@ dist/
 .env
 .env.local
 .DS_Store
+.clawdhub/
+.sisyphus/
+.tmp/
+bun.lock
