@@ -13,8 +13,8 @@
     "access": "public"
   },
   "bin": {
-    "basecamp": "./dist/index.js",
-    "basecamp-mcp": "./dist/mcp.js"
+    "basecamp": "dist/index.js",
+    "basecamp-mcp": "dist/mcp.js"
   },
   "type": "module",
   "scripts": {
