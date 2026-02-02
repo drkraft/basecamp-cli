@@ -166,11 +166,6 @@ describe('Projects API', () => {
 
   describe('createProject', () => {
     it('should create a new project', async () => {
-      const newProject = {
-        name: 'New Project',
-        description: 'Project description',
-      };
-
       server.use(
         http.post(
           `https://3.basecampapi.com/:accountId/projects.json`,
@@ -189,7 +184,7 @@ describe('Projects API', () => {
         )
       );
 
-      const project = await createProject(newProject);
+      const project = await createProject('New Project', 'Project description');
 
       expect(project.id).toBe(100);
       expect(project.name).toBe('New Project');
@@ -215,7 +210,7 @@ describe('Projects API', () => {
         )
       );
 
-      const project = await createProject({ name: 'Minimal Project' });
+      const project = await createProject('Minimal Project');
 
       expect(project.id).toBe(101);
       expect(project.name).toBe('Minimal Project');
@@ -244,7 +239,7 @@ describe('Projects Edge Cases', () => {
       )
     );
 
-    const project = await createProject({ name: specialName });
+    const project = await createProject(specialName);
 
     expect(project.name).toBe(specialName);
   });
@@ -269,7 +264,7 @@ describe('Projects Edge Cases', () => {
       )
     );
 
-    const project = await createProject({ name: unicodeName });
+    const project = await createProject(unicodeName);
 
     expect(project.name).toBe(unicodeName);
   });

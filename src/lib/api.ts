@@ -943,3 +943,16 @@ export async function testWebhook(projectId: number, webhookId: number): Promise
   const client = await createClient();
   await client.post(`buckets/${projectId}/webhooks/${webhookId}/test.json`, { json: {} });
 }
+
+export const listTodolists = listTodoLists;
+export const getTodolist = getTodoList;
+export const createTodolist = (projectId: number, options: { name: string; description?: string }) =>
+  createTodoList(projectId, options.name, options.description);
+
+export async function deleteTodo(projectId: number, todoId: number): Promise<void> {
+  return trashRecording(projectId, todoId);
+}
+
+export async function deleteTodolist(projectId: number, todolistId: number): Promise<void> {
+  return trashRecording(projectId, todolistId);
+}
