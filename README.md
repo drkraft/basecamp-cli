@@ -25,6 +25,10 @@ Or with bun:
 bun add -g @drkraft/basecamp-cli
 ```
 
+## Requirements
+
+- Node.js >= 18
+
 ## Quick Start
 
 ### 1. Create a Basecamp Integration
@@ -288,7 +292,11 @@ Add to your MCP configuration:
 {
   "mcpServers": {
     "basecamp": {
-      "command": "basecamp-mcp"
+      "command": "basecamp-mcp",
+      "env": {
+        "BASECAMP_CLIENT_ID": "<your-client-id>",
+        "BASECAMP_CLIENT_SECRET": "<your-client-secret>"
+      }
     }
   }
 }
