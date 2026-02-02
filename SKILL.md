@@ -24,7 +24,7 @@ npm install -g @drkraft/basecamp-cli
 
 ## Requirements
 
-- Node.js >= 18
+- Node.js >= 20
 
 ## Authentication Setup
 
